@@ -151,8 +151,8 @@ dev 模式由 Vite proxy 转发：
 server: {
   port: 5173,
   proxy: {
-    '/api': { target: 'http://localhost:3001', changeOrigin: true },
-    '/healthz': { target: 'http://localhost:3001', changeOrigin: true },
+    '/api': { target: 'http://localhost:9494', changeOrigin: true },
+    '/healthz': { target: 'http://localhost:9494', changeOrigin: true },
   },
 }
 ```

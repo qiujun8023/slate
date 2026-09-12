@@ -43,7 +43,7 @@ const BooleanEnv = z.union([z.boolean(), z.string()]).transform((value, ctx) => 
 export const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
-  PORT: z.coerce.number().int().positive().default(3001),
+  PORT: z.coerce.number().int().positive().default(9494),
   DATABASE_URL: DatabaseUrl,
   JWT_SECRET: JwtSecret,
   JWT_EXPIRATION: JwtExpiration.default('7d'),

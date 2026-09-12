@@ -307,7 +307,7 @@ button.primary .arrow { font-family: ui-monospace, monospace; font-size: 16px; l
                value="{{SERVER_URL}}"
                placeholder="https://slate.your-domain.com">
       </label>
-      <p class="hint">填运行 slate 后端的地址。本地调试用 http://&lt;LAN-IP&gt;:3001 即可。</p>
+      <p class="hint">填运行 slate 后端的地址。本地调试用 http://&lt;LAN-IP&gt;:9494 即可。</p>
     </section>
 
     <button type="submit" class="primary" id="btn">

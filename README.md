@@ -144,8 +144,8 @@ bun run --cwd backend prisma:migrate
 运行开发服务：
 
 ```bash
-bun run dev:backend     # http://localhost:3001
-bun run dev:frontend    # http://localhost:5173，Vite proxy /api 与 /healthz 到 :3001
+bun run dev:backend     # http://localhost:9494
+bun run dev:frontend    # http://localhost:5173，Vite proxy /api 与 /healthz 到 :9494
 ```
 
 首次访问 `http://localhost:5173/register` 注册账号。
@@ -203,10 +203,10 @@ openssl rand -hex 64   # 填 JWT_SECRET
 mkdir -p slate/blobs mysql
 sudo chown -R 1000:1000 slate
 docker compose up -d
-curl -fsS http://localhost:3001/healthz
+curl -fsS http://localhost:9494/healthz
 ```
 
-健康后访问 `http://<host>:3001/register` 注册第一个账号。
+健康后访问 `http://<host>:9494/register` 注册第一个账号。
 
 持久化目录：
 

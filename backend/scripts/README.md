@@ -41,7 +41,7 @@ environment:
   - SLATE_JOB=sub2api-usage-stats
   - SLATE_JOB_INTERVAL_SECONDS=600
   - SLATE_JOB_TIME_ZONE=Asia/Shanghai
-  - SLATE_API_BASE=http://slate:3001
+  - SLATE_API_BASE=http://slate:9494
 ```
 
 `SLATE_JOB_INTERVAL_SECONDS` 默认 600。`SLATE_JOB_RUN_ONCE=1` 只执行一次后退出，适合临时验证。新增临时 job 只需要新增 `scripts/jobs/<name>.ts`，不需要改中心注册表。
@@ -63,7 +63,7 @@ SLATE_RUN_MODE=job
 SLATE_JOB=sub2api-usage-stats
 SLATE_JOB_INTERVAL_SECONDS=600
 SLATE_JOB_TIME_ZONE=Asia/Shanghai
-SLATE_API_BASE=http://slate:3001
+SLATE_API_BASE=http://slate:9494
 SUB2API_BASE=https://sub2api.example.com
 SUB2API_CONTENT_ID=slate_dashboard_content_id
 SUB2API_EMAIL=you@example.com
@@ -88,7 +88,7 @@ services:
       SLATE_JOB: sub2api-usage-stats
       SLATE_JOB_INTERVAL_SECONDS: '600'
       SLATE_JOB_TIME_ZONE: Asia/Shanghai
-      SLATE_API_BASE: http://slate:3001
+      SLATE_API_BASE: http://slate:9494
       SUB2API_BASE: https://sub2api.example.com
       SUB2API_CONTENT_ID: slate_dashboard_content_id
       SUB2API_EMAIL: you@example.com

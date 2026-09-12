@@ -411,7 +411,7 @@ TTS 使用 OpenAI-compatible `/chat/completions`，请求 `audio: { format: 'pcm
 | --- | --- | --- |
 | `NODE_ENV` | `development` | `development` / `production` / `test` |
 | `LOG_LEVEL` | `info` | `debug` / `info` / `warn` / `error` |
-| `PORT` | `3001` | HTTP 监听端口 |
+| `PORT` | `9494` | HTTP 监听端口 |
 | `DATABASE_URL` | 无 | 必填，`mysql://user:pwd@host:3306/db` |
 | `DB_ALLOW_PUBLIC_KEY_RETRIEVAL` | `false` | 本地 MySQL `caching_sha2_password` 无 TLS 时通常需设 `true` |
 | `JWT_SECRET` | 无 | 必填，至少 32 字符，且需满足基础熵检查 |
@@ -482,7 +482,7 @@ Compose 会注入：
 ```text
 DATABASE_URL=mysql://slate:${MYSQL_PASSWORD}@mysql:3306/slate
 NODE_ENV=production
-PORT=${PORT:-3001}
+PORT=${PORT:-9494}
 BLOB_DIR=/data/blobs
 ```
 

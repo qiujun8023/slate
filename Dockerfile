@@ -24,7 +24,7 @@ FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    PORT=3001 \
+    PORT=9494 \
     BLOB_DIR=/data/blobs
 
 # 依赖：
@@ -75,7 +75,7 @@ RUN chmod +x /app/entrypoint.sh
 
 USER bun
 
-EXPOSE 3001
+EXPOSE 9494
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD [ "${SLATE_RUN_MODE:-server}" != "server" ] || wget --spider -q "http://127.0.0.1:${PORT}/healthz" || exit 1
