@@ -13,7 +13,7 @@
     },
     "backend": {
       "name": "backend",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@fastify/cookie": "^11",
         "@fastify/multipart": "^9",
@@ -51,7 +51,7 @@
     },
     "frontend": {
       "name": "frontend",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/sortable": "^10.0.0",
@@ -89,7 +89,7 @@
     },
     "shared": {
       "name": "shared",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "zod": "^4.4.3",
       },
