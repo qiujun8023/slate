@@ -11,7 +11,7 @@
  *   2. 自动读取 ~/.claude/.credentials.json 中的 accessToken
  *
  * 环境变量：
- *   SLATE_API_BASE          Slate 后端地址，如 http://localhost:3000
+ *   SLATE_API_BASE          Slate 后端地址，如 http://localhost:9494
  *   CLAUDE_QUOTA_CONTENT_ID Slate 中 ai_quota_monitor 类型动态帧的 contentId
  *   ANTHROPIC_API_KEY       （可选）Anthropic API key 或 OAuth token
  *   ANTHROPIC_API_BASE      （可选）API 地址，默认 https://api.anthropic.com

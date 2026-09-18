@@ -1,112 +1,70 @@
 # Backend Scripts
 
-`backend/scripts/` 只放随 Slate 代码一起版本管理的辅助程序。可选临时 dashboard 推送任务走统一 job runner；一次性维护、调试、字体生成脚本保留真实路径，不提供旧入口兼容。
-
-## 目录
-
 ```text
 scripts/
-├── job-runner.ts                  Docker sidecar / cron-like job 入口
-├── jobs/                          可选临时 dashboard 推送任务
-│   ├── sub2api-usage-stats.ts     Sub2API 用量统计 -> ai_usage_stats
-│   └── claude-code-quota-monitor.ts Claude Code 限额 -> ai_quota_monitor
-├── lib/                           job 共享 env / HTTP / Slate ingest helper
-├── helpers/                       维护脚本共享 Nest bootstrap 和日志 helper
-├── maintenance/                   一次性创建或修正内容组
-├── fonts/                         位图字体提取和生成工具
-└── debug/                         本地渲染调试
+├── job-runner.ts     job 入口，Docker 中 SLATE_RUN_MODE=job 时运行
+├── jobs/             dashboard 数据推送任务
+├── lib/              job 共用的环境变量、HTTP、推送 helper
+├── helpers/          维护脚本共用的 Nest 启动与日志
+├── maintenance/      一次性创建内容组
+├── fonts/            位图字体提取与生成
+└── debug/            本地渲染调试
 ```
 
-## Job Runner
+## Job
 
-本地单次运行：
+`SLATE_JOB=<name>` 会加载 `jobs/<name>.ts` 导出的 `job`。新增 job 只需新建文件，无需注册。
+
+| 变量 | 默认 | 说明 |
+| --- | --- | --- |
+| `SLATE_JOB` | — | 必填，job 文件名 |
+| `SLATE_API_BASE` | — | 必填，Slate 地址，如 `http://slate:9494` |
+| `SLATE_JOB_INTERVAL_SECONDS` | `600` | 循环间隔 |
+| `SLATE_JOB_RUN_ONCE` | — | 设为 `1` 时只运行一次 |
+| `SLATE_JOB_TIME_ZONE` | `Asia/Shanghai` | 时间显示用的时区 |
+
+本地运行一次：
 
 ```bash
 cd backend
 SLATE_JOB=sub2api-usage-stats SLATE_JOB_RUN_ONCE=1 bun run scripts/job-runner.ts
 ```
 
-长期循环运行：
-
-```bash
-cd backend
-SLATE_JOB=sub2api-usage-stats SLATE_JOB_INTERVAL_SECONDS=600 bun run scripts/job-runner.ts
-```
-
-生产 Docker 通过 `SLATE_RUN_MODE=job` 进入 job runner。`SLATE_JOB=<name>` 会动态加载 `scripts/jobs/<name>.ts`，该文件导出 `job` 或 default `SlateJob`：
-
-```yaml
-environment:
-  - SLATE_RUN_MODE=job
-  - SLATE_JOB=sub2api-usage-stats
-  - SLATE_JOB_INTERVAL_SECONDS=600
-  - SLATE_JOB_TIME_ZONE=Asia/Shanghai
-  - SLATE_API_BASE=http://slate:9494
-```
-
-`SLATE_JOB_INTERVAL_SECONDS` 默认 600。`SLATE_JOB_RUN_ONCE=1` 只执行一次后退出，适合临时验证。新增临时 job 只需要新增 `scripts/jobs/<name>.ts`，不需要改中心注册表。
-
-## Sub2API Usage Stats
-
-`sub2api-usage-stats` 使用 Sub2API 的用户登录接口：
-
-- `POST /api/v1/auth/login`，body 为 `email` 和 `password`。
-- 登录返回 `access_token`、`refresh_token`、`expires_in`。
-- access token 只缓存在当前进程内；到期前复用，不落盘。
-- access token 过期后优先用 `POST /api/v1/auth/refresh` 轮转 refresh token；refresh 失败才重新用账号密码登录。
-- 2FA / Turnstile 登录不属于这个自动化任务的支持范围。
-
-所需环境变量：
-
-```text
-SLATE_RUN_MODE=job
-SLATE_JOB=sub2api-usage-stats
-SLATE_JOB_INTERVAL_SECONDS=600
-SLATE_JOB_TIME_ZONE=Asia/Shanghai
-SLATE_API_BASE=http://slate:9494
-SUB2API_BASE=https://sub2api.example.com
-SUB2API_CONTENT_ID=slate_dashboard_content_id
-SUB2API_EMAIL=you@example.com
-SUB2API_PASSWORD=change_me
-```
-
-Sub2API 的 refresh token 是按会话单独存储和撤销的，多端登录可以并存。这个 job 不会每轮重新登录，正常情况下只在首次启动、refresh 失败或进程重启后用账号密码登录。
-
-## Compose 配置边界
-
-临时 job sidecar 的配置直接写在部署现场 compose 的该 job service `environment` 中；不要把外部系统账号密码混入主服务环境，也不要把特定临时 job 放进 release 用根 `compose.yml`。
-
-示例：
+部署时在自己的 compose 里加一个 sidecar，复用 Slate 镜像。外部系统的账号只写在这个 service 里，不要放进 Slate 主服务的 `.env`，也不要加到仓库的 `compose.yml`：
 
 ```yaml
 services:
-  slate-sub2api-usage-stats:
+  slate-sub2api-stats:
     image: ghcr.io/qiujun8023/slate:latest
     restart: unless-stopped
     environment:
       SLATE_RUN_MODE: job
       SLATE_JOB: sub2api-usage-stats
-      SLATE_JOB_INTERVAL_SECONDS: '600'
-      SLATE_JOB_TIME_ZONE: Asia/Shanghai
       SLATE_API_BASE: http://slate:9494
       SUB2API_BASE: https://sub2api.example.com
-      SUB2API_CONTENT_ID: slate_dashboard_content_id
+      SUB2API_CONTENT_ID: <dashboard 内容 ID>
       SUB2API_EMAIL: you@example.com
       SUB2API_PASSWORD: change_me
 ```
 
-这些具体 job 的 compose 片段属于部署现场配置，不放进 release 文档或根 `compose.yml`。
+### sub2api-usage-stats
 
-## Maintenance / Debug / Fonts
+把 Sub2API 用量推送到 `ai_usage_stats` 模板的 dashboard。需要 `SUB2API_BASE`、`SUB2API_CONTENT_ID`、`SUB2API_EMAIL`、`SUB2API_PASSWORD`。
 
-这些脚本需要显式路径运行：
+用账号密码登录，access token 只缓存在进程内，过期后用 refresh token 续期，续期失败或进程重启才重新登录。不支持 2FA / Turnstile。
+
+### claude-code-quota-monitor
+
+把 Claude Code 限额推送到 `ai_quota_monitor` 模板的 dashboard。需要 `CLAUDE_QUOTA_CONTENT_ID`；可选 `ANTHROPIC_API_KEY`（默认读取 `~/.claude/.credentials.json`）、`ANTHROPIC_API_BASE`、`CLAUDE_PLAN_LABEL`。
+
+也可以直接配成 Claude Code 的 statusLine 命令：从 stdin 读取限额，输出状态栏并在后台推送，推送频率由 `CLAUDE_QUOTA_PUSH_INTERVAL_MS` 控制（默认 60000）。
+
+## 其他脚本
+
+在 `backend/` 下直接运行，例如：
 
 ```bash
 bun run scripts/maintenance/create-hot-list-group.ts
-bun run scripts/maintenance/create-font-test-group.ts
-bun run scripts/maintenance/create-vehicle-group.ts
 bun run scripts/debug/render-dynamic-debug.ts
 bash scripts/fonts/generate-font-test-assets.sh
 ```
-
-它们不是 Docker entrypoint 的运行模式。需要以 sidecar 运行时才新增到 `jobs/`，并让部署现场通过 `SLATE_JOB=<name>` 选择。

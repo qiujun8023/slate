@@ -3,16 +3,17 @@
 #
 # 首次启动:
 #   1. 创建 .env，至少设置 JWT_SECRET 和 MYSQL_PASSWORD
-#   2. docker compose up -d
-#   3. 浏览器访问 http://localhost:9494/register 注册第一个账号
+#   2. mkdir -p slate mysql && sudo chown -R 1000:1000 slate   # 容器以 uid 1000 运行
+#   3. docker compose up -d
+#   4. 浏览器访问 http://localhost:9494/register 注册第一个账号
 #
 # 升级:
 #   docker compose pull && docker compose up -d
 #
-# 持久化目录(compose 启动后会在 cwd 自动创建):
-#   ./slate/blobs/   frame image + audio,容器内 /data/blobs
+# 持久化目录:
+#   ./slate/blobs/   图片与音频,容器内 /data/blobs
 #   ./mysql/         MySQL datadir
-# 备份建议:每天 mysqldump + tar ./slate/blobs。
+# 备份:mysqldump + 打包 ./slate/blobs。
 
 services:
   slate:
@@ -30,12 +31,9 @@ services:
       - .env
     environment:
       - DATABASE_URL=mysql://slate:${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}@mysql:3306/slate
-      - NODE_ENV=production
-      - PORT=${PORT:-9494}
-      - BLOB_DIR=/data/blobs
 
   mysql:
-    image: mysql:8
+    image: mysql:8.4
     container_name: slate-mysql
     restart: unless-stopped
     environment:
