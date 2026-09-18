@@ -31,9 +31,9 @@ describe('EnvSchema', () => {
     );
   });
 
-  it('defaults public key retrieval to disabled', () => {
+  it('defaults public key retrieval to enabled', () => {
     const parsed = EnvSchema.parse(baseEnv);
 
-    expect(parsed.DB_ALLOW_PUBLIC_KEY_RETRIEVAL).toBe(false);
+    expect(parsed.DB_ALLOW_PUBLIC_KEY_RETRIEVAL).toBe(true);
   });
 });

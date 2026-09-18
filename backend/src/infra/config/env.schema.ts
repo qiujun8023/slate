@@ -48,7 +48,7 @@ export const EnvSchema = z.object({
   JWT_SECRET: JwtSecret,
   JWT_EXPIRATION: JwtExpiration.default('7d'),
   BLOB_DIR: z.string().default('./blobs'),
-  DB_ALLOW_PUBLIC_KEY_RETRIEVAL: BooleanEnv.default(false),
+  DB_ALLOW_PUBLIC_KEY_RETRIEVAL: BooleanEnv.default(true),
   QWEATHER_API_KEY: OptionalEnv(z.string().min(1)),
   QWEATHER_API_HOST: OptionalEnv(z.string().url()),
   AI_API_KEY: OptionalEnv(z.string().min(1)),
