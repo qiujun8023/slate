@@ -1,22 +1,28 @@
 dependencies:
   78/esp-ml307:
-    component_hash: 5231991281a2f48f0e34ec705c2982936264d8b14f6f9373e60b153fd4b62123
+    component_hash: b364afdf01f9c0c037b239d36d77ca7ebe2c435d6b7dde0d293923ad45a3c8db
     dependencies:
     - name: 78/uart-uhci
       registry_url: https://components.espressif.com
       require: private
       rules:
       - if: target not in [esp32]
-      version: ~0.2.1
+      version: ^0.3.2
+    - matches:
+      - if: idf_version >=6.0
+      name: espressif/mqtt
+      registry_url: https://components.espressif.com
+      require: private
+      version: ^1.0.0
     - name: idf
       require: private
       version: '>=5.5.2'
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 3.6.5
+    version: 3.6.7
   78/uart-uhci:
-    component_hash: d33e4cd9f634a561bfddcad79be6fa30f0ee279a9e4d1a2df91eabccbca5d362
+    component_hash: 0e391c695621ac725506166b908146a02e9cff26e6d36f8e43e7e63b5b1d200f
     dependencies:
     - name: idf
       require: private
@@ -24,9 +30,9 @@ dependencies:
     source:
       registry_url: https://components.espressif.com
       type: service
-    version: 0.2.2
+    version: 0.3.3
   espressif/button:
-    component_hash: d0afa32f0e50d60bc0c6fc23f7eea98adc6b02cfe70b590bc52c23c506745287
+    component_hash: 7cb7e2944b5828f409af0c92f7fcc0e2d405de09c3325b7ee4a0eba5fb28dfdc
     dependencies:
     - name: espressif/cmake_utilities
       registry_url: https://components.espressif.com
@@ -38,7 +44,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 4.1.6
+    version: 4.2.2
   espressif/cmake_utilities:
     component_hash: 05165f30922b422b4b90c08845e6d449329b97370fbd06309803d8cb539d79e3
     dependencies:
@@ -50,7 +56,7 @@ dependencies:
       type: service
     version: 1.1.1
   espressif/esp_audio_codec:
-    component_hash: af4663830bc73eca58febcc34a976d003465e78ed57458aa00a14b231e392ca1
+    component_hash: a5b9275af74247e3ce536d16a7080e4d77207a185b63e1bea368eb4d57176c2b
     dependencies:
     - name: idf
       require: private
@@ -58,16 +64,20 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 2.4.1
+    version: 2.6.2
   espressif/esp_audio_effects:
-    component_hash: 8fa2bf7356a3c7fb9a9c7d2185aba474fa033b0506886c70752f67c42cd81b3f
-    dependencies: []
+    component_hash: a7f3625a9a49849afe5c98a9469da58ec3176c8901c908086cb4d8d7886e54e1
+    dependencies:
+    - name: espressif/gmf_fft
+      registry_url: https://components.espressif.com
+      require: private
+      version: ~1.1
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.2.1
+    version: 1.4.3
   espressif/esp_codec_dev:
-    component_hash: 896c67360ae1f8dedaf8a53dfe48c015317fa455f061a5165307892296990028
+    component_hash: 4779f31a3ba3f9b38aee1afe6ccb9ba8f6108dc3a6e77d39d7d714e9a215371b
     dependencies:
     - name: idf
       require: private
@@ -75,13 +85,13 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.5.10
+    version: 1.6.2
   espressif/esp_lvgl_port:
-    component_hash: b6360960f47b6776462e7092861b3ea66477ffb762a01baa0aecbb3d74cd50f4
+    component_hash: d3c020b45c3dfc0d1706a83b63a1c34a6eb444a6e935f9afff79f92b7b94dcef
     dependencies:
     - name: idf
       require: private
-      version: '>=5.1'
+      version: '>=5.2'
     - name: lvgl/lvgl
       registry_url: https://components.espressif.com
       require: public
@@ -89,21 +99,28 @@ dependencies:
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 2.7.2
+    version: 2.9.0
+  espressif/gmf_fft:
+    component_hash: de42f5953b90989ca6588bacd69b0908c7265f4f1eaea8b1d3f163e705661bd4
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.1.0
   idf:
     source:
       type: idf
-    version: 5.5.2
+    version: 5.5.6
   joltwallet/littlefs:
-    component_hash: add3caf39a265868f70e55f17e8bfb401f200e45a601dc392832e7ac2c1487bc
+    component_hash: e1a0f4a6adf821759cb34703a91107bbdce5d7ff6f4728f40ab012bb87842974
     dependencies:
     - name: idf
       require: private
-      version: '>=4.3'
+      version: '>=5.0'
     source:
       registry_url: https://components.espressif.com/
       type: service
-    version: 1.16.4
+    version: 1.23.1
   lvgl/lvgl:
     component_hash: 184e532558c1c45fefed631f3e235423d22582aafb4630f3e8885c35281a49ae
     dependencies: []
@@ -121,6 +138,6 @@ direct_dependencies:
 - idf
 - joltwallet/littlefs
 - lvgl/lvgl
-manifest_hash: eab6b31acd589e52bd9abd0363b6cc63892211cf79f4b96589fa6b3011be8d44
+manifest_hash: b8d519fbe8902e4946b98eb4fbd47b8fdba3d08165938459714a23132ffc2fa3
 target: esp32s3
 version: 2.0.0

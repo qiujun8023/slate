@@ -1,12 +1,12 @@
 ## ESP-IDF Component Manager Manifest
 dependencies:
-  espressif/button: ~4.1.5            # iot_button
-  espressif/esp_codec_dev: ~1.5.6     # ES8311 codec runtime
-  78/esp-ml307: ~3.6.5                # Xiaozhi MQTT/UDP/WebSocket transport
-  espressif/esp_audio_codec: ~2.4.1   # Opus codec
-  espressif/esp_audio_effects: ~1.2.1 # Downlink resampler
+  espressif/button: ~4.2.2            # iot_button
+  espressif/esp_codec_dev: ~1.6.2     # ES8311 codec runtime
+  78/esp-ml307: ~3.6.7                # Xiaozhi MQTT/UDP/WebSocket transport
+  espressif/esp_audio_codec: ~2.6.2   # Opus codec
+  espressif/esp_audio_effects: ~1.4.3 # Downlink resampler
   lvgl/lvgl: ~9.5.0                   # 黑白 EPD UI
-  espressif/esp_lvgl_port: ~2.7.2     # lvgl tick / lock helpers
-  joltwallet/littlefs: ~1.16.0        # M2.1 LittleFS 文件系统(缓存 frame/audio)
+  espressif/esp_lvgl_port: ~2.9.0     # lvgl tick / lock helpers
+  joltwallet/littlefs: ~1.23.1        # M2.1 LittleFS 文件系统(缓存 frame/audio)
   idf:
     version: ">=5.5"
