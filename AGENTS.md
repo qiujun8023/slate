@@ -9,6 +9,7 @@
 - 前端 UI 改动遵守 `frontend/README.md` 的 Mono Press 设计系统。
 - 固件改动涉及分区表、NVS、同步协议或 OTA 时，在最终说明里写明风险和验证结果。
 - 大改后运行 CONTRIBUTING.md 中的提交前检查。
+- 固件的 ESP-IDF 环境由 `firmware/.envrc`（本地文件，不入库）通过 direnv 加载，在 `firmware/` 下直接运行 `idf.py`。`idf.py monitor` 是交互式命令，agent 会话中用本机的 `esp-log <秒数>` 抓串口日志。
 
 ## 提交
 
