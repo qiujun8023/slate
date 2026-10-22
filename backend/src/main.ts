@@ -15,7 +15,11 @@ const bootstrapLogger = new NestLogger('Bootstrap');
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ trustProxy: 1, bodyLimit: 32 * 1024 * 1024 }),
+    // 只信任本机和内网的反代，公网直连的客户端不能用 X-Forwarded-For 伪造 IP 绕过限流
+    new FastifyAdapter({
+      trustProxy: ['loopback', 'linklocal', 'uniquelocal'],
+      bodyLimit: 32 * 1024 * 1024,
+    }),
     { bufferLogs: true }
   );
   app.useLogger(app.get(PinoLogger));
