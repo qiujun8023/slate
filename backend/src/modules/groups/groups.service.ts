@@ -502,14 +502,14 @@ async function bulkSetContentEtags(
   if (updates.length === 0) return;
   const ids = Prisma.join(updates.map((update) => update.id));
   await client.$executeRaw`
-    UPDATE \`contents\`
-    SET \`content_etag\` = CASE \`id\`
+    UPDATE "contents"
+    SET "content_etag" = CASE "id"
       ${Prisma.join(
         updates.map((update) => Prisma.sql`WHEN ${update.id} THEN ${update.etag}`),
         ' '
       )}
     END
-    WHERE \`id\` IN (${ids})
+    WHERE "id" IN (${ids})
   `;
 }
 
@@ -520,13 +520,13 @@ async function bulkSetGroupManifestEtags(
   if (updates.length === 0) return;
   const ids = Prisma.join(updates.map((update) => update.id));
   await client.$executeRaw`
-    UPDATE \`groups\`
-    SET \`manifest_etag\` = CASE \`id\`
+    UPDATE "groups"
+    SET "manifest_etag" = CASE "id"
       ${Prisma.join(
         updates.map((update) => Prisma.sql`WHEN ${update.id} THEN ${update.manifestEtag}`),
         ' '
       )}
     END
-    WHERE \`id\` IN (${ids})
+    WHERE "id" IN (${ids})
   `;
 }

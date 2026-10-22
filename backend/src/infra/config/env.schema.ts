@@ -10,12 +10,13 @@ const OptionalEnv = (schema: z.ZodString) =>
 const DatabaseUrl = z.string().refine(
   (value) => {
     try {
-      return new URL(value).protocol === 'mysql:';
+      const { protocol } = new URL(value);
+      return protocol === 'postgresql:' || protocol === 'postgres:';
     } catch {
       return false;
     }
   },
-  { message: 'DATABASE_URL must be a mysql:// connection string' }
+  { message: 'DATABASE_URL must be a postgresql:// connection string' }
 );
 
 const JwtSecret = z.string().min(32).refine(hasReasonableSecretEntropy, {
@@ -48,7 +49,6 @@ export const EnvSchema = z.object({
   JWT_SECRET: JwtSecret,
   JWT_EXPIRATION: JwtExpiration.default('7d'),
   BLOB_DIR: z.string().default('./blobs'),
-  DB_ALLOW_PUBLIC_KEY_RETRIEVAL: BooleanEnv.default(true),
   QWEATHER_API_KEY: OptionalEnv(z.string().min(1)),
   QWEATHER_API_HOST: OptionalEnv(z.string().url()),
   AI_API_KEY: OptionalEnv(z.string().min(1)),

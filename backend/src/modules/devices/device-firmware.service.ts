@@ -283,6 +283,6 @@ function throttleError(elapsedMs: number): ConflictError {
 
 async function lockDeviceMacRow(tx: Prisma.TransactionClient, mac: string): Promise<void> {
   await tx.$queryRaw<Array<{ id: string }>>`
-    SELECT id FROM \`devices\` WHERE mac = ${mac} FOR UPDATE
+    SELECT id FROM "devices" WHERE mac = ${mac} FOR UPDATE
   `;
 }

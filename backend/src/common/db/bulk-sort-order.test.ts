@@ -33,7 +33,7 @@ describe('bulk sort order helpers', () => {
       bulkSetDeviceSortOrder(tx as never, 'user-1', ['device-1'])
     ).resolves.toBeUndefined();
     expect(() =>
-      assertSortOrderIdentifiers('groups` SET sort_order = 0 --', 'owner_user_id')
+      assertSortOrderIdentifiers('groups" SET sort_order = 0 --', 'owner_user_id')
     ).toThrow(ValidationError);
     expect(() => assertSortOrderIdentifiers('groups', 'owner_user_id` = owner_user_id --')).toThrow(
       ValidationError

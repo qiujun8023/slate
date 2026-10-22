@@ -1,9 +1,9 @@
-# Slate 单机 docker compose 样例。开箱即用,自带 MySQL,适合自托管。
-# 生产部署用外部 MySQL 或反代时按需改造(去掉 mysql service,改 DATABASE_URL,加 traefik labels)。
+# Slate 单机 docker compose 样例。开箱即用,自带 PostgreSQL,适合自托管。
+# 生产部署用外部 PostgreSQL 或反代时按需改造(去掉 postgres service,改 DATABASE_URL,加 traefik labels)。
 #
 # 首次启动:
-#   1. 创建 .env，至少设置 JWT_SECRET 和 MYSQL_PASSWORD
-#   2. mkdir -p slate mysql && sudo chown -R 1000:1000 slate   # 容器以 uid 1000 运行
+#   1. 创建 .env，至少设置 JWT_SECRET 和 POSTGRES_PASSWORD
+#   2. mkdir -p slate postgres && sudo chown -R 1000:1000 slate   # 容器以 uid 1000 运行
 #   3. docker compose up -d
 #   4. 浏览器访问 http://localhost:9494/register 注册第一个账号
 #
@@ -12,8 +12,8 @@
 #
 # 持久化目录:
 #   ./slate/blobs/   图片与音频,容器内 /data/blobs
-#   ./mysql/         MySQL datadir
-# 备份:mysqldump + 打包 ./slate/blobs。
+#   ./postgres/      PostgreSQL 数据目录
+# 备份:pg_dump + 打包 ./slate/blobs。
 
 services:
   slate:
@@ -21,7 +21,7 @@ services:
     container_name: slate
     restart: unless-stopped
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     ports:
       - '9494:9494'
@@ -30,21 +30,20 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=mysql://slate:${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}@mysql:3306/slate
+      - DATABASE_URL=postgresql://slate:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/slate
 
-  mysql:
-    image: mysql:8.4
-    container_name: slate-mysql
+  postgres:
+    image: postgres:18-alpine
+    container_name: slate-postgres
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: slate
-      MYSQL_USER: slate
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      POSTGRES_DB: slate
+      POSTGRES_USER: slate
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     volumes:
-      - ./mysql:/var/lib/mysql
+      - ./postgres:/var/lib/postgresql
     healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -uslate -p$${MYSQL_PASSWORD}']
+      test: ['CMD-SHELL', 'pg_isready -U slate -d slate']
       interval: 5s
       timeout: 3s
       retries: 12

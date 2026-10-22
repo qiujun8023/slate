@@ -38,7 +38,7 @@ Slate（墨笺）是一个面向 400 × 300 黑白墨水屏的开源相框 / 信
 
 | 目录 | 内容 | 文档 |
 | --- | --- | --- |
-| `backend/` | Bun + NestJS 11 + Fastify + Prisma 7 + MySQL 8；API、设备协议、帧渲染、音频 | [backend/README.md](backend/README.md) |
+| `backend/` | Bun + NestJS 11 + Fastify + Prisma 7 + PostgreSQL 18；API、设备协议、帧渲染、音频 | [backend/README.md](backend/README.md) |
 | `frontend/` | React 19 + Vite 8 + Tailwind v4 Web 管理端 | [frontend/README.md](frontend/README.md) |
 | `shared/` | 前后端共享的 zod schema、动态内容配置、抖动与图像预处理 | [shared/README.md](shared/README.md) |
 | `firmware/` | ESP-IDF 5.5 固件，目标板 ZecTrix Note4（ESP32-S3 + 4.2" EPD） | [firmware/README.md](firmware/README.md) |
@@ -54,26 +54,26 @@ curl -fLO https://github.com/qiujun8023/slate/releases/latest/download/compose.y
 curl -fLo .env https://github.com/qiujun8023/slate/releases/latest/download/slate.env.example
 ```
 
-在 `.env` 里填写 `MYSQL_PASSWORD`（`openssl rand -hex 32`）和 `JWT_SECRET`（`openssl rand -hex 64`），按需填写天气、AI、TTS 配置。然后：
+在 `.env` 里填写 `POSTGRES_PASSWORD`（`openssl rand -hex 32`）和 `JWT_SECRET`（`openssl rand -hex 64`），按需填写天气、AI、TTS 配置。然后：
 
 ```bash
-mkdir -p slate mysql
+mkdir -p slate postgres
 sudo chown -R 1000:1000 slate   # 容器以 uid 1000 运行
 docker compose up -d
 ```
 
-打开 `http://<host>:9494/register` 注册第一个账号。数据在 `./slate`（图片、音频）和 `./mysql`。升级：`docker compose pull && docker compose up -d`。
+打开 `http://<host>:9494/register` 注册第一个账号。数据在 `./slate`（图片、音频）和 `./postgres`。升级：`docker compose pull && docker compose up -d`。
 
 镜像 tag：`latest` / `vX.Y.Z` / `X.Y` 为稳定版，`master` 为主干最新构建，`sha-<short>` 固定到某次提交。
 
 ## 本地开发
 
-需要 Bun 1.x、MySQL 8、ffmpeg；构建固件另需 ESP-IDF 5.5。
+需要 Bun 1.x、PostgreSQL 18、ffmpeg；构建固件另需 ESP-IDF 5.5。
 
 ```bash
-docker run -d --name slate-mysql -p 3306:3306 \
-  -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=slate \
-  -e MYSQL_USER=slate -e MYSQL_PASSWORD=slate mysql:8.4
+docker run -d --name slate-postgres -p 5432:5432 \
+  -e POSTGRES_DB=slate -e POSTGRES_USER=slate -e POSTGRES_PASSWORD=slate \
+  postgres:18-alpine
 
 bun install
 cp backend/.env.example backend/.env

@@ -1,24 +1,13 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { AppConfig } from '../config/app.config';
-
-function makeAdapter(databaseUrl: string, allowPublicKeyRetrieval: boolean): PrismaMariaDb {
-  const url = new URL(databaseUrl);
-  const hasPublicKeyRetrieval = [...url.searchParams.keys()].some(
-    (key) => key.toLowerCase() === 'allowpublickeyretrieval'
-  );
-  if (allowPublicKeyRetrieval && !hasPublicKeyRetrieval) {
-    url.searchParams.set('allowPublicKeyRetrieval', 'true');
-  }
-  return new PrismaMariaDb(url.toString());
-}
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(config: AppConfig) {
     super({
-      adapter: makeAdapter(config.databaseUrl, config.dbAllowPublicKeyRetrieval),
+      adapter: new PrismaPg({ connectionString: config.databaseUrl }),
       log: config.isProd ? ['error'] : ['warn', 'error'],
     });
   }

@@ -27,9 +27,6 @@ export class AppConfig {
   get blobDir() {
     return this.cs.get('BLOB_DIR', { infer: true });
   }
-  get dbAllowPublicKeyRetrieval() {
-    return this.cs.get('DB_ALLOW_PUBLIC_KEY_RETRIEVAL', { infer: true });
-  }
   get backgroundWorkers() {
     return this.cs.get('BACKGROUND_WORKERS', { infer: true });
   }

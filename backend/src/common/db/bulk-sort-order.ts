@@ -28,21 +28,21 @@ async function bulkSetSortOrder(
     throw new ValidationError('排序列表不能包含重复 ID', { code: 'order_duplicate' });
   }
   assertSortOrderIdentifiers(table, scopeColumn);
-  const tableSql = Prisma.raw(`\`${table}\``);
-  const scopeColSql = Prisma.raw(`\`${scopeColumn}\``);
+  const tableSql = Prisma.raw(`"${table}"`);
+  const scopeColSql = Prisma.raw(`"${scopeColumn}"`);
   const ids = Prisma.join(order);
   for (const stage of ['staging', 'final'] as const) {
     await tx.$executeRaw`
       UPDATE ${tableSql}
-      SET \`sort_order\` = CASE \`id\`
+      SET "sort_order" = CASE "id"
         ${Prisma.join(
           order.map(
-            (id, idx) => Prisma.sql`WHEN ${id} THEN ${stage === 'final' ? idx : -(idx + 1)}`
+            (id, idx) => Prisma.sql`WHEN ${id} THEN ${stage === 'final' ? idx : -(idx + 1)}::int`
           ),
           ' '
         )}
       END
-      WHERE ${scopeColSql} = ${scopeValue} AND \`id\` IN (${ids})
+      WHERE ${scopeColSql} = ${scopeValue} AND "id" IN (${ids})
     `;
   }
 }

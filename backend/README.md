@@ -1,6 +1,6 @@
 # Slate / Backend
 
-Bun 直接运行 TypeScript 的 NestJS 11（Fastify 5）服务，数据库为 MySQL 8（Prisma 7 + `@prisma/adapter-mariadb`）。单进程负责：
+Bun 直接运行 TypeScript 的 NestJS 11（Fastify 5）服务，数据库为 PostgreSQL 18（Prisma 7 + `@prisma/adapter-pg`）。单进程负责：
 
 - Web 管理 API（JWT）
 - 设备协议（`Authorization: Bearer <device_secret>`）
@@ -160,10 +160,9 @@ image-render-cache/{xx}/{key}.bin         图片渲染缓存
 
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
-| `DATABASE_URL` | — | 必填，`mysql://user:pwd@host:3306/db` |
+| `DATABASE_URL` | — | 必填，`postgresql://user:pwd@host:5432/db` |
 | `JWT_SECRET` | — | 必填，至少 32 字符且熵足够 |
 | `JWT_EXPIRATION` | `7d` | 秒数或 `15m` / `1h` / `7d` |
-| `DB_ALLOW_PUBLIC_KEY_RETRIEVAL` | `true` | 允许向 MySQL 获取 RSA 公钥，无 TLS 时 `caching_sha2_password` 认证需要 |
 | `NODE_ENV` | `development` | `development` / `production` / `test` |
 | `LOG_LEVEL` | `info` | `debug` / `info` / `warn` / `error` |
 | `PORT` | `9494` | |

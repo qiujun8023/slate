@@ -2,13 +2,24 @@ import { describe, expect, it } from 'bun:test';
 import { EnvSchema } from './env.schema';
 
 const baseEnv = {
-  DATABASE_URL: 'mysql://slate:slate@127.0.0.1:3306/slate',
+  DATABASE_URL: 'postgresql://slate:slate@127.0.0.1:5432/slate',
   JWT_SECRET: 'slate-test-secret-0123456789abcdef',
 };
 
 describe('EnvSchema', () => {
-  it('accepts mysql database connection strings', () => {
+  it('accepts postgresql database connection strings', () => {
     expect(EnvSchema.safeParse(baseEnv).success).toBe(true);
+    expect(
+      EnvSchema.safeParse({ ...baseEnv, DATABASE_URL: 'postgres://slate:slate@127.0.0.1/slate' })
+        .success
+    ).toBe(true);
+  });
+
+  it('rejects mysql connection strings', () => {
+    expect(
+      EnvSchema.safeParse({ ...baseEnv, DATABASE_URL: 'mysql://slate:slate@127.0.0.1:3306/slate' })
+        .success
+    ).toBe(false);
   });
 
   it('rejects non-database URLs for DATABASE_URL', () => {
@@ -29,11 +40,5 @@ describe('EnvSchema', () => {
     expect(EnvSchema.safeParse({ ...baseEnv, TTS_DEFAULT_VOICE: '不存在的音色' }).success).toBe(
       false
     );
-  });
-
-  it('defaults public key retrieval to enabled', () => {
-    const parsed = EnvSchema.parse(baseEnv);
-
-    expect(parsed.DB_ALLOW_PUBLIC_KEY_RETRIEVAL).toBe(true);
   });
 });

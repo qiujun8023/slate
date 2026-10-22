@@ -18,7 +18,7 @@ defaults:
     shell: bash
 
 env:
-  DATABASE_URL: mysql://ci:ci@127.0.0.1:3306/ci
+  DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
   JWT_SECRET: ci_dummy_secret_long_enough_to_pass_validation
   IMAGE: ghcr.io/${{ github.repository_owner }}/slate
 

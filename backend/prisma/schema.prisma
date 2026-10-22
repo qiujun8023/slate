@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 enum ContentKind {
@@ -36,8 +36,8 @@ enum ContentAudioSource {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
-  username  String?  @unique @db.VarChar(32)
+  email     String   @unique @db.Citext
+  username  String?  @unique @db.Citext
   password  String   @db.VarChar(255) // bcrypt hash
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

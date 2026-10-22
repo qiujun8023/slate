@@ -28,4 +28,4 @@ runs:
       run: bun run --cwd backend prisma:generate
       shell: bash
       env:
-        DATABASE_URL: mysql://ci:ci@127.0.0.1:3306/ci
+        DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
