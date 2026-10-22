@@ -7,8 +7,7 @@ type FetchOptions = NonNullable<Parameters<typeof fetchJson>[1]>;
 type SourceId = HotListSource['id'];
 type HotListItemInput = Omit<HotListItem, 'rank'> | HotListItem;
 type SourceRequestOptions =
-  | Omit<FetchOptions, 'signal'>
-  | ((ctx: HotListSourceFetchCtx) => Omit<FetchOptions, 'signal'>);
+  Omit<FetchOptions, 'signal'> | ((ctx: HotListSourceFetchCtx) => Omit<FetchOptions, 'signal'>);
 
 interface DefineDirectSourceConfig<TId extends CurrentHotListSourceIdT = CurrentHotListSourceIdT> {
   id: TId;

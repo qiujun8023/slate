@@ -32,7 +32,7 @@ bun run --cwd backend test
 bun run --cwd frontend build
 ```
 
-改了固件需要 ESP-IDF 5.5 构建通过（CI 用 v5.5.2）：
+改了固件需要 ESP-IDF 5.5 构建通过（CI 用 v5.5.6）：
 
 ```bash
 source $IDF_PATH/export.sh

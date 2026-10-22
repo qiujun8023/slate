@@ -8,7 +8,7 @@ idf.py -C firmware build
 idf.py -C firmware -p <serial> flash monitor
 ```
 
-target、Flash、PSRAM、分区表都已写在 `sdkconfig.defaults` 里，不需要 `set-target`。CI 使用 v5.5.2，产物为 `slate-full.bin`（合并后的完整镜像）和 `slate-ota.bin`。
+target、Flash、PSRAM、分区表都已写在 `sdkconfig.defaults` 里，不需要 `set-target`。CI 使用 v5.5.6，产物为 `slate-full.bin`（合并后的完整镜像）和 `slate-ota.bin`。
 
 ## 代码结构
 
