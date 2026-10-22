@@ -26,6 +26,7 @@ jobs:
   prepare:
     name: validate release metadata
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       version: ${{ steps.version.outputs.version }}
       minor_version: ${{ steps.version.outputs.minor_version }}
@@ -155,6 +156,7 @@ jobs:
   quality:
     name: quality checks
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: prepare
     steps:
       - uses: actions/checkout@v7
@@ -170,6 +172,7 @@ jobs:
   docker:
     name: build + push release image
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs:
       - prepare
       - quality
@@ -210,6 +213,7 @@ jobs:
   firmware:
     name: build release firmware
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs:
       - prepare
       - quality
@@ -264,6 +268,7 @@ jobs:
   github-release:
     name: publish GitHub Release
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs:
       - prepare
       - docker
