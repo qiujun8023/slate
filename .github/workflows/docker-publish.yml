@@ -1,12 +1,14 @@
-name: docker
+name: Docker Publish
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [master]
   workflow_dispatch:
 
 concurrency:
-  group: docker-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
@@ -19,9 +21,20 @@ env:
 jobs:
   build:
     name: build + push GHCR
+    # CI 通过的 push 才发布；手动触发直接发布
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      # workflow_run 的上下文指向默认分支最新提交，标签和 revision 要用 CI 那次提交
+      - name: Resolve commit
+        id: commit
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
@@ -38,7 +51,9 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=raw,value=master
-            type=sha,prefix=sha-,format=short
+            type=raw,value=sha-${{ steps.commit.outputs.short }}
+          labels: |
+            org.opencontainers.image.revision=${{ steps.commit.outputs.sha }}
 
       - uses: docker/build-push-action@v7
         with:

@@ -66,4 +66,4 @@ idf.py -C firmware build
 
 推送 tag 后 `release.yml` 会校验版本号与 tag body、跑完整检查、推送镜像（`vX.Y.Z` / `X.Y` / `latest` / `sha-*`）、构建固件，并把固件、sha256、`compose.yml`、`slate.env.example` 上传到 Release。只有最新的 tag 能发布，防止 `latest` 回退。
 
-`master` 上的 `docker.yml` / `firmware.yml` 是滚动构建，不代表稳定版本。
+`master` 上的 `docker-publish.yml` / `firmware-build.yml` 是滚动构建，不代表稳定版本。

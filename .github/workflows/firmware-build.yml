@@ -1,11 +1,11 @@
-name: firmware
+name: Firmware Build
 
 on:
   push:
     branches: [master]
     paths:
       - 'firmware/**'
-      - '.github/workflows/firmware.yml'
+      - '.github/workflows/firmware-build.yml'
   workflow_dispatch:
 
 jobs:
