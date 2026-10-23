@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---------- builder(只用来构 frontend dist;backend 走解释执行,不预编译) ----------
-FROM oven/bun:1-slim AS builder
+FROM oven/bun:1.4.3-slim AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY shared ./shared
 RUN bun run --cwd frontend build
 
 # ---------- runner ----------
-FROM oven/bun:1-alpine AS runner
+FROM oven/bun:1.4.3-alpine AS runner
 
 WORKDIR /app
 
