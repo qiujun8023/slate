@@ -197,7 +197,7 @@ jobs:
             type=raw,value=${{ needs.prepare.outputs.tag }}
             type=raw,value=${{ needs.prepare.outputs.minor_version }}
             type=raw,value=latest
-            type=sha,prefix=sha-,format=short
+            type=sha,format=short
 
       - uses: docker/build-push-action@v7
         with:

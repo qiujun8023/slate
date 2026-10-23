@@ -64,7 +64,7 @@ docker compose up -d
 
 打开 `http://<host>:9494/register` 注册第一个账号。数据在 `./slate`（图片、音频）和 `./postgres`。升级：`docker compose pull && docker compose up -d`。
 
-镜像 tag：`latest` / `vX.Y.Z` / `X.Y` 为稳定版，`master` 为主干最新构建，`sha-<short>` 固定到某次提交。
+镜像 tag：`latest` / `vX.Y.Z` / `X.Y` 为稳定版，`master` 为主干最新构建，`<short>`（裸短 commit sha）固定到某次提交。
 
 ## 本地开发
 
