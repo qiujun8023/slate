@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-# ---------- builder(只用来构 frontend dist;backend 走解释执行,不预编译) ----------
-FROM oven/bun:1.4.3-slim AS builder
+# ---------- builder(在构建机原生架构上构建一次 frontend dist，供各架构镜像共用) ----------
+FROM --platform=$BUILDPLATFORM oven/bun:1.4.3-slim AS builder
 
 WORKDIR /app
 
