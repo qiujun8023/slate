@@ -52,7 +52,7 @@ jobs:
           fi
 
           VERSION="${GITHUB_REF_NAME#v}"
-          MINOR_VERSION="$(echo "$VERSION" | awk -F. '{ print $1 "." $2 }')"
+          MINOR_VERSION="${GITHUB_REF_NAME%.*}"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "minor_version=$MINOR_VERSION" >> "$GITHUB_OUTPUT"
@@ -182,6 +182,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
       - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
 
@@ -199,7 +202,7 @@ jobs:
             type=raw,value=${{ needs.prepare.outputs.tag }}
             type=raw,value=${{ needs.prepare.outputs.minor_version }}
             type=raw,value=latest
-            type=sha,format=short
+            type=raw,value=${{ env.SHORT_SHA }}
 
       - uses: docker/build-push-action@v7
         with:
