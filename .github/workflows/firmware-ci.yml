@@ -1,11 +1,17 @@
-name: Firmware Build
+name: Firmware CI
 
 on:
   push:
     branches: [master]
     paths:
       - 'firmware/**'
-      - '.github/workflows/firmware-build.yml'
+      - .github/workflows/firmware-ci.yml
+      - '!**.md'
+  pull_request:
+    paths:
+      - 'firmware/**'
+      - .github/workflows/firmware-ci.yml
+      - '!**.md'
   workflow_dispatch:
 
 permissions:
@@ -13,11 +19,10 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
-    name: ESP-IDF build
+  firmware:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -34,7 +39,7 @@ jobs:
             idf.py merge-bin -o slate-full.bin &&
             cp build/slate.bin build/slate-ota.bin
 
-      - name: upload firmware
+      - name: Upload firmware
         uses: actions/upload-artifact@v7
         with:
           name: firmware
