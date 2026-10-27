@@ -24,7 +24,7 @@ var templates = func() struct {
 	return t
 }()
 
-// SystemTemplates are the built-in dashboard layouts the push jobs target.
+// SystemTemplates are the built-in dashboard layouts for data pushed by external programs.
 func SystemTemplates() []api.DashboardSystemTemplate { return templates.System }
 
 // StarterTemplate is the default layout of a new custom dashboard.

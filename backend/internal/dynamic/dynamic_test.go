@@ -15,7 +15,7 @@ func TestNormalizeConfigDefaults(t *testing.T) {
 		`{"type":"weather_alert","province":"广西","audioEnabled":true}`: `{"type":"weather_alert","audioEnabled":true,"audioVoice":"冰糖","refreshIntervalSec":600,"province":"广西壮族自治区"}`,
 		`{"type":"font_test"}`:                              `{"type":"font_test","fontId":"fusion_pixel_12"}`,
 		`{"type":"daily_calendar","tz":"Asia/Shanghai"}`:    `{"type":"daily_calendar","tz":"Asia/Shanghai","audioVoice":"冰糖"}`,
-		`{"type":"dashboard","template":{"kind":"system"}}`: `{"type":"dashboard","refreshIntervalSec":600,"template":{"kind":"system","id":"ai_usage_stats"}}`,
+		`{"type":"dashboard","template":{"kind":"system"}}`: `{"type":"dashboard","refreshIntervalSec":600,"template":{"kind":"system","id":"ai_quota_monitor"}}`,
 	}
 	for in, want := range cases {
 		cfg, err := NormalizeConfig(json.RawMessage(in))

@@ -155,7 +155,7 @@ func normalizeTemplateRef(ref *api.DashboardTemplateRef) (*api.DashboardTemplate
 	case "system":
 		id := ref.ID
 		if id == "" {
-			id = "ai_usage_stats"
+			id = "ai_quota_monitor"
 		}
 		if render.SystemTemplate(id) == nil {
 			return nil, invalid("系统模板不存在: %s", ref.ID)

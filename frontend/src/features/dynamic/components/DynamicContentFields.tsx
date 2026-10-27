@@ -45,7 +45,7 @@ export function DynamicContentFields({
             maxLength={64}
             value={frameName}
             onChange={(event) => onFrameNameChange(event.target.value)}
-            placeholder="如：AI 使用统计"
+            placeholder="如：AI 限额监控"
           />
         </FormSection>
       )}

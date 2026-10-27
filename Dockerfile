@@ -60,7 +60,6 @@ COPY --from=backend /out/slate /usr/local/bin/slate
 ENV PORT=9494 BLOB_DIR=/data/blobs PUBLIC_DIR=/app/public
 USER slate
 EXPOSE 9494
-# `slate job` 以 sidecar 方式运行时不监听端口，需在 compose 里 healthcheck.disable。
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --spider -q "http://127.0.0.1:${PORT}/api/health" || exit 1
 ENTRYPOINT ["slate"]

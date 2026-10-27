@@ -12,8 +12,6 @@
 | `slate serve` | 应用迁移后启动 HTTP 服务和后台任务（默认） |
 | `slate migrate` | 只应用迁移 |
 | `slate import <mysql-url>` | 把 v0.1.x 的 MySQL 部署导入空库 |
-| `slate job <name>` | 运行 dashboard 推送任务 |
-| `slate claude-statusline` | Claude Code 的 statusLine 命令 |
 
 启动时读取当前目录的 `.env`，已有的环境变量优先。日志为 JSON，输出到 stdout。
 
@@ -32,7 +30,6 @@
 | `internal/hotlist/` | 热榜抓取，`sources.json` 是榜单源清单 |
 | `internal/blob/` | sha256 内容寻址文件存储 |
 | `internal/media/` | ffmpeg 音频转码 |
-| `internal/job/` | dashboard 推送任务 |
 | `internal/legacyimport/` | v0.1.x MySQL 导入 |
 | `internal/fetch/` | 第三方数据源的 HTTP 客户端 |
 | `internal/config/` | 环境变量与 `.env` |
@@ -144,6 +141,21 @@ POST /api/contents/{id}/data
 - 不需要 JWT，内容 ID 本身就是凭证；泄漏后删除内容重建。
 - 请求体 ≤ 64 KB，每个内容每分钟 30 次。
 
+内置模板「AI 限额监控」（`ai_quota_monitor`）展示一个服务的两个限额窗口，Claude Code、Codex 都适用。`data` 字段：
+
+| 字段 | 示例 | 说明 |
+| --- | --- | --- |
+| `service_label` | `Codex` | 服务名 |
+| `plan_label` | `Pro` | 套餐 |
+| `status_label` | `正常` | 状态 |
+| `primary_window_label` | `5小时` | 第一个窗口名，重置时间标题显示为「5小时重置」 |
+| `primary_used_percent` | `42` | 使用率，0–100 |
+| `primary_reset_at_label` | `14:00` | 重置时间 |
+| `secondary_window_label` | `每周` | 第二个窗口名 |
+| `secondary_used_percent` | `18` | 使用率，0–100 |
+| `secondary_reset_at_label` | `周四 09:00` | 重置时间 |
+| `updated_label` | `10-27 16:10` | 更新时间 |
+
 ### 设备协议 v2
 
 | 接口 | 请求体 |
@@ -251,40 +263,6 @@ POST /api/contents/{id}/data
 | `TTS_MODEL` | `mimo-v2.5-tts` | |
 
 `JWT_SECRET` 可以用 `openssl rand -hex 64` 生成。本地开发的样例见 [.env.example](.env.example)。
-
-## Dashboard 推送任务
-
-`slate job <name>` 定时向 dashboard 内容推送数据。
-
-| 变量 | 默认 | 说明 |
-| --- | --- | --- |
-| `SLATE_API_BASE` | — | Slate 地址，如 `http://slate:9494` |
-| `SLATE_JOB_INTERVAL_SECONDS` | `600` | 推送间隔 |
-| `SLATE_JOB_RUN_ONCE` | — | 设为 `1` 时只跑一次 |
-| `SLATE_JOB_TIME_ZONE` | `Asia/Shanghai` | |
-
-目前只有 `claude-code-quota-monitor` 一个任务：
-
-- 必填 `CLAUDE_QUOTA_CONTENT_ID`；
-- token 取自 `ANTHROPIC_API_KEY` 或 `~/.claude/.credentials.json`；
-- 可选 `ANTHROPIC_API_BASE`、`CLAUDE_PLAN_LABEL`。
-
-用同一个镜像作为 compose sidecar 运行时，它不监听端口，需要关掉镜像自带的健康检查：
-
-```yaml
-  claude-quota:
-    image: ghcr.io/qiujun8023/slate:latest
-    restart: unless-stopped
-    command: ['job', 'claude-code-quota-monitor']
-    environment:
-      SLATE_API_BASE: http://slate:9494
-      CLAUDE_QUOTA_CONTENT_ID: <dashboard 内容 ID>
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-    healthcheck:
-      disable: true
-```
-
-`slate claude-statusline` 可以直接作为 Claude Code 的 statusLine 命令：输出限额状态行，并按 `CLAUDE_QUOTA_PUSH_INTERVAL_MS`（默认 60000）在后台推送。
 
 ---
 

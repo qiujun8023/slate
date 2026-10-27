@@ -21,7 +21,6 @@ import (
 	"slate/internal/config"
 	"slate/internal/dynamic"
 	"slate/internal/httpapi"
-	"slate/internal/job"
 	"slate/internal/legacyimport"
 	"slate/internal/media"
 	"slate/internal/store"
@@ -32,9 +31,7 @@ const usage = `usage: slate <command>
 
   serve                      apply migrations, then run the HTTP server and background workers (default)
   migrate                    apply database migrations
-  import <mysql-url>         copy a v0.1.x MySQL deployment into an empty database
-  job <name>                 run a dashboard push job (claude-code-quota-monitor)
-  claude-statusline          Claude Code statusLine command that also pushes quota data`
+  import <mysql-url>         copy a v0.1.x MySQL deployment into an empty database`
 
 func main() {
 	if err := config.LoadDotenv(".env"); err != nil {
@@ -61,14 +58,6 @@ func main() {
 		err = migrate(ctx)
 	case "import":
 		err = importLegacy(ctx, args)
-	case "job":
-		if len(args) != 1 {
-			err = errors.New(usage)
-		} else {
-			err = job.Run(ctx, args[0])
-		}
-	case "claude-statusline":
-		err = job.StatusLine(ctx, args)
 	default:
 		err = errors.New(usage)
 	}
