@@ -2,7 +2,13 @@
 
 Slate 的 Web 管理端：账号、设备绑定、内容组、图片与动态内容编辑、帧预览。
 
-React 19 + React Router 7 + Vite 8 + Tailwind v4，TypeScript。数据请求用 TanStack Query 5 + axios，组件原语用 Radix UI，拖拽用 dnd-kit，图标用 lucide-react。
+| 用途 | 技术 |
+| --- | --- |
+| 框架 | React 19 + React Router 7，TypeScript |
+| 构建与样式 | Vite 8 + Tailwind v4 |
+| 数据请求 | TanStack Query 5 + axios |
+| 组件原语 | Radix UI |
+| 拖拽 / 图标 | dnd-kit / lucide-react |
 
 ## 目录
 
@@ -37,22 +43,46 @@ React 19 + React Router 7 + Vite 8 + Tailwind v4，TypeScript。数据请求用 
 
 ## 实现要点
 
-- **请求**：axios 的 `baseURL` 是 `/api`，`lib/http.ts` 统一取出 envelope 的 `data`，错误提示由 `lib/api-errors.ts` 从 envelope 的 `message` 读取。JWT 存在 localStorage，收到 401 时清除登录态并跳到登录页。
-- **图片**：浏览器完成裁剪、缩放、灰度、自动反色、自动对比度和抖动，`renderFrame` 生成 400×300 packed 1bpp（15000 字节）直接上传，服务端原样保存。预览和上传走同一套函数，看到的就是设备上的样子。抖动模式列表在 `lib/eink/dither.ts`，`lib/eink/testdata/dither.json` 固定了各模式的输出，改算法要有意更新它。
-- **动态内容**：配置表单覆盖所有类型，选项（字体、模板、榜单源、音色）来自 `catalog.json`。预览调用 `POST /api/contents/preview`，返回的 1bpp 画到 canvas 上。
-- **Dashboard**：编辑页展示推送 URL（`POST /api/contents/{id}/data`），这个 URL 本身就是凭证。
-- **缓存**：帧和音频按 blob hash 做 query key，永不过期；设备列表每 30 秒刷新；有音频在生成时每 2.5 秒轮询；拖拽排序先乐观更新，失败回滚。
-- **开发代理**：`bun run dev` 把 `/api` 转发到 `localhost:9494`。生产环境由后端同域托管 `dist/`。
+**请求**
+
+- axios 的 `baseURL` 是 `/api`，`lib/http.ts` 统一取出 envelope 的 `data`。
+- 错误提示由 `lib/api-errors.ts` 从 envelope 的 `message` 读取。
+- 默认超时 30 秒。上传、动态内容的创建与修改、刷新和预览用 `SLOW_REQUEST`（120 秒），覆盖后端的 AI、TTS 和转码耗时。
+- JWT 存在 localStorage，收到 401 时清除登录态并跳到登录页。
+
+**图片**
+
+- 浏览器完成裁剪、缩放、灰度、自动反色、自动对比度和抖动，`renderFrame` 生成 400×300 packed 1bpp（15000 字节）直接上传，服务端原样保存。
+- 预览和上传走同一套函数，看到的就是设备上的样子。
+- 抖动模式列表在 `lib/eink/dither.ts`。`lib/eink/testdata/dither.json` 固定了各模式的输出，改算法时要有意更新它。
+
+**动态内容**
+
+- 配置表单覆盖所有类型，选项（字体、模板、榜单源、音色）来自 `catalog.json`。
+- 预览调用 `POST /api/contents/preview`，返回的 1bpp 画到 canvas 上。
+- Dashboard 编辑页展示推送 URL（`POST /api/contents/{id}/data`），这个 URL 本身就是凭证。
+
+**缓存与刷新**
+
+- 帧和音频按 blob hash 做 query key，永不过期。
+- 设备列表每 30 秒刷新；有音频在生成时每 2.5 秒轮询。
+- 拖拽排序先乐观更新。保存串行执行：请求进行中再拖拽，只在当前请求结束后提交最新顺序；失败时回到最后一次保存成功的顺序。
+
+**开发代理**：`bun run dev` 把 `/api` 转发到 `localhost:9494`。生产环境由后端同域托管 `dist/`。
 
 ## 设计系统 Mono Press
 
-报刊编辑风格，token 定义在 [src/styles/global.css](src/styles/global.css) 的 `@theme` 中。颜色、圆角、字体都用 token，不写裸色值。
+报刊编辑风格。token 定义在 [src/styles/global.css](src/styles/global.css) 的 `@theme` 中，颜色、圆角、字体都用 token，不写裸色值。
 
-- 配色：纸本底 `paper` #f5f3ed、墨色 `ink` #14110d、次要文字 `stone`、分隔线 `line`。砖红 `clay` #a8281c 只用于危险操作、错误和低电量。
-- 字体：标题用 `serif`（Noto Serif SC），界面用 `sans`（IBM Plex Sans），数字和代码用 `mono`（IBM Plex Mono）。
-- 形态：所有圆角都是 0px（全局覆写，Radix 浮层除外）；1px 墨线；不用模糊。
-- 页面 header：标题在上，meta 在下，不用眉题。
-- canvas 无法读取 CSS 变量，帧预览的纸色和墨色在 `src/lib/eink/colors.ts` 里硬编码，改 token 时同步。
+| 项 | 规则 |
+| --- | --- |
+| 配色 | 纸本底 `paper` #f5f3ed、墨色 `ink` #14110d、次要文字 `stone`、分隔线 `line` |
+| 强调色 | 砖红 `clay` #a8281c，只用于危险操作、错误和低电量 |
+| 字体 | 标题 `serif`（Noto Serif SC），界面 `sans`（IBM Plex Sans），数字和代码 `mono`（IBM Plex Mono） |
+| 形态 | 圆角全部 0px（全局覆写，Radix 浮层除外）；1px 墨线；不用模糊 |
+| 页面 header | 标题在上，meta 在下，不用眉题 |
+
+canvas 无法读取 CSS 变量，帧预览的纸色和墨色在 `src/lib/eink/colors.ts` 里硬编码，改 token 时同步。
 
 ## 检查
 
