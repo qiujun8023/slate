@@ -1,0 +1,291 @@
+{
+ "fonts": [
+  {
+   "id": "fusion_pixel_10",
+   "label": "Fusion Pixel 10",
+   "file": "fusion-pixel-10.json",
+   "sizePx": 10,
+   "kind": "cjk",
+   "hint": "10px full cmap",
+   "note": "按源字体 cmap 全量生成，适合墨水屏小正文。",
+   "source": "TakWolf/fusion-pixel-font",
+   "license": "MIT"
+  },
+  {
+   "id": "fusion_pixel_12",
+   "label": "Fusion Pixel 12",
+   "file": "fusion-pixel-12.json",
+   "sizePx": 12,
+   "kind": "cjk",
+   "hint": "12px full cmap",
+   "note": "按源字体 cmap 全量生成，中文正文覆盖较完整。",
+   "source": "TakWolf/fusion-pixel-font",
+   "license": "MIT"
+  },
+  {
+   "id": "zfull_gb_10",
+   "label": "Zfull-GB 10",
+   "file": "zfull-gb-10.json",
+   "sizePx": 10,
+   "kind": "cjk",
+   "hint": "10px GB2312",
+   "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+   "source": "zfull-for-yosemite",
+   "license": "No explicit license"
+  },
+  {
+   "id": "zfull_gb_12",
+   "label": "Zfull-GB 12",
+   "file": "zfull-gb-12.json",
+   "sizePx": 12,
+   "kind": "cjk",
+   "hint": "12px GB2312",
+   "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+   "source": "zfull-for-yosemite",
+   "license": "No explicit license"
+  },
+  {
+   "id": "zfull_gb_14",
+   "label": "Zfull-GB 14",
+   "file": "zfull-gb-14.json",
+   "sizePx": 14,
+   "kind": "cjk",
+   "hint": "14px GB2312",
+   "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+   "source": "zfull-for-yosemite",
+   "license": "No explicit license"
+  },
+  {
+   "id": "zfull_gb_16",
+   "label": "Zfull-GB 16",
+   "file": "zfull-gb-16.json",
+   "sizePx": 16,
+   "kind": "cjk",
+   "hint": "16px GB2312",
+   "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+   "source": "zfull-for-yosemite",
+   "license": "No explicit license"
+  },
+  {
+   "id": "zfull_gb_18",
+   "label": "Zfull-GB 18",
+   "file": "zfull-gb-18.json",
+   "sizePx": 18,
+   "kind": "cjk",
+   "hint": "18px GB2312",
+   "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+   "source": "zfull-for-yosemite",
+   "license": "No explicit license"
+  },
+  {
+   "id": "ark_pixel_10",
+   "label": "Ark Pixel 10",
+   "file": "ark-pixel-10.json",
+   "sizePx": 10,
+   "kind": "cjk",
+   "hint": "10px full cmap",
+   "note": "按 Ark 10px 源字体 cmap 全量生成；源字体中文覆盖较小。",
+   "source": "TakWolf/ark-pixel-font",
+   "license": "MIT"
+  },
+  {
+   "id": "ark_pixel_12",
+   "label": "Ark Pixel 12",
+   "file": "ark-pixel-12.json",
+   "sizePx": 12,
+   "kind": "cjk",
+   "hint": "12px full cmap",
+   "note": "按 Ark 12px 源字体 cmap 全量生成，中号中文覆盖较好。",
+   "source": "TakWolf/ark-pixel-font",
+   "license": "MIT"
+  },
+  {
+   "id": "ark_pixel_16",
+   "label": "Ark Pixel 16",
+   "file": "ark-pixel-16.json",
+   "sizePx": 16,
+   "kind": "cjk",
+   "hint": "16px full cmap",
+   "note": "按 Ark 16px 源字体 cmap 全量生成；源字体中文覆盖有限。",
+   "source": "TakWolf/ark-pixel-font",
+   "license": "MIT"
+  },
+  {
+   "id": "zlabs_pixel_12",
+   "label": "Z Labs Pixel 12",
+   "file": "zlabs-pixel-12-demo.json",
+   "sizePx": 12,
+   "kind": "cjk",
+   "hint": "12px demo subset",
+   "note": "中文像素黑体候选；测试页样张子集，适合和 Fusion/Ark 12px 对比。",
+   "source": "Astro-2539/ZLabs-Pixel-12px",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "zlabs_roundpix_12",
+   "label": "Z Labs RoundPix 12",
+   "file": "zlabs-roundpix-12-demo.json",
+   "sizePx": 12,
+   "kind": "cjk",
+   "hint": "12px demo subset",
+   "note": "圆角像素中文候选；测试页样张子集，观察墨水屏边缘是否发糊。",
+   "source": "Astro-2539/ZLabs-RoundPix-12px",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "zlabs_roundpix_16",
+   "label": "Z Labs RoundPix 16",
+   "file": "zlabs-roundpix-16-demo.json",
+   "sizePx": 16,
+   "kind": "cjk",
+   "hint": "16px demo subset",
+   "note": "圆角像素中文 16px 候选；测试页样张子集。",
+   "source": "Astro-2539/ZLabs-RoundPix-16px",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "chill_bitmap_16",
+   "label": "ChillBitmap 16",
+   "file": "chill-bitmap-16-demo.json",
+   "sizePx": 16,
+   "kind": "cjk",
+   "hint": "16px demo subset",
+   "note": "寒蝉点阵体 16px 中文；测试页样张子集。",
+   "source": "Warren2060/ChillBitmap",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "cubic_11",
+   "label": "Cubic 11",
+   "file": "cubic-11-demo.json",
+   "sizePx": 11,
+   "kind": "cjk",
+   "hint": "11px demo subset",
+   "note": "俐方體 11 號；偏繁体/TW 风格，测试页样张子集。",
+   "source": "ACh-K/Cubic-11",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "unifont_16",
+   "label": "GNU Unifont 16",
+   "file": "unifont-16.json",
+   "sizePx": 16,
+   "kind": "cjk",
+   "hint": "16px full cmap",
+   "note": "按源字体 cmap 全量生成的宽覆盖 fallback，风格粗糙但缺字少。",
+   "source": "multitheftauto/unifont",
+   "license": "GNU Unifont"
+  },
+  {
+   "id": "spleen_5x8",
+   "label": "Spleen 5x8",
+   "file": "spleen-5x8.json",
+   "sizePx": 8,
+   "kind": "latin",
+   "hint": "5x8 Latin",
+   "note": "极小号等宽点阵，适合状态栏英文/数字。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "spleen_6x12",
+   "label": "Spleen 6x12",
+   "file": "spleen-6x12.json",
+   "sizePx": 12,
+   "kind": "latin",
+   "hint": "6x12 Latin",
+   "note": "小号等宽点阵，适合密集英文/数字。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "spleen_8x16",
+   "label": "Spleen 8x16",
+   "file": "spleen-8x16.json",
+   "sizePx": 16,
+   "kind": "latin",
+   "hint": "8x16 Latin",
+   "note": "经典终端点阵尺寸。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "spleen_12x24",
+   "label": "Spleen 12x24",
+   "file": "spleen-12x24.json",
+   "sizePx": 24,
+   "kind": "latin",
+   "hint": "12x24 Latin",
+   "note": "中大号等宽点阵。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "spleen_16x32",
+   "label": "Spleen 16x32",
+   "file": "spleen-16x32.json",
+   "sizePx": 32,
+   "kind": "latin",
+   "hint": "16x32 Latin",
+   "note": "大字号等宽点阵。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "spleen_32x64",
+   "label": "Spleen 32x64",
+   "file": "spleen-32x64.json",
+   "sizePx": 64,
+   "kind": "latin",
+   "hint": "32x64 Latin",
+   "note": "超大号数字/短文本点阵。",
+   "source": "fcambus/spleen",
+   "license": "BSD-2-Clause"
+  },
+  {
+   "id": "cozette_13",
+   "label": "Cozette 13",
+   "file": "cozette-13.json",
+   "sizePx": 13,
+   "kind": "latin",
+   "hint": "13px Latin",
+   "note": "编程向点阵字体，ASCII 细节清晰。",
+   "source": "the-moonwitch/Cozette",
+   "license": "MIT"
+  },
+  {
+   "id": "montserrat_48",
+   "label": "Montserrat 48",
+   "file": "montserrat-48.json",
+   "sizePx": 48,
+   "kind": "display",
+   "hint": "48px display",
+   "note": "大号拉丁数字对照组。",
+   "source": "JulietaUla/Montserrat",
+   "license": "OFL-1.1"
+  },
+  {
+   "id": "font_awesome_14",
+   "label": "Font Awesome 14",
+   "file": "font-awesome-14.json",
+   "sizePx": 14,
+   "kind": "icon",
+   "hint": "14px full icons",
+   "note": "按 Font Awesome 5 源字体 cmap 全量生成的小号图标测试。",
+   "source": "FortAwesome/Font-Awesome",
+   "license": "Font Awesome Free"
+  },
+  {
+   "id": "font_awesome_30",
+   "label": "Font Awesome 30",
+   "file": "font-awesome-30.json",
+   "sizePx": 30,
+   "kind": "icon",
+   "hint": "30px full icons",
+   "note": "按 Font Awesome 5 源字体 cmap 全量生成的大号图标测试。",
+   "source": "FortAwesome/Font-Awesome",
+   "license": "Font Awesome Free"
+  }
+ ],
+ "iconSample": "                                    "
+}

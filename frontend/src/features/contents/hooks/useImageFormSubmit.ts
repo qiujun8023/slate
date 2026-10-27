@@ -1,44 +1,41 @@
 import { useCallback } from 'react';
-import type { DitherMode } from 'shared';
+import type { DitherMode } from '@/lib/eink/dither';
+import { renderFrame, type CropOptions } from '@/lib/eink/image-preview';
 
 export function useImageFormSubmit({
   imageFile,
   audioFile,
-  previewRef,
   frameName,
   threshold,
   mode,
+  scale,
+  offset,
 }: {
   imageFile: File | null;
   audioFile: File | null;
-  previewRef: React.RefObject<HTMLCanvasElement | null>;
   frameName: string;
   threshold: number;
   mode: DitherMode;
-}) {
+} & CropOptions) {
   return useCallback(async (): Promise<FormData> => {
     const fd = new FormData();
     if (imageFile) {
-      const canvas = previewRef.current;
-      if (!canvas) {
-        throw new Error('预览画布尚未就绪，请稍后重试。');
+      const bitmap = await createImageBitmap(imageFile).catch(() => {
+        throw new Error('图片无法解码，请换一张图片。');
+      });
+      try {
+        const frame = renderFrame(bitmap, { scale, offset, threshold, mode });
+        fd.append(
+          'frame',
+          new Blob([frame.slice()], { type: 'application/octet-stream' }),
+          'frame.bin'
+        );
+      } finally {
+        bitmap.close();
       }
-      const blob = await exportCanvasBlob(canvas);
-      fd.append('image', blob, 'cropped.png');
-      fd.append('threshold', String(threshold));
-      fd.append('mode', mode);
     }
     if (audioFile) fd.append('audio', audioFile);
-    fd.append('frame_name', frameName.trim());
+    fd.append('frameName', frameName.trim());
     return fd;
-  }, [audioFile, frameName, imageFile, mode, previewRef, threshold]);
-}
-
-function exportCanvasBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error('canvas export failed'))),
-      'image/png'
-    );
-  });
+  }, [audioFile, frameName, imageFile, mode, offset, scale, threshold]);
 }

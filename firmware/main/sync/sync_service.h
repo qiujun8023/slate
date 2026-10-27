@@ -1,6 +1,6 @@
 #pragma once
 
-// 后台同步：POST /api/v1/devices/current/poll 后按 manifest 增量拉 frame image / audio。
+// 后台同步：POST /api/device/sync(或 /group)拿到 DeviceState,manifest 版本变化时按 hash 增量拉帧。
 // 状态/进度通过 EventBus 反馈：
 //   - SyncStarted       每轮开始
 //   - SyncFinished{ok}  每轮结束(含 304 noop)
@@ -32,18 +32,18 @@ class SyncService {
     void Start(std::string wake_reason, InitialSync initial_sync = InitialSync::kNone);
     void Stop();
 
-    // 主动触发一次前台 poll。用于后台刷新被充电/解绑宽限打断后转入 active 模式。
+    // 主动触发一次前台 sync。用于后台刷新被充电/解绑宽限打断后转入 active 模式。
     void RequestUserActiveSync();
 
     // 设备主动 cycle 切组(scene 按键 callback 调)。
-    // 内部置 BIT_CYCLE_NEXT/PREV,Loop 在唤醒时调 api::CycleGroup 然后立即 SyncOnce。
+    // 内部置 BIT_CYCLE_NEXT/PREV,Loop 在唤醒时调 api::ChangeGroup 并同步返回的 manifest。
     void CycleNext();
     void CyclePrev();
 
     // 当前已就绪的 group_id(Scene::OnEnter 时读)
     std::string CurrentGroupId() const;
 
-    // 是否正在执行一次 sync 突发(poll/cycle → manifest → 拉帧)。SleepManager 用它阻止
+    // 是否正在执行一次 sync 突发(sync/group → 拉帧)。SleepManager 用它阻止
     // idle deep sleep 在大文件下载中途打断同步。只在单轮 SyncOnce/DoCycle 期间为真,
     // 突发之间(轮询间隔)为假,因此不会让设备永不睡(卡死由看门狗兜底)。
     bool IsBusy() const {
@@ -59,22 +59,15 @@ class SyncService {
     enum class SyncReason { kUserActive, kBackgroundRefresh, kCycle };
     void               SyncOnce(SyncMode mode);
     void               Trigger(SyncMode mode);
-    void               DoCycle(const std::string& direction);
+    void               DoCycle(api::GroupAction action);
     static const char* SyncModeName(SyncMode mode);
-    bool SyncBackground(const api::DeviceState& state, const api::Telemetry& telemetry, bool& group_changed);
-    bool SyncUserActive(const api::DeviceState& state, bool& group_changed);
-    bool ShouldStop() const;
-    bool SyncManifestAndFrames(const std::string& gid, const std::string& expected_etag, const std::string& group_name,
-                               int expected_content_count, SyncReason reason, bool& group_changed);
-    bool SyncCurrentContent(const std::string& gid, const api::ContentMeta& content, bool& changed);
-    bool ClearSelectedGroup();
-    bool HandleCachedManifestHit(const std::string& gid, const std::string& expected_etag,
+    bool               ApplyState(const api::DeviceState& state, SyncReason reason, bool& group_changed);
+    bool               ShouldStop() const;
+    bool               SyncManifestAndFrames(const api::DeviceState& state, SyncReason reason, bool& group_changed);
+    bool               ClearSelectedGroup();
+    bool HandleCachedManifestHit(const std::string& gid, const std::string& manifest_version,
                                  const std::string& status_name, int content_count, const std::string& previous_current,
-                                 const std::string& selected_group_id, SyncReason reason);
-    bool HandleNotModifiedManifest(const std::string& gid, const cache::ManifestMeta& cached_meta,
-                                   const std::string& status_name, int expected_content_count,
-                                   const std::string& previous_current, const std::string& selected_group_id,
-                                   SyncReason reason);
+                                 const std::string& selected_group_id, SyncReason reason, bool content_changed);
     bool DownloadFramesToStage(cache::CacheWriter& writer, const std::string& gid, const api::Manifest& manifest,
                                const std::string& status_name, const std::string& previous_current,
                                const std::string& selected_group_id, SyncReason reason, int& total_updates);

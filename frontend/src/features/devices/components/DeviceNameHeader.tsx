@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
-import type { DeviceSummaryT } from 'shared';
+import type { Device } from '@/api';
 import { InlineRename } from '@/components/ui/InlineRename';
 import { cn } from '@/lib/cn';
 
@@ -15,7 +15,7 @@ export function DeviceNameHeader({
   onKeyDown,
   pending,
 }: {
-  device: DeviceSummaryT;
+  device: Device;
   online: boolean;
   editingName: boolean;
   draftName: string;

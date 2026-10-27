@@ -7,7 +7,7 @@ import { ArrowLeft, Plus, Layers } from 'lucide-react';
 import { useGroup, useUpdateGroup } from '@/features/groups/query/group-queries';
 import { useGroupContents } from '@/features/contents/query/content-read-queries';
 import { useReorderContents } from '@/features/contents/query/content-mutation-queries';
-import type { ContentDetailT, GroupSummaryT } from 'shared';
+import type { Content, Group } from '@/api';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -67,7 +67,7 @@ function GroupDetailContent({
   );
 
   const openCreate = () => navigate(appRoutes.newContent(gid));
-  const openEdit = (content: ContentDetailT) => {
+  const openEdit = (content: Content) => {
     if (content.kind === 'dynamic') {
       navigate(appRoutes.editDynamicContent(gid, content.id));
     } else {
@@ -135,7 +135,7 @@ function GroupDetailContent({
   );
 }
 
-function getContentId(content: ContentDetailT): string {
+function getContentId(content: Content): string {
   return content.id;
 }
 
@@ -156,7 +156,7 @@ function GroupHeader({
   onBack,
   onAdd,
 }: {
-  group: GroupSummaryT;
+  group: Group;
   onBack: () => void;
   onAdd: () => void;
 }) {
@@ -197,7 +197,7 @@ function GroupHeader({
           buttonClassName="p-2 -m-1"
         />
       }
-      subtitle={`${group.content_count} 项 · ${formatBytes(group.total_bytes)}`}
+      subtitle={`${group.contentCount} 项 · ${formatBytes(group.totalBytes)}`}
       action={
         <Button iconLeft={<Plus size={16} />} size="sm" onClick={onAdd}>
           新建帧

@@ -1,6 +1,6 @@
 import { useCallback, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { ContentDetailT } from 'shared';
+import type { Content } from '@/api';
 import { useContentDetail } from '@/features/contents/query/content-read-queries';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { RequireRouteParams } from '@/components/layout/RequireRouteParams';
@@ -10,8 +10,8 @@ import { appRoutes } from '@/app/routes';
 interface ContentEditorPageLayoutProps {
   missingContentHint: string;
   notFoundTitle: string;
-  findContent: (content: ContentDetailT) => boolean;
-  renderEditor: (props: { gid: string; content: ContentDetailT; onDone: () => void }) => ReactNode;
+  findContent: (content: Content) => boolean;
+  renderEditor: (props: { gid: string; content: Content; onDone: () => void }) => ReactNode;
 }
 
 export function ContentEditorPageLayout({
@@ -72,7 +72,7 @@ function ContentEditorPageContent({
     return <EmptyState title="加载失败" hint="内容详情返回了不匹配的 ID，请刷新重试。" />;
   }
 
-  if (!content.data || !isExpectedContent || content.data.group_id !== gid) {
+  if (!content.data || !isExpectedContent || content.data.groupId !== gid) {
     if (content.isFetching) {
       return (
         <div className="pt-16 text-center">

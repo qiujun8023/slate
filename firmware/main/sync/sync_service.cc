@@ -193,9 +193,9 @@ void SyncService::Loop() {
         // 标记突发进行中：SleepManager 据此阻止 idle 睡眠打断正在进行的下载。
         in_flight_.store(true, std::memory_order_release);
         if (bits & BIT_CYCLE_NEXT) {
-            DoCycle("next");
+            DoCycle(api::GroupAction::kNext);
         } else if (bits & BIT_CYCLE_PREV) {
-            DoCycle("prev");
+            DoCycle(api::GroupAction::kPrev);
         } else if (bits & BIT_WAKE_REFRESH) {
             SyncOnce(SyncMode::kBackgroundRefresh);
         } else {
@@ -203,7 +203,7 @@ void SyncService::Loop() {
         }
         in_flight_.store(false, std::memory_order_release);
 
-        // 一次 sync 突发(poll/cycle → manifest → 各帧)结束,释放持久连接回收 mbedTLS 内存。
+        // 一次 sync 突发(sync/group → 各帧 blob)结束,释放持久连接回收 mbedTLS 内存。
         // 连接只在单次突发内复用,突发之间(轮询间隔以分钟计)不保活,避免常驻占内存。
         api::ResetConnection();
     }

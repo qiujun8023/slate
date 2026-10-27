@@ -2,14 +2,9 @@
 
 import { useCallback, useMemo, type FormEvent } from 'react';
 import { Sparkles } from 'lucide-react';
-import {
-  isAudioDynamicConfig,
-  type ContentDetailT,
-  type DynamicConfigT,
-  type DynamicTypeT,
-} from 'shared';
+import { isAudioDynamicConfig, type Content, type DynamicConfig, type DynamicType } from '@/api';
 import { useUpdateDynamicContent } from '@/features/dynamic/query/dynamic-content-queries';
-import { useContentImage } from '@/features/contents/query/content-image-queries';
+import { useBlob } from '@/features/contents/query/content-image-queries';
 import { useToast } from '@/components/feedback/toast-context';
 import { FormActions } from '@/components/ui/FormActions';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -23,9 +18,9 @@ import { DynamicContentFields } from './DynamicContentFields';
 
 interface DynamicContentEditorProps {
   gid: string;
-  content: ContentDetailT;
-  initialConfig: DynamicConfigT;
-  initialType: DynamicTypeT;
+  content: Content;
+  initialConfig: DynamicConfig;
+  initialType: DynamicType;
   onDone: () => void;
 }
 
@@ -40,20 +35,20 @@ export function DynamicContentEditor({
   const submitting = update.isPending;
   const toast = useToast();
   const initialDashboardData = useMemo(
-    () => (initialType === 'dashboard' ? dashboardDataRecord(content.dynamic_data) : null),
-    [content.dynamic_data, initialType]
+    () => (initialType === 'dashboard' ? dashboardDataRecord(content.dynamic?.data) : null),
+    [content.dynamic?.data, initialType]
   );
   const form = useDynamicContentForm({
     contentId: content.id,
     initialType,
     initialConfig,
-    initialFrameName: content.frame_name,
+    initialFrameName: content.frameName,
     initialDashboardData,
   });
   const { baseline, setBaseline } = useDynamicEditorBaselineSync({
     contentId: content.id,
     serverType: initialType,
-    serverFrameName: content.frame_name,
+    serverFrameName: content.frameName,
     serverConfig: initialConfig,
     type: form.type,
     frameName: form.frameName,
@@ -77,8 +72,8 @@ export function DynamicContentEditor({
     ]
   );
 
-  const savedPreviewEnabled = !!content.image_etag;
-  const savedPreview = useContentImage(content.id, content.image_etag ?? null);
+  const savedPreviewEnabled = !!content.imageHash;
+  const savedPreview = useBlob(content.imageHash);
   const dynamicMeta = form.type ? DYNAMIC_TYPE_META[form.type] : null;
   const showParams = Boolean(dynamicMeta?.hasConfigurableParams);
   const showAudio = Boolean(

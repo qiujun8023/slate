@@ -25,54 +25,41 @@ concurrency:
 permissions:
   contents: read
 
-# typecheck / test 运行时需要的占位配置,任意值即可(不连真实 DB)。
 env:
-  DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
-  JWT_SECRET: ci_dummy_secret_long_enough_to_pass_validation
   IMAGE: ghcr.io/${{ github.repository_owner }}/slate
 
 jobs:
-  lint-format:
-    name: lint + format
+  backend:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: slate
+          POSTGRES_PASSWORD: slate
+          POSTGRES_DB: slate_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U slate -d slate_test"
+          --health-interval 5s --health-timeout 3s --health-retries 12
+    env:
+      SLATE_TEST_DATABASE_URL: postgresql://slate:slate@127.0.0.1:5432/slate_test
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: bun run format:check
-      - run: bun run lint
+      - run: scripts/check.sh backend
 
-  typecheck:
+  frontend:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-        with:
-          prisma: 'true'
-      - run: bun run typecheck
-
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-        with:
-          prisma: 'true'
-      - run: bun run --cwd backend test
-
-  frontend-build:
-    name: frontend build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: bun run --cwd frontend build
+      - run: scripts/check.sh frontend
 
   docker:
-    needs: [lint-format, typecheck, test, frontend-build]
+    needs: [backend, frontend]
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 30

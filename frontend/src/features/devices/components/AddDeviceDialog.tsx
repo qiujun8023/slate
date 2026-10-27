@@ -1,7 +1,7 @@
 // 按设备屏上的 6 位配对码绑定设备。
 //
 // 流程：用户拿到一台已经联网但未绑定的 Slate 设备 → 设备屏上显示配对码 →
-// 用户在此对话框输入 → 后端找到 device、把 owner 设为当前用户、轮换 pair_code。
+// 用户在此对话框输入 → 后端找到 device、把 owner 设为当前用户、轮换 pairCode。
 //
 // 命名留到绑定后在设备列表 PATCH name。
 
@@ -38,12 +38,12 @@ export function AddDeviceDialog({ open, onOpenChange }: AddDeviceDialogProps) {
     e.preventDefault();
     if (!codeValid) return;
     try {
-      const device = await claim.mutateAsync({ pair_code: normalizePairCode(code) });
+      const device = await claim.mutateAsync({ pairCode: normalizePairCode(code) });
       // 后端 claim 时若 owner 已有相册会自动绑第一个，无相册则后续 create 会反向绑；
       // 这里只给出与实际后端行为一致的概要提示，不做额外引导（用户可在设备列表看进度）。
       toast.success(
         '设备已绑定',
-        device.selected_group_id ? '设备屏将开始同步相册' : '请创建一个相册，设备屏会自动同步'
+        device.groupId ? '设备屏将开始同步相册' : '请创建一个相册，设备屏会自动同步'
       );
       reset();
       onOpenChange(false);

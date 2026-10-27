@@ -1,14 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  WEATHER_ALERT_PROVINCES,
-  isWeatherAlertProvince,
-  normalizeWeatherAlertProvince,
-} from 'shared';
+import { catalog, normalizeWeatherAlertProvince } from '@/api';
 import { SearchDropdown } from '@/components/ui/SearchDropdown';
 
 const WEATHER_ALERT_REGIONS: Array<{ label: string; value: string; hint?: string }> = [
   { label: '全国', value: '', hint: '全部预警' },
-  ...WEATHER_ALERT_PROVINCES.map((province) => ({
+  ...catalog.weatherAlertProvinces.map((province) => ({
     label: province,
     value: province,
     hint: province.endsWith('市') ? '直辖市' : undefined,
@@ -98,7 +94,7 @@ function regionValueFromInput(value: string): string {
 }
 
 function isWeatherAlertRegionValue(value: string): boolean {
-  return value === '' || isWeatherAlertProvince(value);
+  return value === '' || catalog.weatherAlertProvinces.includes(value);
 }
 
 function searchWeatherAlertRegions(query: string): typeof WEATHER_ALERT_REGIONS {

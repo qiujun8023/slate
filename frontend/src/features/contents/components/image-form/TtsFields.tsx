@@ -1,4 +1,4 @@
-import { TTS_VOICES, isTtsVoice, type TtsVoiceT, type ContentAudioStatusT } from 'shared';
+import { TTS_VOICES, isTtsVoice, type AudioStatus } from '@/api';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { inputCls } from '@/components/ui/styles/form';
 import { cn } from '@/lib/cn';
@@ -6,9 +6,9 @@ import { cn } from '@/lib/cn';
 interface TtsFieldsProps {
   text: string;
   onTextChange: (text: string) => void;
-  voice: TtsVoiceT;
-  onVoiceChange: (voice: TtsVoiceT) => void;
-  status?: ContentAudioStatusT;
+  voice: string;
+  onVoiceChange: (voice: string) => void;
+  status?: AudioStatus | null;
   error?: string | null;
 }
 

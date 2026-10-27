@@ -1,83 +1,67 @@
 # syntax=docker/dockerfile:1
 
-# ---------- builder(在构建机原生架构上构建一次 frontend dist，供各架构镜像共用) ----------
-FROM --platform=$BUILDPLATFORM oven/bun:1.4.3-slim AS builder
+# 前端和 Go 在构建机原生架构上构建：前端产物与架构无关，Go 交叉编译出静态二进制。
+# ffmpeg 在目标架构上从源码编译，只包含音频转码用到的格式。
 
-WORKDIR /app
-
-# 先拷依赖描述,利用层缓存(workspaces 需要每个子包的 package.json)
-COPY package.json bun.lock ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-COPY shared/package.json ./shared/
-
+FROM --platform=$BUILDPLATFORM oven/bun:1.4.3-slim AS frontend
+WORKDIR /src/frontend
+COPY frontend/package.json frontend/bun.lock ./
 RUN bun install --frozen-lockfile
+COPY frontend ./
+RUN bun run build
 
-# 只拷构 frontend 需要的源码 → vite build
-COPY frontend ./frontend
-COPY shared ./shared
-RUN bun run --cwd frontend build
+FROM --platform=$BUILDPLATFORM golang:1.27.3-alpine AS backend
+WORKDIR /src/backend
+COPY backend/go.mod backend/go.sum ./
+RUN go mod download
+COPY backend ./
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags="-s -w" -o /out/slate ./cmd/slate \
+ && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go test -c -o /out/media.test ./internal/media
 
-# ---------- runner ----------
-FROM oven/bun:1.4.3-alpine AS runner
+# 输入：上传表单接受的 wav/mp3/aac/m4a/ogg/opus/flac/wma，以及 TTS 返回的 s16le；输出：s16le。
+FROM alpine:3.23 AS ffmpeg
+ARG FFMPEG_VERSION=9.0.2
+ARG FFMPEG_SHA256=8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
+RUN apk add --no-cache build-base nasm curl xz
+WORKDIR /src
+RUN curl -fsSLo ffmpeg.tar.xz https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.xz \
+ && echo "${FFMPEG_SHA256}  ffmpeg.tar.xz" | sha256sum -c - \
+ && tar -xJf ffmpeg.tar.xz --strip-components=1 \
+ && ./configure \
+      --disable-everything --disable-autodetect --disable-network \
+      --disable-doc --disable-debug --disable-ffplay --disable-ffprobe \
+      --disable-avdevice --disable-swscale \
+      --enable-static --disable-shared --extra-ldflags=-static \
+      --enable-protocol=pipe \
+      --enable-demuxer=wav,mp3,aac,mov,ogg,flac,asf,pcm_s16le \
+      --enable-parser=mpegaudio,aac,flac,vorbis,opus \
+      --enable-decoder=pcm_s16le,pcm_s16be,pcm_s24le,pcm_s32le,pcm_u8,pcm_f32le,pcm_f64le,pcm_alaw,pcm_mulaw,adpcm_ms,adpcm_ima_wav \
+      --enable-decoder=mp3,mp3float,aac,alac,vorbis,opus,flac,wmav1,wmav2,wmapro \
+      --enable-encoder=pcm_s16le --enable-muxer=pcm_s16le \
+      --enable-swresample --enable-filter=aresample,aformat,anull,atrim \
+ && make -j"$(nproc)" ffmpeg \
+ && strip ffmpeg
 
+# 用刚编出的 ffmpeg 跑转码测试，漏掉格式时构建失败。
+FROM ffmpeg AS ffmpeg-check
+COPY --from=backend /out/media.test ./
+COPY backend/internal/media/testdata ./testdata
+RUN PATH=/src:$PATH ./media.test -test.v
+
+FROM alpine:3.23
+RUN apk add --no-cache ca-certificates \
+ && adduser -D -u 1000 slate \
+ && mkdir -p /data/blobs && chown -R slate:slate /data
 WORKDIR /app
-
-ENV NODE_ENV=production \
-    PORT=9494 \
-    BLOB_DIR=/data/blobs
-
-# 依赖：
-#   - ffmpeg：音频转码（audio.service 把上传音频转成 16k mono s16le PCM）
-# HEALTHCHECK 复用 alpine 自带的 busybox wget,无需额外装包
-# 字体和位图字库由 backend/assets/ 目录随代码库入库，不依赖系统 fontconfig。
-RUN apk add --no-cache ffmpeg
-
-# === 按变更频率从低到高分层,客户端 docker pull 增量最小 ===
-
-# 1. 包描述 + lockfile:仅 deps 变化时失效
-COPY package.json bun.lock ./
-COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
-COPY shared/package.json ./shared/
-
-# 2. 仅生产依赖(--production 跳过所有 devDependencies),独占一层 → 代码改动不会让它失效
-RUN bun install --frozen-lockfile --production
-
-# 3. Prisma schema + 生成 client(generate 产物落在 node_modules 内,
-#    单独成层 → 仅 schema 变更才失效)。entrypoint 还要用 prisma migrate deploy,
-#    prisma CLI 已升为 backend dependency,prod install 已带上。
-COPY backend/prisma ./backend/prisma
-COPY backend/prisma.config.ts ./backend/
-RUN cd backend && bunx prisma generate
-
-# 4. 前端构建产物(前端代码变才失效)
-COPY --from=builder /app/frontend/dist ./frontend/dist
-
-# 5. shared 源码(很少变)
-COPY shared/src ./shared/src
-
-# 6. backend 配置(几乎不变)
-COPY backend/tsconfig.json ./backend/
-
-# 7. 运行时资产（矢量字体 + 1bpp 位图字库，变更极少，单独成层）
-COPY backend/assets ./backend/assets
-
-# 8. backend 脚本（可选临时 job、调试和一次性维护任务）
-COPY backend/scripts ./backend/scripts
-
-# 9. backend 源码(改动最频繁,~300K,放最后让其他层全部命中缓存)
-COPY backend/src ./backend/src
-
-# 10. entrypoint
-COPY entrypoint.sh ./
-RUN chmod +x /app/entrypoint.sh
-
-USER bun
-
+COPY --from=ffmpeg-check /src/ffmpeg /usr/local/bin/ffmpeg
+COPY --from=frontend /src/frontend/dist ./public
+COPY --from=backend /out/slate /usr/local/bin/slate
+ENV PORT=9494 BLOB_DIR=/data/blobs PUBLIC_DIR=/app/public
+USER slate
 EXPOSE 9494
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD [ "${SLATE_RUN_MODE:-server}" != "server" ] || wget --spider -q "http://127.0.0.1:${PORT}/healthz" || exit 1
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+# `slate job` 以 sidecar 方式运行时不监听端口，需在 compose 里 healthcheck.disable。
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --spider -q "http://127.0.0.1:${PORT}/api/health" || exit 1
+ENTRYPOINT ["slate"]
+CMD ["serve"]

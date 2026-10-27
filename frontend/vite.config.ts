@@ -23,15 +23,13 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      shared: path.resolve(__dirname, '../shared/src'),
+      '@': path.resolve(import.meta.dirname, 'src'),
     },
   },
   server: {
     port: 5173,
     proxy: {
       '/api': { target: 'http://localhost:9494', changeOrigin: true },
-      '/healthz': { target: 'http://localhost:9494', changeOrigin: true },
     },
   },
 });

@@ -13,7 +13,6 @@ std::string FramesDir(const std::string& gid);
 std::string StageDir(const std::string& gid);
 std::string ImagePath(const std::string& gid, int idx);
 std::string AudioPath(const std::string& gid, int idx);
-std::string EtagPath(const std::string& gid, int idx, const char* ext);
 std::string StageImagePath(const std::string& gid, int idx);
 std::string StageAudioPath(const std::string& gid, int idx);
 std::string ManifestPath(const std::string& gid);

@@ -6,8 +6,10 @@
 #include <freertos/semphr.h>
 
 #include <cstring>
+#include <ctime>
 
 #include "drivers/display/framebuffer_ops.h"
+#include "network/sntp.h"
 #include "utils/scoped_mutex_lock.h"
 
 namespace power_state {
@@ -19,14 +21,15 @@ constexpr char kTag[] = "power_state";
 constexpr uint32_t kMinWakeIntervalSec = 60u;
 
 // RTC slow memory 持久化变量。深睡跨越保留；cold boot 由 Init(true) 显式清零。
-RTC_DATA_ATTR bool     s_frame_dynamic         = false;
-RTC_DATA_ATTR uint32_t s_frame_server_sync_sec = 0;
-RTC_DATA_ATTR int      s_current_frame_seq     = 0;
+RTC_DATA_ATTR int64_t s_frame_refresh_at  = 0;
+RTC_DATA_ATTR int     s_current_frame_seq = 0;
 
 // 连续 timer wake 未能联系上服务器(WiFi/后端不可达,或 sync 失败)的次数。
 // 用于指数退避下次 RTC timer 间隔,避免网络长期不可用时每 60s 空醒耗电。
 // 成功同步清零;cold boot 清零;深睡跨越保留(退避需跨唤醒累计)。
 RTC_DATA_ATTR uint32_t s_timer_wake_fail_count = 0;
+
+RTC_DATA_ATTR bool s_cache_commit_interrupted = false;
 
 // 退避位移上限:60s << 6 ≈ 64min,与下方 kMaxBackoffWakeSec 共同封顶。
 constexpr uint32_t kMaxBackoffShift   = 6;
@@ -41,10 +44,6 @@ SemaphoreHandle_t StateMutex() {
     static StaticSemaphore_t s_mutex_buf;
     static SemaphoreHandle_t s_mutex = xSemaphoreCreateMutexStatic(&s_mutex_buf);
     return s_mutex;
-}
-
-uint32_t NormalizeDynamicWakeSec(uint32_t sec) {
-    return sec < kMinWakeIntervalSec ? kMinWakeIntervalSec : sec;
 }
 
 uint32_t HashBytes(const uint8_t* data, size_t len) {
@@ -62,27 +61,25 @@ void Init(bool cold_boot) {
     if (!cold_boot)
         return;
     ScopedMutexLock lock(StateMutex());
-    s_frame_dynamic         = false;
-    s_frame_server_sync_sec = 0;
-    s_current_frame_seq     = 0;
-    s_timer_wake_fail_count = 0;
-    s_status_bar_magic      = 0;
-    s_status_bar_hash       = 0;
+    s_frame_refresh_at         = 0;
+    s_current_frame_seq        = 0;
+    s_timer_wake_fail_count    = 0;
+    s_cache_commit_interrupted = false;
+    s_status_bar_magic         = 0;
+    s_status_bar_hash          = 0;
     std::memset(s_status_bar_snapshot, 0, sizeof(s_status_bar_snapshot));
 }
 
 CurrentFrameSchedule GetCurrentFrameSchedule() {
     CurrentFrameSchedule schedule;
     ScopedMutexLock      lock(StateMutex());
-    schedule.dynamic         = s_frame_dynamic;
-    schedule.server_sync_sec = s_frame_server_sync_sec;
+    schedule.refresh_at = s_frame_refresh_at;
     return schedule;
 }
 
 void SetCurrentFrameSchedule(const CurrentFrameSchedule& schedule) {
     ScopedMutexLock lock(StateMutex());
-    s_frame_dynamic         = schedule.dynamic;
-    s_frame_server_sync_sec = schedule.dynamic ? NormalizeDynamicWakeSec(schedule.server_sync_sec) : 0;
+    s_frame_refresh_at = schedule.refresh_at > 0 ? schedule.refresh_at : 0;
 }
 
 int GetCurrentFrameSeq() {
@@ -97,10 +94,7 @@ void SetCurrentFrameSeq(int seq) {
 }
 
 void SetCurrentFrameFromMeta(int seq, const cache::FrameMeta& meta) {
-    CurrentFrameSchedule schedule;
-    schedule.dynamic         = meta.has_ttl;
-    schedule.server_sync_sec = meta.ttl_sec;
-    SetCurrentFrameSchedule(schedule);
+    SetCurrentFrameSchedule({.refresh_at = meta.refresh_at});
     SetCurrentFrameSeq(seq);
     // flash 去重：current_frame_seq 仅在与已持久化值不同时才写。后台定时刷新每次唤醒
     // 都展示同一帧，旧实现每次都写 LittleFS，长期磨损 flash；读取不伤寿命，先读再判。
@@ -108,6 +102,16 @@ void SetCurrentFrameFromMeta(int seq, const cache::FrameMeta& meta) {
     if (cache::ReadCurrentFrameSeq(persisted) && persisted == seq)
         return;
     cache::WriteCurrentFrameSeq(seq);
+}
+
+bool CacheCommitInterrupted() {
+    ScopedMutexLock lock(StateMutex());
+    return s_cache_commit_interrupted;
+}
+
+void SetCacheCommitInterrupted(bool interrupted) {
+    ScopedMutexLock lock(StateMutex());
+    s_cache_commit_interrupted = interrupted;
 }
 
 void ClearCurrentFrame() {
@@ -118,8 +122,8 @@ void ClearCurrentFrame() {
 
 bool RestoreCurrentFrameScheduleFromCache() {
     std::string gid;
-    std::string etag;
-    if (!cache::ReadStateMeta(gid, etag) || gid.empty()) {
+    std::string manifest_version;
+    if (!cache::ReadStateMeta(gid, manifest_version) || gid.empty()) {
         ClearCurrentFrame();
         return false;
     }
@@ -148,23 +152,22 @@ bool RestoreCurrentFrameScheduleFromCache() {
 
 bool CurrentFrameNeedsTimerWake() {
     ScopedMutexLock lock(StateMutex());
-    const bool      needs_wake = s_frame_dynamic && s_frame_server_sync_sec > 0;
-    return needs_wake;
+    return s_frame_refresh_at > 0;
 }
 
 uint32_t ComputeNextWakeSec() {
     ScopedMutexLock lock(StateMutex());
-    const bool      dynamic         = s_frame_dynamic;
-    const uint32_t  server_sync_sec = s_frame_server_sync_sec;
-
-    if (!dynamic) {
+    if (s_frame_refresh_at <= 0)
         return 0;
-    }
-    const uint32_t next  = NormalizeDynamicWakeSec(server_sync_sec);
     const uint32_t shift = s_timer_wake_fail_count > kMaxBackoffShift ? kMaxBackoffShift : s_timer_wake_fail_count;
-    // 不可达退避:连续 timer wake 失败时指数拉长下次唤醒,封顶 kMaxBackoffWakeSec。
-    const uint64_t backed = static_cast<uint64_t>(next) << shift;
-    return static_cast<uint32_t>(backed > kMaxBackoffWakeSec ? kMaxBackoffWakeSec : backed);
+    // 不可达退避:连续 timer wake 失败时指数抬高下限,封顶 kMaxBackoffWakeSec。
+    const uint64_t backoff = static_cast<uint64_t>(kMinWakeIntervalSec) << shift;
+    const uint64_t floor   = backoff > kMaxBackoffWakeSec ? kMaxBackoffWakeSec : backoff;
+    // 未对时则无法换算绝对时刻,按下限唤醒,醒来后由 serverTime 校准。
+    const int64_t delta = sntp::TimeSynced() ? s_frame_refresh_at - static_cast<int64_t>(time(nullptr)) : 0;
+    if (delta <= static_cast<int64_t>(floor))
+        return static_cast<uint32_t>(floor);
+    return delta > static_cast<int64_t>(UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(delta);
 }
 
 void RecordTimerWakeResult(bool success) {

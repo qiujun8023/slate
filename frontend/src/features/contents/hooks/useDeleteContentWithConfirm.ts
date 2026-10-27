@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { ContentSummaryT } from 'shared';
+import type { Content } from '@/api';
 import { useConfirmAction } from '@/hooks/useMutationAction';
 import { useDeleteContent } from '@/features/contents/query/content-mutation-queries';
 
@@ -9,7 +9,7 @@ export function useDeleteContentWithConfirm({
   description,
 }: {
   gid: string;
-  content: Pick<ContentSummaryT, 'id' | 'seq' | 'frame_name' | 'audio_etag' | 'kind'>;
+  content: Pick<Content, 'id' | 'seq' | 'frameName' | 'audio' | 'kind'>;
   description?: string;
 }) {
   const { mutate, isPending } = useDeleteContent(gid);
@@ -36,15 +36,13 @@ export function useDeleteContentWithConfirm({
   return { deleteWithConfirm, isPending };
 }
 
-function defaultDeleteDescription(
-  content: Pick<ContentSummaryT, 'frame_name' | 'audio_etag' | 'kind'>
-): string {
+function defaultDeleteDescription(content: Pick<Content, 'frameName' | 'audio' | 'kind'>): string {
   if (content.kind === 'dynamic') {
-    return content.frame_name
-      ? `「${content.frame_name}」动态内容会一并删除，不可逆。`
+    return content.frameName
+      ? `「${content.frameName}」动态内容会一并删除，不可逆。`
       : '这项动态内容会删除，不可逆。';
   }
-  return content.frame_name
-    ? `「${content.frame_name}」连同图${content.audio_etag ? '与音频' : ''}一起删除，不可逆。`
-    : `这项内容的图${content.audio_etag ? '与音频' : ''}会删除，不可逆。`;
+  return content.frameName
+    ? `「${content.frameName}」连同图${content.audio?.hash ? '与音频' : ''}一起删除，不可逆。`
+    : `这项内容的图${content.audio?.hash ? '与音频' : ''}会删除，不可逆。`;
 }

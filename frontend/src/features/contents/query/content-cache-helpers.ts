@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import type { ContentDetailT } from 'shared';
+import type { Content } from '@/api';
 import { groupKeys } from '@/features/groups/query/keys';
 import { contentKeys } from './keys';
 
 const AUDIO_GENERATING_REFETCH_INTERVAL_MS = 2500;
 
-type AudioStatusRow = Pick<ContentDetailT, 'audio_status'>;
+type AudioStatusRow = Pick<Content, 'audio'>;
 type AudioStatusQueryData = AudioStatusRow | AudioStatusRow[];
 
 export function audioGenerationRefetchInterval(query: { state: { data?: AudioStatusQueryData } }) {
@@ -26,7 +26,7 @@ export function useInvalidateContentDependencies(gid: string) {
 }
 
 function isGeneratingAudio(row: AudioStatusRow | undefined): boolean {
-  return row?.audio_status === 'pending' || row?.audio_status === 'generating';
+  return row?.audio?.status === 'pending' || row?.audio?.status === 'generating';
 }
 
 function invalidateContentDependencies(qc: QueryClient, gid: string, contentId?: string) {
@@ -35,7 +35,5 @@ function invalidateContentDependencies(qc: QueryClient, gid: string, contentId?:
   void qc.invalidateQueries({ queryKey: groupKeys.detail(gid) });
   if (contentId) {
     void qc.invalidateQueries({ queryKey: contentKeys.detail(contentId) });
-    qc.removeQueries({ queryKey: contentKeys.image(contentId) });
-    qc.removeQueries({ queryKey: contentKeys.audio(contentId) });
   }
 }

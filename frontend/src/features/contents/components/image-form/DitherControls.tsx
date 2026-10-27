@@ -1,7 +1,6 @@
 // 抖动算法选择 + 阈值滑块(仅 threshold 模式显示)+ 缩放滑块(仅选了图时显示)。
 
-import { DITHER_MODES, DITHER_INFO } from 'shared';
-import type { DitherMode } from 'shared';
+import { DITHER_MODES, type DitherMode } from '@/lib/eink/dither';
 import { cn } from '@/lib/cn';
 
 interface DitherControlsProps {
@@ -62,10 +61,10 @@ export function DitherControls({
       <div>
         <div className="flex items-baseline justify-between mb-2 ml-0.5">
           <p className="font-sans text-[13px] text-stone">抖动算法</p>
-          <p className="font-mono text-[11px] text-stone-light">{DITHER_INFO[mode].hint}</p>
+          <p className="font-mono text-[11px] text-stone-light">{ditherInfo(mode)?.hint}</p>
         </div>
         <div className="grid grid-cols-2">
-          {DITHER_MODES.map((m) => (
+          {DITHER_MODES.map(({ id: m }) => (
             <button
               key={m}
               type="button"
@@ -78,7 +77,7 @@ export function DitherControls({
                 disabled && 'cursor-not-allowed opacity-50 hover:bg-transparent'
               )}
             >
-              <span>{DITHER_INFO[m].label}</span>
+              <span>{ditherInfo(m)?.label}</span>
               {mode === m && <span className="font-mono text-[10px]">●</span>}
             </button>
           ))}
@@ -112,4 +111,8 @@ export function DitherControls({
       )}
     </div>
   );
+}
+
+function ditherInfo(mode: DitherMode) {
+  return DITHER_MODES.find((info) => info.id === mode);
 }

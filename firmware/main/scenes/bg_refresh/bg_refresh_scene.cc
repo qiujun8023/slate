@@ -147,8 +147,8 @@ bool BgRefreshScene::SeedPreviousFrame(SceneContext& ctx) {
     }
 
     std::string gid;
-    std::string etag;
-    if (!cache::ReadStateMeta(gid, etag) || gid.empty()) {
+    std::string manifest_version;
+    if (!cache::ReadStateMeta(gid, manifest_version) || gid.empty()) {
         ESP_LOGW(kTag, "seed skipped reason=cached_group_missing");
         return false;
     }
@@ -180,8 +180,8 @@ bool BgRefreshScene::SeedPreviousFrame(SceneContext& ctx) {
 }
 
 bool BgRefreshScene::ResolveCurrentFrame(std::string& gid, int& seq, int& content_count) {
-    std::string etag;
-    if (!cache::ReadStateMeta(gid, etag) || gid.empty()) {
+    std::string manifest_version;
+    if (!cache::ReadStateMeta(gid, manifest_version) || gid.empty()) {
         ESP_LOGW(kTag, "render skipped reason=cached_group_missing");
         return false;
     }

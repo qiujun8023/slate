@@ -10,7 +10,7 @@
 
 import { useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import type { DeviceSummaryT } from 'shared';
+import type { Device } from '@/api';
 import { usePatchDevice } from '@/features/devices/query/device-queries';
 import { useGroups } from '@/features/groups/query/group-queries';
 import { useToast } from '@/components/feedback/toast-context';
@@ -28,7 +28,7 @@ import { DeviceStatusGrid } from './DeviceStatusGrid';
 interface DeviceModalProps {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  device: DeviceSummaryT;
+  device: Device;
 }
 
 export function DeviceModal({ open, onOpenChange, device }: DeviceModalProps) {
@@ -58,15 +58,15 @@ export function DeviceModal({ open, onOpenChange, device }: DeviceModalProps) {
     }
   });
 
-  const online = useDeviceOnline(device.last_seen_at);
-  const lastSeenAgo = useTimeAgo(device.last_seen_at);
+  const online = useDeviceOnline(device.lastSeenAt);
+  const lastSeenAgo = useTimeAgo(device.lastSeenAt);
 
   function changeGroup(value: string) {
     if (patch.isPending) return;
     const next = value === '__none__' ? null : value;
-    if (next === device.selected_group_id) return;
+    if (next === device.groupId) return;
     patch.mutate(
-      { selected_group_id: next },
+      { groupId: next },
       {
         onSuccess: () => toast.success(next ? '已切换在播' : '已清空在播'),
         onError: (err) => toast.error('切换失败', getApiErrorMessage(err)),
@@ -94,7 +94,7 @@ export function DeviceModal({ open, onOpenChange, device }: DeviceModalProps) {
           <div className="flex-1 overflow-y-auto px-6 sm:px-7 py-5 space-y-6">
             <DeviceGroupSelector
               groups={groups.data ?? []}
-              value={device.selected_group_id}
+              value={device.groupId}
               onChange={changeGroup}
               disabled={patch.isPending}
             />

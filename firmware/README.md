@@ -1,6 +1,6 @@
 # Slate / Firmware
 
-ESP-IDF 5.5 固件，目标芯片 ESP32-S3，目前只支持 **ZecTrix Note4 V1.0**（极趣实验室「Ai 便利贴」）：4.2 英寸黑白墨水屏、ES8311 音频、MEMS 麦克风、3 个按键、单节锂电池。本目录是独立的 ESP-IDF 工程，不在 Bun workspace 内。
+ESP-IDF 5.5 固件，目标芯片 ESP32-S3，目前只支持 **ZecTrix Note4 V1.0**（极趣实验室「Ai 便利贴」）：4.2 英寸黑白墨水屏、ES8311 音频、MEMS 麦克风、3 个按键、单节锂电池。本目录是独立的 ESP-IDF 工程。
 
 ```bash
 source $IDF_PATH/export.sh
@@ -114,12 +114,12 @@ storage  0x410000  12 MB   LittleFS，缓存帧与音频
 | 模式 | 条件 | 行为 |
 | --- | --- | --- |
 | Portal | 没有 Wi-Fi 凭据 | 开启配网热点 |
-| BackgroundRefresh | 定时器唤醒，且已注册、有缓存 | 只刷新当前动态帧，然后继续深睡 |
+| BackgroundRefresh | 定时器唤醒，且已注册、有缓存 | 不点亮界面，同步当前组，当前帧变化时才刷屏，然后继续深睡 |
 | FullActive | 其他情况 | 显示界面、联网同步 |
 
 **配网**：热点名为 `Slate-XXXX`（前缀可配置，后缀取 MAC 后两字节），所有 DNS 请求都指向 `192.168.4.1`。配网页分两步填写 Wi-Fi 和服务端地址，固件先试连 Wi-Fi，成功后才保存并重启。
 
-**注册**：联网并完成 SNTP 对时（HTTPS 需要正确时间）后，如果还没有 `device_secret`，就调用 `POST /api/v1/devices` 注册，屏幕显示配对码，等待在 Web 端绑定。之后的请求都带 `Authorization: Bearer <device_secret>`；连续收到 5 次 401 时清除 secret 并重启，重新注册。
+**注册**：联网并完成 SNTP 对时（HTTPS 需要正确时间）后，如果还没有 `device_secret`，就调用 `POST /api/device/register` 注册，屏幕显示配对码，等待在 Web 端绑定。之后的请求都带 `Authorization: Bearer <device_secret>`；连续收到 5 次 401 时清除 secret 并重启，重新注册。
 
 ## 同步
 
@@ -127,16 +127,19 @@ storage  0x410000  12 MB   LittleFS，缓存帧与音频
 
 轮询间隔：已绑定时 60 秒；未绑定时，前 10 分钟每 10 秒一次，10–30 分钟每 30 秒一次，之后每 60 秒一次。
 
-- manifest etag 未变时不下载任何内容。
-- manifest 变化后拉取新 manifest，只下载缺失或变化的图片和音频，请求带 `If-None-Match`。
-- 如果是定时器唤醒、manifest 未变，且后端返回了 `current_content`，只更新当前这一帧。
+- 每次 `sync` / `group` 请求都带上本地缓存的 `manifestVersion`；版本一致时服务端不返回 manifest，设备不下载任何内容。
+- 版本变化时响应里直接带新 manifest，设备按 sha256 只下载缺失或变化的图片和音频（`GET /api/device/blobs/{hash}`），并校验大小和哈希。
+- 动态帧带 `refreshAt`（Unix 秒），深睡前按 `refreshAt - 当前时间` 设置 RTC 定时器，最短 60 秒；连续联系不上服务器时按指数退避，最长 1 小时。
+- 定时器唤醒时上报当前帧的 `currentContentId`，服务端会先重新渲染这一帧（如果已到期），设备在同一次唤醒中拿到新图。只有当前帧的图片或状态栏变化时才刷新屏幕。
+- 服务端返回 426 表示固件协议版本过旧，需要升级固件。
 
-整组同步先下载到该组的暂存目录，全部成功后才逐帧提交，失败时不会留下更新到一半的缓存。缓存最多保留 4 个组，并保证至少 1 MB 空闲空间。
+整组同步先把缺失的文件下载到该组的暂存目录，下载阶段失败不影响已有缓存。全部下载完成后逐帧替换（每帧的图片、音频和 meta 一起换），最后才写 manifest 版本；提交中途失败或断电时版本号保持旧值，下一轮同步会拿到完整 manifest，按 hash 补齐不一致的帧。缓存最多保留 4 个组，并保证至少 1 MB 空闲空间。
 
 ```text
+/littlefs/layout                      缓存布局版本，不一致时启动时整体格式化
 /littlefs/state.json
 /littlefs/groups/{gid}/manifest.json
-/littlefs/groups/{gid}/frames/{idx}.img | .pcm | .meta，以及各自的 .etag
+/littlefs/groups/{gid}/frames/{idx}.img | .pcm | .meta    idx 为帧在 manifest 中的位置
 ```
 
 ## 按键与界面
@@ -183,10 +186,10 @@ ES8311 在第一次播放时才打开；打开后等 100 ms 再开功放，切�
 | `SLATE_DEFAULT_TIMEZONE` | `CST-8` | POSIX 时区 |
 | `SLATE_IDLE_DEEP_SLEEP_MIN` | `3` | 闲置多少分钟后深睡 |
 
-组件依赖见 [main/idf_component.yml](main/idf_component.yml)，内置字体由 `tools/gen_zfull_fonts.sh` 生成。
+组件依赖见 [main/idf_component.yml](main/idf_component.yml)，内置字体由仓库根目录的 `scripts/fonts/firmware.sh` 生成。
 
 ## 调试提示
 
 - 服务端地址可以是 `http://`，但鉴权请求走明文时会打印警告。
-- `/api/v1` 前缀写死在 `sync/api_client.cc` 中。
+- 设备协议版本是 `api::kProtocol`（`sync/api_client.h`），要和后端 `api.DeviceProtocol` 一致。
 - 调试 EPD 时注意：BUSY 是低电平表示忙，和 SSD1683 手册的默认极性相反。

@@ -1,24 +1,21 @@
 import {
-  DASHBOARD_SYSTEM_TEMPLATES,
-  FONT_TEST_FONTS,
-  hotListSourceShortLabel,
+  fontInfo,
+  hotListSource,
   normalizeWeatherAlertProvince,
-  type DashboardConfigT,
-  type DynamicConfigT,
-  type DynamicTypeT,
-} from 'shared';
+  systemTemplate,
+  type DynamicConfig,
+  type DynamicType,
+} from '@/api';
 import { zonedDateParts } from '@/features/dynamic/lib/date';
 
-export function defaultDynamicFrameName(type: DynamicTypeT, config: DynamicConfigT): string {
+export function defaultDynamicFrameName(type: DynamicType, config: DynamicConfig): string {
   switch (type) {
     case 'daily_calendar':
       return '日历';
     case 'month_calendar':
       return '月历';
     case 'weather':
-      return config.type === 'weather' && config.location_label
-        ? `${config.location_label}天气`
-        : '天气';
+      return config.locationLabel ? `${config.locationLabel}天气` : '天气';
     case 'history_today':
       return '历史上的今天';
     case 'weather_alert':
@@ -26,7 +23,7 @@ export function defaultDynamicFrameName(type: DynamicTypeT, config: DynamicConfi
     case 'earthquake_report':
       return '地震速报';
     case 'dashboard':
-      return config.type === 'dashboard' ? dashboardStatusTitle(config) : '外部数据';
+      return dashboardStatusTitle(config);
     case 'font_test':
       return dynamicStatusTitle(config) ?? '字体测试';
     case 'hot_list':
@@ -35,8 +32,8 @@ export function defaultDynamicFrameName(type: DynamicTypeT, config: DynamicConfi
 }
 
 export function effectiveDynamicFrameName(
-  type: DynamicTypeT,
-  config: DynamicConfigT,
+  type: DynamicType,
+  config: DynamicConfig,
   frameName: string
 ): string {
   if (type === 'dashboard') return frameName.trim() || defaultDynamicFrameName(type, config);
@@ -44,26 +41,24 @@ export function effectiveDynamicFrameName(
 }
 
 export function effectiveDynamicStatusBarText(
-  type: DynamicTypeT | null,
-  config: DynamicConfigT | null,
+  type: DynamicType | null,
+  config: DynamicConfig | null,
   frameName: string
 ): string | null {
   if (type === 'dashboard') {
-    return (
-      frameName.trim() || (config?.type === 'dashboard' ? dashboardStatusTitle(config) : '外部数据')
-    );
+    return frameName.trim() || (config ? dashboardStatusTitle(config) : '外部数据');
   }
   return dynamicStatusTitle(config);
 }
 
 export function frameNameForSyncedDynamicConfigChange(
-  previous: DynamicConfigT,
-  next: DynamicConfigT
+  previous: DynamicConfig,
+  next: DynamicConfig
 ): string | null {
   if (
     next.type === 'weather' &&
     previous.type === 'weather' &&
-    next.location_label !== previous.location_label
+    next.locationLabel !== previous.locationLabel
   ) {
     return defaultDynamicFrameName(next.type, next);
   }
@@ -77,22 +72,22 @@ export function frameNameForSyncedDynamicConfigChange(
   return null;
 }
 
-export function dynamicStatusTitle(config: DynamicConfigT | null | undefined): string | null {
+export function dynamicStatusTitle(config: DynamicConfig | null | undefined): string | null {
   if (!config) return null;
 
   switch (config.type) {
     case 'daily_calendar': {
-      const date = zonedDateParts(new Date(), config.tz);
+      const date = zonedDateParts(new Date(), config.tz ?? 'Asia/Shanghai');
       return `${date.month}月${date.day}日`;
     }
     case 'month_calendar': {
-      const date = zonedDateParts(new Date(), config.tz);
+      const date = zonedDateParts(new Date(), config.tz ?? 'Asia/Shanghai');
       return `${date.year}年${date.month}月`;
     }
     case 'weather':
-      return config.location_label ? `${config.location_label}天气` : '天气';
+      return config.locationLabel ? `${config.locationLabel}天气` : '天气';
     case 'history_today': {
-      const date = zonedDateParts(new Date(), config.tz);
+      const date = zonedDateParts(new Date(), config.tz ?? 'Asia/Shanghai');
       return `历史上的${date.month}月${date.day}日`;
     }
     case 'weather_alert':
@@ -102,15 +97,15 @@ export function dynamicStatusTitle(config: DynamicConfigT | null | undefined): s
     case 'dashboard':
       return dashboardStatusTitle(config);
     case 'font_test':
-      return FONT_TEST_FONTS.find((font) => font.id === config.font_id)?.label ?? '字体测试';
+      return fontInfo(config.fontId)?.label ?? '字体测试';
     case 'hot_list':
-      return `${hotListSourceShortLabel(config.source)}热榜`;
+      return `${hotListSource(config.source)?.shortLabel ?? ''}热榜`;
   }
 }
 
-export function dashboardStatusTitle(config: DashboardConfigT): string {
-  if (config.template.kind === 'system') {
-    return DASHBOARD_SYSTEM_TEMPLATES[config.template.id].label;
-  }
-  return config.template.template.name?.trim() || '自定义模板';
+export function dashboardStatusTitle(config: DynamicConfig): string {
+  const template = config.template;
+  if (template?.kind === 'system') return systemTemplate(template.id)?.label ?? '外部数据';
+  if (template?.template) return template.template.name?.trim() || '自定义模板';
+  return '外部数据';
 }

@@ -1,0 +1,639 @@
+[
+ {
+  "id": "zhihu",
+  "label": "知乎",
+  "shortLabel": "知乎热榜",
+  "kind": "general",
+  "channelLabel": "热榜",
+  "mainstream": true
+ },
+ {
+  "id": "weibo",
+  "label": "微博",
+  "shortLabel": "微博热搜",
+  "kind": "general",
+  "channelLabel": "热搜榜",
+  "mainstream": true
+ },
+ {
+  "id": "baidu",
+  "label": "百度热搜",
+  "shortLabel": "百度热搜",
+  "kind": "general",
+  "channelLabel": "热搜榜",
+  "mainstream": true
+ },
+ {
+  "id": "v2ex",
+  "label": "V2EX",
+  "shortLabel": "V2EX热门",
+  "kind": "community",
+  "channelLabel": "热门主题",
+  "mainstream": true
+ },
+ {
+  "id": "bilibili",
+  "label": "哔哩哔哩",
+  "shortLabel": "B站热门视频",
+  "kind": "general",
+  "channelLabel": "热门视频",
+  "mainstream": true
+ },
+ {
+  "id": "toutiao",
+  "label": "今日头条",
+  "shortLabel": "头条",
+  "kind": "news",
+  "mainstream": true
+ },
+ {
+  "id": "thepaper",
+  "label": "澎湃新闻",
+  "shortLabel": "澎湃",
+  "kind": "news",
+  "mainstream": true
+ },
+ {
+  "id": "douyin",
+  "label": "抖音",
+  "shortLabel": "抖音",
+  "kind": "general",
+  "mainstream": true
+ },
+ {
+  "id": "kuaishou",
+  "label": "快手",
+  "shortLabel": "快手",
+  "kind": "general",
+  "mainstream": true
+ },
+ {
+  "id": "hupu",
+  "label": "虎扑",
+  "shortLabel": "虎扑",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "tieba",
+  "label": "百度贴吧",
+  "shortLabel": "贴吧热议",
+  "kind": "community",
+  "channelLabel": "热议话题",
+  "mainstream": true
+ },
+ {
+  "id": "juejin",
+  "label": "稀土掘金",
+  "shortLabel": "掘金",
+  "kind": "tech",
+  "mainstream": true
+ },
+ {
+  "id": "sspai",
+  "label": "少数派",
+  "shortLabel": "少数派",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "ithome",
+  "label": "IT之家",
+  "shortLabel": "IT之家",
+  "kind": "tech",
+  "mainstream": true
+ },
+ {
+  "id": "smzdm",
+  "label": "什么值得买",
+  "shortLabel": "值得买",
+  "kind": "commerce",
+  "mainstream": false
+ },
+ {
+  "id": "36kr",
+  "label": "36氪",
+  "shortLabel": "36氪热榜",
+  "kind": "tech",
+  "channelLabel": "热榜",
+  "mainstream": true
+ },
+ {
+  "id": "dongchedi",
+  "label": "懂车帝",
+  "shortLabel": "懂车帝",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "github-trending",
+  "label": "GitHub",
+  "shortLabel": "GitHub热门仓库",
+  "kind": "tech",
+  "channelLabel": "热门仓库",
+  "mainstream": true
+ },
+ {
+  "id": "hello-github",
+  "label": "HelloGitHub",
+  "shortLabel": "HelloGitHub精选",
+  "kind": "tech",
+  "channelLabel": "精选",
+  "mainstream": false
+ },
+ {
+  "id": "netease",
+  "label": "网易新闻",
+  "shortLabel": "网易热榜",
+  "kind": "news",
+  "channelLabel": "热榜（Next）",
+  "mainstream": true
+ },
+ {
+  "id": "netease-music",
+  "label": "网易云音乐",
+  "shortLabel": "网易云热歌",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "qq",
+  "label": "腾讯新闻",
+  "shortLabel": "腾讯热点",
+  "kind": "community",
+  "channelLabel": "热点榜（Next）",
+  "mainstream": true
+ },
+ {
+  "id": "quark",
+  "label": "夸克",
+  "shortLabel": "夸克热点",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "woshipm",
+  "label": "人人都是产品经理",
+  "shortLabel": "人人都是产品经理",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "51cto",
+  "label": "51CTO",
+  "shortLabel": "51CTO",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "52pojie",
+  "label": "吾爱破解",
+  "shortLabel": "吾爱破解",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "acfun",
+  "label": "AcFun",
+  "shortLabel": "AcFun",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "csdn",
+  "label": "CSDN",
+  "shortLabel": "CSDN",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "dgtle",
+  "label": "数字尾巴",
+  "shortLabel": "数字尾巴",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "douban-group",
+  "label": "豆瓣讨论小组",
+  "shortLabel": "豆瓣小组",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "douban-movie",
+  "label": "豆瓣电影",
+  "shortLabel": "豆瓣新片",
+  "kind": "general",
+  "channelLabel": "新片榜（DailyHot）",
+  "mainstream": false
+ },
+ {
+  "id": "gameres",
+  "label": "GameRes 游资网",
+  "shortLabel": "GameRes 游资网",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "geekpark",
+  "label": "极客公园",
+  "shortLabel": "极客公园",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "guokr",
+  "label": "果壳",
+  "shortLabel": "果壳",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "hackernews",
+  "label": "Hacker News",
+  "shortLabel": "Hacker News",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "huxiu",
+  "label": "虎嗅",
+  "shortLabel": "虎嗅24小时",
+  "kind": "news",
+  "mainstream": true
+ },
+ {
+  "id": "ifanr",
+  "label": "爱范儿",
+  "shortLabel": "爱范儿快讯",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "ithome-xijiayi",
+  "label": "IT之家「喜加一」",
+  "shortLabel": "IT之家喜加一",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "jianshu",
+  "label": "简书",
+  "shortLabel": "简书",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "linuxdo",
+  "label": "Linux.do",
+  "shortLabel": "Linux.do",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "miyoushe",
+  "label": "米游社",
+  "shortLabel": "米游社",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "netease-news",
+  "label": "网易新闻",
+  "shortLabel": "网易热点榜",
+  "kind": "news",
+  "channelLabel": "热点榜（DailyHot）",
+  "mainstream": false
+ },
+ {
+  "id": "newsmth",
+  "label": "水木社区",
+  "shortLabel": "水木",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "ngabbs",
+  "label": "NGA",
+  "shortLabel": "NGA",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "nodeseek",
+  "label": "NodeSeek",
+  "shortLabel": "NodeSeek",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "nytimes",
+  "label": "纽约时报",
+  "shortLabel": "纽约时报",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "producthunt",
+  "label": "Product Hunt",
+  "shortLabel": "Product Hunt",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "qq-news",
+  "label": "腾讯新闻",
+  "shortLabel": "腾讯热点榜",
+  "kind": "news",
+  "channelLabel": "热点榜（DailyHot）",
+  "mainstream": false
+ },
+ {
+  "id": "sina",
+  "label": "新浪网",
+  "shortLabel": "新浪网",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "sina-news",
+  "label": "新浪新闻",
+  "shortLabel": "新浪新闻",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "weread",
+  "label": "微信读书",
+  "shortLabel": "微信读书",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "yystv",
+  "label": "游研社",
+  "shortLabel": "游研社",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "zhihu-daily",
+  "label": "知乎日报",
+  "shortLabel": "知乎日报",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "36kr-quick",
+  "label": "36氪",
+  "shortLabel": "36氪快讯",
+  "kind": "tech",
+  "channelLabel": "快讯",
+  "mainstream": false
+ },
+ {
+  "id": "bilibili-hot-search",
+  "label": "哔哩哔哩",
+  "shortLabel": "B站热搜",
+  "kind": "community",
+  "channelLabel": "热搜",
+  "mainstream": false
+ },
+ {
+  "id": "bilibili-ranking",
+  "label": "哔哩哔哩",
+  "shortLabel": "B站排行榜",
+  "kind": "community",
+  "channelLabel": "排行榜",
+  "mainstream": false
+ },
+ {
+  "id": "cankaoxiaoxi",
+  "label": "参考消息",
+  "shortLabel": "参考消息",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "douban",
+  "label": "豆瓣",
+  "shortLabel": "豆瓣热门",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "chongbuluo-hot",
+  "label": "虫部落",
+  "shortLabel": "虫部落最热",
+  "kind": "community",
+  "channelLabel": "最热",
+  "mainstream": false
+ },
+ {
+  "id": "chongbuluo-latest",
+  "label": "虫部落",
+  "shortLabel": "虫部落最新",
+  "kind": "community",
+  "channelLabel": "最新",
+  "mainstream": false
+ },
+ {
+  "id": "cls-depth",
+  "label": "财联社",
+  "shortLabel": "财联社深度",
+  "kind": "news",
+  "channelLabel": "深度",
+  "mainstream": false
+ },
+ {
+  "id": "cls-hot",
+  "label": "财联社",
+  "shortLabel": "财联社热门",
+  "kind": "news",
+  "channelLabel": "热门",
+  "mainstream": true
+ },
+ {
+  "id": "cls-telegraph",
+  "label": "财联社",
+  "shortLabel": "财联社电报",
+  "kind": "news",
+  "channelLabel": "电报",
+  "mainstream": false
+ },
+ {
+  "id": "fastbull",
+  "label": "法布财经",
+  "shortLabel": "FastBull快讯",
+  "kind": "news",
+  "channelLabel": "快讯",
+  "mainstream": false
+ },
+ {
+  "id": "fastbull-express",
+  "label": "法布财经",
+  "shortLabel": "FastBull快线",
+  "kind": "news",
+  "channelLabel": "快线",
+  "mainstream": false
+ },
+ {
+  "id": "fastbull-news",
+  "label": "法布财经",
+  "shortLabel": "FastBull头条",
+  "kind": "news",
+  "channelLabel": "头条",
+  "mainstream": false
+ },
+ {
+  "id": "freebuf",
+  "label": "FreeBuf",
+  "shortLabel": "FreeBuf",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "gelonghui",
+  "label": "格隆汇",
+  "shortLabel": "格隆汇",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "ifeng",
+  "label": "凤凰网",
+  "shortLabel": "凤凰网",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "iqiyi-hot-ranklist",
+  "label": "爱奇艺",
+  "shortLabel": "爱奇艺热播榜",
+  "kind": "general",
+  "channelLabel": "热播榜",
+  "mainstream": false
+ },
+ {
+  "id": "jin10",
+  "label": "金十数据",
+  "shortLabel": "金十",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "kaopu",
+  "label": "靠谱新闻",
+  "shortLabel": "靠谱",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "mktnews-flash",
+  "label": "MKTNews",
+  "shortLabel": "MKTNews快讯",
+  "kind": "news",
+  "channelLabel": "快讯",
+  "mainstream": false
+ },
+ {
+  "id": "nowcoder",
+  "label": "牛客",
+  "shortLabel": "牛客",
+  "kind": "community",
+  "mainstream": false
+ },
+ {
+  "id": "pcbeta-windows11",
+  "label": "远景论坛",
+  "shortLabel": "远景Win11热帖",
+  "kind": "community",
+  "channelLabel": "Windows 11 热帖",
+  "mainstream": false
+ },
+ {
+  "id": "solidot",
+  "label": "Solidot",
+  "shortLabel": "Solidot",
+  "kind": "tech",
+  "mainstream": false
+ },
+ {
+  "id": "sputniknewscn",
+  "label": "卫星通讯社",
+  "shortLabel": "卫星通讯社",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "steam",
+  "label": "Steam",
+  "shortLabel": "Steam",
+  "kind": "general",
+  "mainstream": false
+ },
+ {
+  "id": "tencent-hot",
+  "label": "腾讯新闻",
+  "shortLabel": "腾讯综合早报",
+  "kind": "news",
+  "channelLabel": "综合早报",
+  "mainstream": false
+ },
+ {
+  "id": "v2ex-share",
+  "label": "V2EX",
+  "shortLabel": "V2EX最新分享",
+  "kind": "community",
+  "channelLabel": "最新分享",
+  "mainstream": false
+ },
+ {
+  "id": "wallstreetcn-hot",
+  "label": "华尔街见闻",
+  "shortLabel": "华尔街最热",
+  "kind": "news",
+  "channelLabel": "最热",
+  "mainstream": true
+ },
+ {
+  "id": "wallstreetcn-news",
+  "label": "华尔街见闻",
+  "shortLabel": "华尔街最新",
+  "kind": "news",
+  "channelLabel": "最新",
+  "mainstream": false
+ },
+ {
+  "id": "wallstreetcn-quick",
+  "label": "华尔街见闻",
+  "shortLabel": "华尔街快讯",
+  "kind": "news",
+  "channelLabel": "快讯",
+  "mainstream": false
+ },
+ {
+  "id": "xueqiu-hotstock",
+  "label": "雪球",
+  "shortLabel": "雪球热门股票",
+  "kind": "news",
+  "channelLabel": "热门股票",
+  "mainstream": true
+ },
+ {
+  "id": "zaobao",
+  "label": "联合早报",
+  "shortLabel": "联合早报",
+  "kind": "news",
+  "mainstream": false
+ },
+ {
+  "id": "qqvideo-tv-hotsearch",
+  "label": "腾讯视频",
+  "shortLabel": "腾讯视频电视热搜榜",
+  "kind": "general",
+  "channelLabel": "电视热搜榜",
+  "mainstream": false
+ }
+]

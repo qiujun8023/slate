@@ -1,4 +1,4 @@
-// JWT 登录态管理。App 启动时如果 localStorage 有 token，自动 GET /users/current 回填 user
+// JWT 登录态管理。App 启动时如果 localStorage 有 token，自动 GET /users/me 回填 user
 // （否则 Layout 等组件读 ctx.user 永远是 null，刷新后看不到登出菜单）。
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
@@ -6,11 +6,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { resetUnauthorizedState, setUnauthorizedHandler } from '@/features/auth/lib/auth-events';
 import { AUTH_TOKEN_STORAGE_KEY, tokenStorage } from '@/features/auth/lib/auth-storage';
-import { API_PREFIX, api } from '@/lib/http';
+import { http } from '@/lib/http';
 import { notifySessionEnded } from '@/features/auth/lib/session-events';
 import { meQueryKey, useMe, type CurrentUser } from '@/features/auth/query/auth-queries';
 import { appRoutes } from '@/app/routes';
-import type { LoginRequestT, LoginResponseT, RegisterRequestT, RegisterResponseT } from 'shared';
+import type { LoginRequest, RegisterRequest, Session } from '@/api';
 import { AuthContext } from './model/auth-context';
 import { safeRedirectPath } from './lib/redirect';
 
@@ -65,36 +65,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearLocalSession, navigate, qc]);
 
   const login = useCallback(
-    async (creds: LoginRequestT, redirectTo: string = appRoutes.home) => {
-      const { data } = await api.post<LoginResponseT>(`${API_PREFIX}/sessions`, creds);
+    async (creds: LoginRequest, redirectTo: string = appRoutes.home) => {
+      const data = await http.post<Session>(`/sessions`, creds);
       handleAuthSuccess(data, redirectTo);
     },
     [handleAuthSuccess]
   );
 
   const register = useCallback(
-    async (creds: RegisterRequestT, redirectTo: string = appRoutes.home) => {
-      const { data } = await api.post<RegisterResponseT>(`${API_PREFIX}/users`, creds);
+    async (creds: RegisterRequest, redirectTo: string = appRoutes.home) => {
+      const data = await http.post<Session>(`/users`, creds);
       handleAuthSuccess(data, redirectTo);
     },
     [handleAuthSuccess]
   );
 
   const logout = useCallback(() => {
-    // 先把本地态清掉并跳登录页，再后台 best-effort 撤销 session：
-    // 服务端 logout 现在还是占位 no-op，等失败也不影响用户体验。
-    const existingToken = tokenStorage.get();
+    // JWT 没有服务端状态，登出只清本地。
     resetUnauthorizedState();
     tokenStorage.clear();
     clearLocalSession();
     navigate(appRoutes.login, { replace: true });
-    if (existingToken) {
-      api
-        .delete(`${API_PREFIX}/sessions/current`, {
-          headers: { Authorization: `Bearer ${existingToken}` },
-        })
-        .catch(() => {});
-    }
   }, [clearLocalSession, navigate]);
 
   return (

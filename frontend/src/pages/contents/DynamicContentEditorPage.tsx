@@ -15,7 +15,7 @@ export function DynamicContentEditorPage() {
       notFoundTitle="动态内容不存在或已删除"
       findContent={(content) => content.kind === 'dynamic'}
       renderEditor={({ gid, content, onDone }) => {
-        if (!content.dynamic_type || !content.dynamic_config) {
+        if (!content.dynamic?.type || !content.dynamic?.config) {
           return (
             <EmptyState
               title="动态内容配置缺失"
@@ -34,8 +34,8 @@ export function DynamicContentEditorPage() {
           <DynamicContentEditor
             gid={gid}
             content={content}
-            initialType={content.dynamic_type}
-            initialConfig={content.dynamic_config}
+            initialType={content.dynamic?.type}
+            initialConfig={content.dynamic?.config}
             onDone={onDone}
           />
         );

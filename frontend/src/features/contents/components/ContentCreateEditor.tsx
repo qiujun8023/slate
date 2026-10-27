@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { DASHBOARD_CUSTOM_STARTER_TEST_DATA } from 'shared/dynamic/test-fixtures';
+import { DASHBOARD_CUSTOM_STARTER_SAMPLE_DATA } from '@/features/dynamic/model/dashboard-samples';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TYPE_META, type AllContentType } from '@/features/contents/model/content-type-meta';
 import { DynamicCreateForm } from '@/features/dynamic/components/DynamicCreateForm';
@@ -30,7 +30,10 @@ export function ContentCreateEditor({ gid, onDone, onEditCreatedImage }: Content
     if (t === 'image') {
       dynamicForm.reset();
     } else {
-      dynamicForm.loadType(t, t === 'dashboard' ? { ...DASHBOARD_CUSTOM_STARTER_TEST_DATA } : null);
+      dynamicForm.loadType(
+        t,
+        t === 'dashboard' ? { ...DASHBOARD_CUSTOM_STARTER_SAMPLE_DATA } : null
+      );
     }
   }
 

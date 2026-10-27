@@ -1,0 +1,1592 @@
+{
+  "ttsVoices": [
+    "冰糖",
+    "茉莉",
+    "苏打",
+    "白桦",
+    "Mia",
+    "Chloe",
+    "Milo",
+    "Dean"
+  ],
+  "defaultTtsVoice": "冰糖",
+  "hotListSources": [
+    {
+      "id": "zhihu",
+      "label": "知乎",
+      "shortLabel": "知乎热榜",
+      "channelLabel": "热榜",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "weibo",
+      "label": "微博",
+      "shortLabel": "微博热搜",
+      "channelLabel": "热搜榜",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "baidu",
+      "label": "百度热搜",
+      "shortLabel": "百度热搜",
+      "channelLabel": "热搜榜",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "v2ex",
+      "label": "V2EX",
+      "shortLabel": "V2EX热门",
+      "channelLabel": "热门主题",
+      "kind": "community",
+      "mainstream": true
+    },
+    {
+      "id": "bilibili",
+      "label": "哔哩哔哩",
+      "shortLabel": "B站热门视频",
+      "channelLabel": "热门视频",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "toutiao",
+      "label": "今日头条",
+      "shortLabel": "头条",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "thepaper",
+      "label": "澎湃新闻",
+      "shortLabel": "澎湃",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "douyin",
+      "label": "抖音",
+      "shortLabel": "抖音",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "kuaishou",
+      "label": "快手",
+      "shortLabel": "快手",
+      "kind": "general",
+      "mainstream": true
+    },
+    {
+      "id": "hupu",
+      "label": "虎扑",
+      "shortLabel": "虎扑",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "tieba",
+      "label": "百度贴吧",
+      "shortLabel": "贴吧热议",
+      "channelLabel": "热议话题",
+      "kind": "community",
+      "mainstream": true
+    },
+    {
+      "id": "juejin",
+      "label": "稀土掘金",
+      "shortLabel": "掘金",
+      "kind": "tech",
+      "mainstream": true
+    },
+    {
+      "id": "sspai",
+      "label": "少数派",
+      "shortLabel": "少数派",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "ithome",
+      "label": "IT之家",
+      "shortLabel": "IT之家",
+      "kind": "tech",
+      "mainstream": true
+    },
+    {
+      "id": "smzdm",
+      "label": "什么值得买",
+      "shortLabel": "值得买",
+      "kind": "commerce",
+      "mainstream": false
+    },
+    {
+      "id": "36kr",
+      "label": "36氪",
+      "shortLabel": "36氪热榜",
+      "channelLabel": "热榜",
+      "kind": "tech",
+      "mainstream": true
+    },
+    {
+      "id": "dongchedi",
+      "label": "懂车帝",
+      "shortLabel": "懂车帝",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "github-trending",
+      "label": "GitHub",
+      "shortLabel": "GitHub热门仓库",
+      "channelLabel": "热门仓库",
+      "kind": "tech",
+      "mainstream": true
+    },
+    {
+      "id": "hello-github",
+      "label": "HelloGitHub",
+      "shortLabel": "HelloGitHub精选",
+      "channelLabel": "精选",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "netease",
+      "label": "网易新闻",
+      "shortLabel": "网易热榜",
+      "channelLabel": "热榜（Next）",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "netease-music",
+      "label": "网易云音乐",
+      "shortLabel": "网易云热歌",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "qq",
+      "label": "腾讯新闻",
+      "shortLabel": "腾讯热点",
+      "channelLabel": "热点榜（Next）",
+      "kind": "community",
+      "mainstream": true
+    },
+    {
+      "id": "quark",
+      "label": "夸克",
+      "shortLabel": "夸克热点",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "woshipm",
+      "label": "人人都是产品经理",
+      "shortLabel": "人人都是产品经理",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "51cto",
+      "label": "51CTO",
+      "shortLabel": "51CTO",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "52pojie",
+      "label": "吾爱破解",
+      "shortLabel": "吾爱破解",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "acfun",
+      "label": "AcFun",
+      "shortLabel": "AcFun",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "csdn",
+      "label": "CSDN",
+      "shortLabel": "CSDN",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "dgtle",
+      "label": "数字尾巴",
+      "shortLabel": "数字尾巴",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "douban-group",
+      "label": "豆瓣讨论小组",
+      "shortLabel": "豆瓣小组",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "douban-movie",
+      "label": "豆瓣电影",
+      "shortLabel": "豆瓣新片",
+      "channelLabel": "新片榜（DailyHot）",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "gameres",
+      "label": "GameRes 游资网",
+      "shortLabel": "GameRes 游资网",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "geekpark",
+      "label": "极客公园",
+      "shortLabel": "极客公园",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "guokr",
+      "label": "果壳",
+      "shortLabel": "果壳",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "hackernews",
+      "label": "Hacker News",
+      "shortLabel": "Hacker News",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "huxiu",
+      "label": "虎嗅",
+      "shortLabel": "虎嗅24小时",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "ifanr",
+      "label": "爱范儿",
+      "shortLabel": "爱范儿快讯",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "ithome-xijiayi",
+      "label": "IT之家「喜加一」",
+      "shortLabel": "IT之家喜加一",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "jianshu",
+      "label": "简书",
+      "shortLabel": "简书",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "linuxdo",
+      "label": "Linux.do",
+      "shortLabel": "Linux.do",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "miyoushe",
+      "label": "米游社",
+      "shortLabel": "米游社",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "netease-news",
+      "label": "网易新闻",
+      "shortLabel": "网易热点榜",
+      "channelLabel": "热点榜（DailyHot）",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "newsmth",
+      "label": "水木社区",
+      "shortLabel": "水木",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "ngabbs",
+      "label": "NGA",
+      "shortLabel": "NGA",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "nodeseek",
+      "label": "NodeSeek",
+      "shortLabel": "NodeSeek",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "nytimes",
+      "label": "纽约时报",
+      "shortLabel": "纽约时报",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "producthunt",
+      "label": "Product Hunt",
+      "shortLabel": "Product Hunt",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "qq-news",
+      "label": "腾讯新闻",
+      "shortLabel": "腾讯热点榜",
+      "channelLabel": "热点榜（DailyHot）",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "sina",
+      "label": "新浪网",
+      "shortLabel": "新浪网",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "sina-news",
+      "label": "新浪新闻",
+      "shortLabel": "新浪新闻",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "weread",
+      "label": "微信读书",
+      "shortLabel": "微信读书",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "yystv",
+      "label": "游研社",
+      "shortLabel": "游研社",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "zhihu-daily",
+      "label": "知乎日报",
+      "shortLabel": "知乎日报",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "36kr-quick",
+      "label": "36氪",
+      "shortLabel": "36氪快讯",
+      "channelLabel": "快讯",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "bilibili-hot-search",
+      "label": "哔哩哔哩",
+      "shortLabel": "B站热搜",
+      "channelLabel": "热搜",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "bilibili-ranking",
+      "label": "哔哩哔哩",
+      "shortLabel": "B站排行榜",
+      "channelLabel": "排行榜",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "cankaoxiaoxi",
+      "label": "参考消息",
+      "shortLabel": "参考消息",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "douban",
+      "label": "豆瓣",
+      "shortLabel": "豆瓣热门",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "chongbuluo-hot",
+      "label": "虫部落",
+      "shortLabel": "虫部落最热",
+      "channelLabel": "最热",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "chongbuluo-latest",
+      "label": "虫部落",
+      "shortLabel": "虫部落最新",
+      "channelLabel": "最新",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "cls-depth",
+      "label": "财联社",
+      "shortLabel": "财联社深度",
+      "channelLabel": "深度",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "cls-hot",
+      "label": "财联社",
+      "shortLabel": "财联社热门",
+      "channelLabel": "热门",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "cls-telegraph",
+      "label": "财联社",
+      "shortLabel": "财联社电报",
+      "channelLabel": "电报",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "fastbull",
+      "label": "法布财经",
+      "shortLabel": "FastBull快讯",
+      "channelLabel": "快讯",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "fastbull-express",
+      "label": "法布财经",
+      "shortLabel": "FastBull快线",
+      "channelLabel": "快线",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "fastbull-news",
+      "label": "法布财经",
+      "shortLabel": "FastBull头条",
+      "channelLabel": "头条",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "freebuf",
+      "label": "FreeBuf",
+      "shortLabel": "FreeBuf",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "gelonghui",
+      "label": "格隆汇",
+      "shortLabel": "格隆汇",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "ifeng",
+      "label": "凤凰网",
+      "shortLabel": "凤凰网",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "iqiyi-hot-ranklist",
+      "label": "爱奇艺",
+      "shortLabel": "爱奇艺热播榜",
+      "channelLabel": "热播榜",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "jin10",
+      "label": "金十数据",
+      "shortLabel": "金十",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "kaopu",
+      "label": "靠谱新闻",
+      "shortLabel": "靠谱",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "mktnews-flash",
+      "label": "MKTNews",
+      "shortLabel": "MKTNews快讯",
+      "channelLabel": "快讯",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "nowcoder",
+      "label": "牛客",
+      "shortLabel": "牛客",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "pcbeta-windows11",
+      "label": "远景论坛",
+      "shortLabel": "远景Win11热帖",
+      "channelLabel": "Windows 11 热帖",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "solidot",
+      "label": "Solidot",
+      "shortLabel": "Solidot",
+      "kind": "tech",
+      "mainstream": false
+    },
+    {
+      "id": "sputniknewscn",
+      "label": "卫星通讯社",
+      "shortLabel": "卫星通讯社",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "steam",
+      "label": "Steam",
+      "shortLabel": "Steam",
+      "kind": "general",
+      "mainstream": false
+    },
+    {
+      "id": "tencent-hot",
+      "label": "腾讯新闻",
+      "shortLabel": "腾讯综合早报",
+      "channelLabel": "综合早报",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "v2ex-share",
+      "label": "V2EX",
+      "shortLabel": "V2EX最新分享",
+      "channelLabel": "最新分享",
+      "kind": "community",
+      "mainstream": false
+    },
+    {
+      "id": "wallstreetcn-hot",
+      "label": "华尔街见闻",
+      "shortLabel": "华尔街最热",
+      "channelLabel": "最热",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "wallstreetcn-news",
+      "label": "华尔街见闻",
+      "shortLabel": "华尔街最新",
+      "channelLabel": "最新",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "wallstreetcn-quick",
+      "label": "华尔街见闻",
+      "shortLabel": "华尔街快讯",
+      "channelLabel": "快讯",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "xueqiu-hotstock",
+      "label": "雪球",
+      "shortLabel": "雪球热门股票",
+      "channelLabel": "热门股票",
+      "kind": "news",
+      "mainstream": true
+    },
+    {
+      "id": "zaobao",
+      "label": "联合早报",
+      "shortLabel": "联合早报",
+      "kind": "news",
+      "mainstream": false
+    },
+    {
+      "id": "qqvideo-tv-hotsearch",
+      "label": "腾讯视频",
+      "shortLabel": "腾讯视频电视热搜榜",
+      "channelLabel": "电视热搜榜",
+      "kind": "general",
+      "mainstream": false
+    }
+  ],
+  "fonts": [
+    {
+      "id": "fusion_pixel_10",
+      "label": "Fusion Pixel 10",
+      "sizePx": 10,
+      "kind": "cjk",
+      "hint": "10px full cmap",
+      "note": "按源字体 cmap 全量生成，适合墨水屏小正文。",
+      "source": "TakWolf/fusion-pixel-font",
+      "license": "MIT"
+    },
+    {
+      "id": "fusion_pixel_12",
+      "label": "Fusion Pixel 12",
+      "sizePx": 12,
+      "kind": "cjk",
+      "hint": "12px full cmap",
+      "note": "按源字体 cmap 全量生成，中文正文覆盖较完整。",
+      "source": "TakWolf/fusion-pixel-font",
+      "license": "MIT"
+    },
+    {
+      "id": "zfull_gb_10",
+      "label": "Zfull-GB 10",
+      "sizePx": 10,
+      "kind": "cjk",
+      "hint": "10px GB2312",
+      "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+      "source": "zfull-for-yosemite",
+      "license": "No explicit license"
+    },
+    {
+      "id": "zfull_gb_12",
+      "label": "Zfull-GB 12",
+      "sizePx": 12,
+      "kind": "cjk",
+      "hint": "12px GB2312",
+      "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+      "source": "zfull-for-yosemite",
+      "license": "No explicit license"
+    },
+    {
+      "id": "zfull_gb_14",
+      "label": "Zfull-GB 14",
+      "sizePx": 14,
+      "kind": "cjk",
+      "hint": "14px GB2312",
+      "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+      "source": "zfull-for-yosemite",
+      "license": "No explicit license"
+    },
+    {
+      "id": "zfull_gb_16",
+      "label": "Zfull-GB 16",
+      "sizePx": 16,
+      "kind": "cjk",
+      "hint": "16px GB2312",
+      "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+      "source": "zfull-for-yosemite",
+      "license": "No explicit license"
+    },
+    {
+      "id": "zfull_gb_18",
+      "label": "Zfull-GB 18",
+      "sizePx": 18,
+      "kind": "cjk",
+      "hint": "18px GB2312",
+      "note": "按 Zfull-GB 点阵生成，覆盖 ASCII、GB2312 常用汉字和常用符号。",
+      "source": "zfull-for-yosemite",
+      "license": "No explicit license"
+    },
+    {
+      "id": "ark_pixel_10",
+      "label": "Ark Pixel 10",
+      "sizePx": 10,
+      "kind": "cjk",
+      "hint": "10px full cmap",
+      "note": "按 Ark 10px 源字体 cmap 全量生成；源字体中文覆盖较小。",
+      "source": "TakWolf/ark-pixel-font",
+      "license": "MIT"
+    },
+    {
+      "id": "ark_pixel_12",
+      "label": "Ark Pixel 12",
+      "sizePx": 12,
+      "kind": "cjk",
+      "hint": "12px full cmap",
+      "note": "按 Ark 12px 源字体 cmap 全量生成，中号中文覆盖较好。",
+      "source": "TakWolf/ark-pixel-font",
+      "license": "MIT"
+    },
+    {
+      "id": "ark_pixel_16",
+      "label": "Ark Pixel 16",
+      "sizePx": 16,
+      "kind": "cjk",
+      "hint": "16px full cmap",
+      "note": "按 Ark 16px 源字体 cmap 全量生成；源字体中文覆盖有限。",
+      "source": "TakWolf/ark-pixel-font",
+      "license": "MIT"
+    },
+    {
+      "id": "zlabs_pixel_12",
+      "label": "Z Labs Pixel 12",
+      "sizePx": 12,
+      "kind": "cjk",
+      "hint": "12px demo subset",
+      "note": "中文像素黑体候选；测试页样张子集，适合和 Fusion/Ark 12px 对比。",
+      "source": "Astro-2539/ZLabs-Pixel-12px",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "zlabs_roundpix_12",
+      "label": "Z Labs RoundPix 12",
+      "sizePx": 12,
+      "kind": "cjk",
+      "hint": "12px demo subset",
+      "note": "圆角像素中文候选；测试页样张子集，观察墨水屏边缘是否发糊。",
+      "source": "Astro-2539/ZLabs-RoundPix-12px",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "zlabs_roundpix_16",
+      "label": "Z Labs RoundPix 16",
+      "sizePx": 16,
+      "kind": "cjk",
+      "hint": "16px demo subset",
+      "note": "圆角像素中文 16px 候选；测试页样张子集。",
+      "source": "Astro-2539/ZLabs-RoundPix-16px",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "chill_bitmap_16",
+      "label": "ChillBitmap 16",
+      "sizePx": 16,
+      "kind": "cjk",
+      "hint": "16px demo subset",
+      "note": "寒蝉点阵体 16px 中文；测试页样张子集。",
+      "source": "Warren2060/ChillBitmap",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "cubic_11",
+      "label": "Cubic 11",
+      "sizePx": 11,
+      "kind": "cjk",
+      "hint": "11px demo subset",
+      "note": "俐方體 11 號；偏繁体/TW 风格，测试页样张子集。",
+      "source": "ACh-K/Cubic-11",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "unifont_16",
+      "label": "GNU Unifont 16",
+      "sizePx": 16,
+      "kind": "cjk",
+      "hint": "16px full cmap",
+      "note": "按源字体 cmap 全量生成的宽覆盖 fallback，风格粗糙但缺字少。",
+      "source": "multitheftauto/unifont",
+      "license": "GNU Unifont"
+    },
+    {
+      "id": "spleen_5x8",
+      "label": "Spleen 5x8",
+      "sizePx": 8,
+      "kind": "latin",
+      "hint": "5x8 Latin",
+      "note": "极小号等宽点阵，适合状态栏英文/数字。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "spleen_6x12",
+      "label": "Spleen 6x12",
+      "sizePx": 12,
+      "kind": "latin",
+      "hint": "6x12 Latin",
+      "note": "小号等宽点阵，适合密集英文/数字。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "spleen_8x16",
+      "label": "Spleen 8x16",
+      "sizePx": 16,
+      "kind": "latin",
+      "hint": "8x16 Latin",
+      "note": "经典终端点阵尺寸。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "spleen_12x24",
+      "label": "Spleen 12x24",
+      "sizePx": 24,
+      "kind": "latin",
+      "hint": "12x24 Latin",
+      "note": "中大号等宽点阵。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "spleen_16x32",
+      "label": "Spleen 16x32",
+      "sizePx": 32,
+      "kind": "latin",
+      "hint": "16x32 Latin",
+      "note": "大字号等宽点阵。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "spleen_32x64",
+      "label": "Spleen 32x64",
+      "sizePx": 64,
+      "kind": "latin",
+      "hint": "32x64 Latin",
+      "note": "超大号数字/短文本点阵。",
+      "source": "fcambus/spleen",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "id": "cozette_13",
+      "label": "Cozette 13",
+      "sizePx": 13,
+      "kind": "latin",
+      "hint": "13px Latin",
+      "note": "编程向点阵字体，ASCII 细节清晰。",
+      "source": "the-moonwitch/Cozette",
+      "license": "MIT"
+    },
+    {
+      "id": "montserrat_48",
+      "label": "Montserrat 48",
+      "sizePx": 48,
+      "kind": "display",
+      "hint": "48px display",
+      "note": "大号拉丁数字对照组。",
+      "source": "JulietaUla/Montserrat",
+      "license": "OFL-1.1"
+    },
+    {
+      "id": "font_awesome_14",
+      "label": "Font Awesome 14",
+      "sizePx": 14,
+      "kind": "icon",
+      "hint": "14px full icons",
+      "note": "按 Font Awesome 5 源字体 cmap 全量生成的小号图标测试。",
+      "source": "FortAwesome/Font-Awesome",
+      "license": "Font Awesome Free"
+    },
+    {
+      "id": "font_awesome_30",
+      "label": "Font Awesome 30",
+      "sizePx": 30,
+      "kind": "icon",
+      "hint": "30px full icons",
+      "note": "按 Font Awesome 5 源字体 cmap 全量生成的大号图标测试。",
+      "source": "FortAwesome/Font-Awesome",
+      "license": "Font Awesome Free"
+    }
+  ],
+  "dashboardTemplates": [
+    {
+      "id": "ai_usage_stats",
+      "label": "AI 使用统计",
+      "description": "展示今日/累计消费、请求、Token、缓存率、均价、响应时间和平台拆分。",
+      "template": {
+        "version": 1,
+        "name": "AI 使用统计",
+        "blocks": [
+          {
+            "type": "metric",
+            "x": 20,
+            "y": 34,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{today_cost_usd|usd2}",
+            "label": "今日消费"
+          },
+          {
+            "type": "metric",
+            "x": 112,
+            "y": 34,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{today_request_count|int}",
+            "label": "今日请求"
+          },
+          {
+            "type": "metric",
+            "x": 204,
+            "y": 34,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{today_token_count|tokens}",
+            "label": "今日Token"
+          },
+          {
+            "type": "metric",
+            "x": 296,
+            "y": 34,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{today_cache_hit_rate_percent|percent}",
+            "label": "今日缓存率"
+          },
+          {
+            "type": "metric",
+            "x": 20,
+            "y": 92,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{total_cost_usd|usd2}",
+            "label": "累计消费"
+          },
+          {
+            "type": "metric",
+            "x": 112,
+            "y": 92,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{total_request_count|int}",
+            "label": "累计请求"
+          },
+          {
+            "type": "metric",
+            "x": 204,
+            "y": 92,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{total_token_count|tokens}",
+            "label": "累计Token"
+          },
+          {
+            "type": "metric",
+            "x": 296,
+            "y": 92,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{total_cache_hit_rate_percent|percent}",
+            "label": "总缓存率"
+          },
+          {
+            "type": "metric",
+            "x": 20,
+            "y": 150,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{average_latency_ms|duration}",
+            "label": "平均响应"
+          },
+          {
+            "type": "metric",
+            "x": 112,
+            "y": 150,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{today_cost_per_million_tokens_usd|usd_per_million}",
+            "label": "今日均价"
+          },
+          {
+            "type": "metric",
+            "x": 204,
+            "y": 150,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{total_cost_per_million_tokens_usd|usd_per_million}",
+            "label": "累计均价"
+          },
+          {
+            "type": "metric",
+            "x": 296,
+            "y": 150,
+            "w": 84,
+            "h": 48,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{last_updated_time_label}",
+            "label": "更新时间"
+          },
+          {
+            "type": "line",
+            "x": 0,
+            "y": 0,
+            "w": 0,
+            "h": 0,
+            "x1": 20,
+            "y1": 218,
+            "x2": 380,
+            "y2": 218,
+            "style": "dashed"
+          },
+          {
+            "type": "text",
+            "x": 20,
+            "y": 237,
+            "w": 120,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "按平台拆分",
+            "fontSize": 12,
+            "align": "left",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 170,
+            "y": 237,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "今日",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 240,
+            "y": 237,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "请求",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 310,
+            "y": 237,
+            "w": 70,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "Token",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 20,
+            "y": 255,
+            "w": 130,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.0.platform_name}",
+            "fontSize": 12,
+            "align": "left",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 170,
+            "y": 255,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.0.today_cost_usd|usd2}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 240,
+            "y": 255,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.0.today_request_count|int}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 310,
+            "y": 255,
+            "w": 70,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.0.today_token_count|tokens}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 20,
+            "y": 275,
+            "w": 130,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.1.platform_name}",
+            "fontSize": 12,
+            "align": "left",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 170,
+            "y": 275,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.1.today_cost_usd|usd2}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 240,
+            "y": 275,
+            "w": 58,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.1.today_request_count|int}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          },
+          {
+            "type": "text",
+            "x": 310,
+            "y": 275,
+            "w": 70,
+            "h": 12,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{platform_breakdown.1.today_token_count|tokens}",
+            "fontSize": 12,
+            "align": "right",
+            "color": "black",
+            "maxLines": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_quota_monitor",
+      "label": "AI 限额监控",
+      "description": "展示 Claude Code 或 Codex/OpenAI 单服务限额快照；只放使用率、状态、绝对重置时间和更新时间。",
+      "template": {
+        "version": 1,
+        "name": "AI 限额监控",
+        "blocks": [
+          {
+            "type": "metric",
+            "x": 20,
+            "y": 44,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{service_label}",
+            "label": "服务"
+          },
+          {
+            "type": "metric",
+            "x": 145,
+            "y": 44,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{plan_label}",
+            "label": "套餐"
+          },
+          {
+            "type": "metric",
+            "x": 270,
+            "y": 44,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{status_label}",
+            "label": "状态"
+          },
+          {
+            "type": "progress",
+            "x": 20,
+            "y": 120,
+            "w": 360,
+            "h": 34,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "label": "{primary_window_label}",
+            "valueText": "{primary_used_percent|int}%",
+            "percentage": "{primary_used_percent}",
+            "labelFontSize": 16,
+            "valueFontSize": 16,
+            "barHeight": 14
+          },
+          {
+            "type": "progress",
+            "x": 20,
+            "y": 162,
+            "w": 360,
+            "h": 34,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "label": "{secondary_window_label}",
+            "valueText": "{secondary_used_percent|int}%",
+            "percentage": "{secondary_used_percent}",
+            "labelFontSize": 16,
+            "valueFontSize": 16,
+            "barHeight": 14
+          },
+          {
+            "type": "line",
+            "x": 0,
+            "y": 0,
+            "w": 0,
+            "h": 0,
+            "x1": 20,
+            "y1": 210,
+            "x2": 380,
+            "y2": 210,
+            "style": "dashed"
+          },
+          {
+            "type": "metric",
+            "x": 20,
+            "y": 228,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{primary_reset_at_label}",
+            "label": "5小时重置"
+          },
+          {
+            "type": "metric",
+            "x": 145,
+            "y": 228,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{secondary_reset_at_label}",
+            "label": "周重置"
+          },
+          {
+            "type": "metric",
+            "x": 270,
+            "y": 228,
+            "w": 110,
+            "h": 52,
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 0,
+            "value": "{updated_label}",
+            "label": "更新"
+          }
+        ]
+      }
+    }
+  ],
+  "dashboardStarter": {
+    "version": 1,
+    "name": "自定义模板",
+    "blocks": [
+      {
+        "type": "metric",
+        "x": 20,
+        "y": 34,
+        "w": 170,
+        "h": 62,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{primary_value}",
+        "label": "{primary_label}",
+        "sparkline": "{primary_trend}"
+      },
+      {
+        "type": "metric",
+        "x": 210,
+        "y": 34,
+        "w": 170,
+        "h": 62,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{secondary_value}",
+        "label": "{secondary_label}"
+      },
+      {
+        "type": "metric",
+        "x": 20,
+        "y": 106,
+        "w": 170,
+        "h": 62,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{third_value}",
+        "label": "{third_label}"
+      },
+      {
+        "type": "metric",
+        "x": 210,
+        "y": 106,
+        "w": 170,
+        "h": 62,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{fourth_value}",
+        "label": "{fourth_label}"
+      },
+      {
+        "type": "line",
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0,
+        "x1": 20,
+        "y1": 184,
+        "x2": 380,
+        "y2": 184,
+        "style": "dashed"
+      },
+      {
+        "type": "progress",
+        "x": 20,
+        "y": 198,
+        "w": 360,
+        "h": 24,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "label": "{primary_progress_label}",
+        "valueText": "{primary_progress_text}",
+        "percentage": "{primary_progress_percent}",
+        "labelFontSize": 12,
+        "valueFontSize": 12,
+        "barHeight": 9
+      },
+      {
+        "type": "progress",
+        "x": 20,
+        "y": 228,
+        "w": 360,
+        "h": 24,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "label": "{secondary_progress_label}",
+        "valueText": "{secondary_progress_text}",
+        "percentage": "{secondary_progress_percent}",
+        "labelFontSize": 12,
+        "valueFontSize": 12,
+        "barHeight": 9
+      },
+      {
+        "type": "text",
+        "x": 20,
+        "y": 270,
+        "w": 170,
+        "h": 14,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{footer_left}",
+        "fontSize": 12,
+        "align": "left",
+        "color": "black",
+        "maxLines": 1
+      },
+      {
+        "type": "text",
+        "x": 210,
+        "y": 270,
+        "w": 170,
+        "h": 14,
+        "x1": 0,
+        "y1": 0,
+        "x2": 0,
+        "y2": 0,
+        "value": "{footer_right}",
+        "fontSize": 12,
+        "align": "right",
+        "color": "black",
+        "maxLines": 1
+      }
+    ]
+  },
+  "weatherAlertProvinces": [
+    "北京市",
+    "上海市",
+    "天津市",
+    "重庆市",
+    "黑龙江省",
+    "吉林省",
+    "辽宁省",
+    "内蒙古自治区",
+    "河北省",
+    "山西省",
+    "陕西省",
+    "山东省",
+    "新疆维吾尔自治区",
+    "西藏自治区",
+    "青海省",
+    "甘肃省",
+    "宁夏回族自治区",
+    "河南省",
+    "江苏省",
+    "湖北省",
+    "浙江省",
+    "安徽省",
+    "福建省",
+    "江西省",
+    "湖南省",
+    "贵州省",
+    "四川省",
+    "广东省",
+    "云南省",
+    "广西壮族自治区",
+    "海南省"
+  ]
+}

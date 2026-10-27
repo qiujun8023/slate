@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers, Trash2 } from 'lucide-react';
-import type { GroupSummaryT } from 'shared';
+import type { Group } from '@/api';
 import { DragHandle } from '@/components/ui/DragHandle';
 import { IconBlock } from '@/components/ui/IconBlock';
 import { formatBytes } from '@/lib/format';
@@ -16,8 +16,8 @@ export const GroupCardSortable = memo(function GroupCardSortable({
   onDelete,
   deleteDisabled,
 }: {
-  group: GroupSummaryT;
-  onDelete: (group: GroupSummaryT) => void;
+  group: Group;
+  onDelete: (group: Group) => void;
   deleteDisabled?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, style, isDragging } = useSortableStyle(group.id);
@@ -44,16 +44,13 @@ export const GroupCardSortable = memo(function GroupCardSortable({
               <h3 className="font-serif text-[20px] font-bold leading-tight truncate tracking-tight">
                 {group.name}
               </h3>
-              <p
-                className="font-mono text-[11px] text-stone-light mt-1.5 truncate"
-                title={`manifest_etag: ${group.manifest_etag}`}
-              >
-                {formatBytes(group.total_bytes)}
+              <p className="font-mono text-[11px] text-stone-light mt-1.5 truncate">
+                {formatBytes(group.totalBytes)}
               </p>
             </div>
             <div className="flex items-baseline gap-1 flex-shrink-0">
               <span className="font-serif text-[28px] font-bold leading-none tabular-nums text-ink">
-                {group.content_count}
+                {group.contentCount}
               </span>
               <span className="font-sans text-[11px] text-stone">项</span>
             </div>

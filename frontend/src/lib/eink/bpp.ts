@@ -1,4 +1,4 @@
-import { FRAME_HEIGHT, FRAME_WIDTH } from 'shared';
+import { FrameHeight, FrameWidth } from '@/api';
 import { INK_RGB, PAPER_HEX, PAPER_RGB } from './colors';
 
 export function clearCanvas(
@@ -6,13 +6,13 @@ export function clearCanvas(
   canvas?: { width: number; height: number }
 ): void {
   ctx.fillStyle = PAPER_HEX;
-  ctx.fillRect(0, 0, canvas?.width ?? FRAME_WIDTH, canvas?.height ?? FRAME_HEIGHT);
+  ctx.fillRect(0, 0, canvas?.width ?? FrameWidth, canvas?.height ?? FrameHeight);
 }
 
 export function decodeBppImage(
   bytes: Uint8Array | ArrayBuffer,
-  width: number = FRAME_WIDTH,
-  height: number = FRAME_HEIGHT,
+  width: number = FrameWidth,
+  height: number = FrameHeight,
   paperColor: readonly [number, number, number] = PAPER_RGB,
   inkColor: readonly [number, number, number] = INK_RGB
 ): ImageData {
@@ -44,8 +44,8 @@ export function decodeBppImage(
 
 export function isValidBppLength(
   bytes: Uint8Array | ArrayBuffer,
-  width: number = FRAME_WIDTH,
-  height: number = FRAME_HEIGHT
+  width: number = FrameWidth,
+  height: number = FrameHeight
 ): boolean {
   const byteLength = bytes instanceof ArrayBuffer ? bytes.byteLength : bytes.length;
   return byteLength === (width * height) / 8;

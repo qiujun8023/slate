@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
-import { FRAME_HEIGHT, FRAME_WIDTH } from 'shared';
+import { FrameHeight, FrameWidth } from '@/api';
 import { cn } from '@/lib/cn';
 import { clearCanvas, decodeBppImage, isValidBppLength } from '@/lib/eink/bpp';
 import { StatusBarOverlay } from './StatusBarOverlay';
@@ -23,8 +23,8 @@ export function FrameBitmapPreview({
     <div className={cn('relative h-full w-full overflow-hidden bg-paper', className)}>
       <canvas
         ref={canvasRef}
-        width={FRAME_WIDTH}
-        height={FRAME_HEIGHT}
+        width={FrameWidth}
+        height={FrameHeight}
         className="block h-full w-full"
         style={{ imageRendering: 'pixelated' }}
       />

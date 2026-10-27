@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { fieldBaseCls } from '@/components/ui/styles/form';
 import { cn } from '@/lib/cn';
-import { API_PREFIX } from '@/lib/http';
 
 export function DashboardPushPanel({
   contentId,
@@ -70,7 +69,7 @@ export function DashboardPushPanel({
       </details>
       <p className="font-sans text-[11px] text-stone italic leading-snug">
         推送流程：① 复制 URL → ② 由你的系统/脚本 POST 数据 → ③ 设备下次唤醒时拉取并刷新屏幕。 URL
-        中的 contentId 即推送凭证（cuid 不可枚举），请勿公开分享，泄漏后只能删内容重建。
+        中的 contentId 即推送凭证（随机 ID 不可枚举），请勿公开分享，泄漏后只能删内容重建。
         推送后不会立即亮屏，设备按预设周期或按键翻页时生效。
       </p>
     </div>
@@ -78,7 +77,7 @@ export function DashboardPushPanel({
 }
 
 function absoluteContentDataUrl(contentId: string): string {
-  const path = `${API_PREFIX}/contents/${contentId}/data`;
+  const path = `/api/contents/${contentId}/data`;
   if (typeof window === 'undefined') return path;
   return new URL(path, window.location.origin).toString();
 }

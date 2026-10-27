@@ -48,6 +48,7 @@ bool TryConnectAndSetup(cred::Credentials& c) {
             evt::PostBootStage(BootStage::kServerUnreachable);
             return false;
         }
+        sntp::ApplyServerTime(rr.server_time_ms);
 
         bool saved = false;
         for (int attempt = 1; attempt <= kSaveSecretRetryCount; ++attempt) {

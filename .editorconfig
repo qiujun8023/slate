@@ -11,8 +11,5 @@ trim_trailing_whitespace = true
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{c,h,cpp,hpp}]
-indent_size = 4
-
-[Makefile]
+[{*.go,go.mod}]
 indent_style = tab

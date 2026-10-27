@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { DynamicConfig, type DynamicConfigT, type DynamicTypeT } from 'shared';
+import type { DynamicConfig, DynamicType } from '@/api';
 import { defaultConfig } from '@/features/dynamic/model/default-config';
 import {
   defaultDynamicFrameName,
@@ -12,8 +12,8 @@ import { useDynamicPreview } from './useDynamicPreview';
 
 interface UseDynamicContentFormOptions {
   contentId?: string;
-  initialType?: DynamicTypeT | null;
-  initialConfig?: DynamicConfigT | null;
+  initialType?: DynamicType | null;
+  initialConfig?: DynamicConfig | null;
   initialFrameName?: string | null;
   initialDashboardData?: Record<string, unknown> | null;
   requireDashboardData?: boolean;
@@ -27,8 +27,8 @@ export function useDynamicContentForm({
   initialDashboardData = null,
   requireDashboardData = false,
 }: UseDynamicContentFormOptions = {}) {
-  const [type, setType] = useState<DynamicTypeT | null>(initialType);
-  const [config, setConfig] = useState<DynamicConfigT | null>(initialConfig);
+  const [type, setType] = useState<DynamicType | null>(initialType);
+  const [config, setConfig] = useState<DynamicConfig | null>(initialConfig);
   const [frameName, setFrameName] = useState(() =>
     initialType && initialConfig
       ? (initialFrameName ?? defaultDynamicFrameName(initialType, initialConfig))
@@ -41,7 +41,6 @@ export function useDynamicContentForm({
     contentId,
     type,
     config,
-    frameName,
     dashboardData,
   });
   const configKey = useMemo(() => (config ? dynamicConfigKey(config) : ''), [config]);
@@ -49,7 +48,7 @@ export function useDynamicContentForm({
   const dashboardDataSatisfied = !requireDashboardData || hasDashboardData;
 
   const loadType = useCallback(
-    (nextType: DynamicTypeT, nextDashboardData: Record<string, unknown> | null = null) => {
+    (nextType: DynamicType, nextDashboardData: Record<string, unknown> | null = null) => {
       invalidatePreview();
       const nextConfig = defaultConfig(nextType);
       setType(nextType);
@@ -68,7 +67,7 @@ export function useDynamicContentForm({
     setDashboardData(null);
   }, [invalidatePreview]);
 
-  const changeConfig = useCallback((next: DynamicConfigT) => {
+  const changeConfig = useCallback((next: DynamicConfig) => {
     setConfig((previous) => {
       if (previous) {
         const nextFrameName = frameNameForSyncedDynamicConfigChange(previous, next);
@@ -80,24 +79,16 @@ export function useDynamicContentForm({
 
   const submitConfig = useCallback(() => {
     if (!type || !config) return { ok: false as const, error: 'config: 请选择动态类型' };
-    const parsed = DynamicConfig.safeParse(config);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return {
-        ok: false as const,
-        error: `${first?.path.join('.') || 'config'}: ${first?.message ?? '请检查'}`,
-      };
-    }
-    if (parsed.data.type === 'dashboard' && !dashboardDataSatisfied) {
+    // Field validation happens on the server; it reports the first invalid field.
+    if (config.type === 'dashboard' && !dashboardDataSatisfied) {
       return { ok: false as const, error: 'dashboard 初始数据不能为空' };
     }
-    const parsedType = parsed.data.type;
     return {
       ok: true as const,
-      type: parsedType,
-      config: parsed.data,
-      frameName: effectiveDynamicFrameName(parsedType, parsed.data, frameName),
-      dashboardData: parsed.data.type === 'dashboard' ? (dashboardData ?? undefined) : undefined,
+      type: config.type,
+      config,
+      frameName: effectiveDynamicFrameName(config.type, config, frameName),
+      dashboardData: config.type === 'dashboard' ? (dashboardData ?? undefined) : undefined,
     };
   }, [config, dashboardData, dashboardDataSatisfied, frameName, type]);
 

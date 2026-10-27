@@ -20,14 +20,10 @@ bool WriteFrameMetaFile(const std::string& path, const cache::FrameMeta& meta) {
     if (!root)
         return false;
     cJSON_AddStringToObject(root, "status_bar_text", meta.status_bar_text.c_str());
-    cJSON_AddStringToObject(root, "content_etag", meta.content_etag.c_str());
-    cJSON_AddStringToObject(root, "image_etag", meta.image_etag.c_str());
-    cJSON_AddStringToObject(root, "audio_etag", meta.audio_etag.c_str());
-    if (meta.has_ttl) {
-        cJSON_AddNumberToObject(root, "ttl_sec", static_cast<double>(meta.ttl_sec));
-    } else {
-        cJSON_AddNullToObject(root, "ttl_sec");
-    }
+    cJSON_AddStringToObject(root, "content_id", meta.content_id.c_str());
+    cJSON_AddStringToObject(root, "image_hash", meta.image_hash.c_str());
+    cJSON_AddStringToObject(root, "audio_hash", meta.audio_hash.c_str());
+    cJSON_AddNumberToObject(root, "refresh_at", static_cast<double>(meta.refresh_at));
     char* s = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
     if (!s)
@@ -47,37 +43,32 @@ bool ReadFrameMetaFile(const std::string& path, cache::FrameMeta& out) {
     if (!root)
         return false;
     cJSON* cap        = cJSON_GetObjectItemCaseSensitive(root, "status_bar_text");
-    cJSON* etag       = cJSON_GetObjectItemCaseSensitive(root, "content_etag");
-    cJSON* image_etag = cJSON_GetObjectItemCaseSensitive(root, "image_etag");
-    cJSON* audio_etag = cJSON_GetObjectItemCaseSensitive(root, "audio_etag");
-    cJSON* ttl        = cJSON_GetObjectItemCaseSensitive(root, "ttl_sec");
+    cJSON* content_id = cJSON_GetObjectItemCaseSensitive(root, "content_id");
+    cJSON* image_hash = cJSON_GetObjectItemCaseSensitive(root, "image_hash");
+    cJSON* audio_hash = cJSON_GetObjectItemCaseSensitive(root, "audio_hash");
+    cJSON* refresh_at = cJSON_GetObjectItemCaseSensitive(root, "refresh_at");
     if (cJSON_IsString(cap) && cap->valuestring)
         out.status_bar_text = cap->valuestring;
-    if (cJSON_IsString(etag) && etag->valuestring)
-        out.content_etag = etag->valuestring;
-    if (cJSON_IsString(image_etag) && image_etag->valuestring)
-        out.image_etag = image_etag->valuestring;
-    if (cJSON_IsString(audio_etag) && audio_etag->valuestring)
-        out.audio_etag = audio_etag->valuestring;
-    if (cJSON_IsNumber(ttl)) {
-        const double v = ttl->valuedouble;
-        if (v >= 0.0 && v <= static_cast<double>(UINT32_MAX)) {
-            out.has_ttl = true;
-            out.ttl_sec = static_cast<uint32_t>(v);
-        }
-    }
+    if (cJSON_IsString(content_id) && content_id->valuestring)
+        out.content_id = content_id->valuestring;
+    if (cJSON_IsString(image_hash) && image_hash->valuestring)
+        out.image_hash = image_hash->valuestring;
+    if (cJSON_IsString(audio_hash) && audio_hash->valuestring)
+        out.audio_hash = audio_hash->valuestring;
+    if (cJSON_IsNumber(refresh_at) && refresh_at->valuedouble > 0.0)
+        out.refresh_at = static_cast<int64_t>(refresh_at->valuedouble);
     cJSON_Delete(root);
     return true;
 }
 
-bool UpdateStagedFrameEtag(const std::string& gid, int idx, const std::string& image_etag,
-                           const std::string& audio_etag) {
+bool UpdateStagedFrameHashes(const std::string& gid, int idx, const std::string& image_hash,
+                             const std::string& audio_hash) {
     cache::FrameMeta meta;
     ReadFrameMetaFile(cache::internal::StageMetaPath(gid, idx), meta);
-    if (!image_etag.empty())
-        meta.image_etag = image_etag;
-    if (!audio_etag.empty())
-        meta.audio_etag = audio_etag;
+    if (!image_hash.empty())
+        meta.image_hash = image_hash;
+    if (!audio_hash.empty())
+        meta.audio_hash = audio_hash;
     return WriteFrameMetaFile(cache::internal::StageMetaPath(gid, idx), meta);
 }
 
@@ -85,8 +76,8 @@ bool UpdateStagedFrameEtag(const std::string& gid, int idx, const std::string& i
 
 namespace cache {
 
-bool FrameImageExists(const std::string& gid, int idx, const std::string& expected_etag) {
-    if (expected_etag.empty())
+bool FrameImageExists(const std::string& gid, int idx, const std::string& expected_hash) {
+    if (expected_hash.empty())
         return false;
     struct stat st;
     if (stat(internal::ImagePath(gid, idx).c_str(), &st) != 0)
@@ -94,11 +85,11 @@ bool FrameImageExists(const std::string& gid, int idx, const std::string& expect
     if (st.st_size != internal::kFrameImageBytes)
         return false;
     FrameMeta meta;
-    return ReadFrameMeta(gid, idx, meta) && meta.image_etag == expected_etag;
+    return ReadFrameMeta(gid, idx, meta) && meta.image_hash == expected_hash;
 }
 
-bool WriteFrameImage(const std::string& gid, int idx, const std::vector<uint8_t>& bytes, const std::string& etag) {
-    (void)etag;
+bool WriteFrameImage(const std::string& gid, int idx, const std::vector<uint8_t>& bytes, const std::string& hash) {
+    (void)hash;
     if (bytes.size() != internal::kFrameImageBytes) {
         ESP_LOGW(internal::kTag, "frame image refused idx=%d bytes=%u expected=%u", idx,
                  static_cast<unsigned>(bytes.size()), static_cast<unsigned>(internal::kFrameImageBytes));
@@ -106,34 +97,28 @@ bool WriteFrameImage(const std::string& gid, int idx, const std::vector<uint8_t>
     }
     internal::DirEnsure(internal::GroupDir(gid));
     internal::DirEnsure(internal::FramesDir(gid));
-    if (!internal::WriteAll(internal::ImagePath(gid, idx), bytes.data(), bytes.size()))
-        return false;
-    internal::RemoveIfExists(internal::EtagPath(gid, idx, "img"));
-    return true;
+    return internal::WriteAll(internal::ImagePath(gid, idx), bytes.data(), bytes.size());
 }
 
 bool ReadFrameImage(const std::string& gid, int idx, std::vector<uint8_t>& out) {
     return internal::ReadAll(internal::ImagePath(gid, idx), out, internal::kFrameImageBytes);
 }
 
-bool FrameAudioExists(const std::string& gid, int idx, const std::string& expected_etag) {
-    if (expected_etag.empty())
+bool FrameAudioExists(const std::string& gid, int idx, const std::string& expected_hash) {
+    if (expected_hash.empty())
         return false;
     struct stat st;
     if (stat(internal::AudioPath(gid, idx).c_str(), &st) != 0)
         return false;
     FrameMeta meta;
-    return ReadFrameMeta(gid, idx, meta) && meta.audio_etag == expected_etag;
+    return ReadFrameMeta(gid, idx, meta) && meta.audio_hash == expected_hash;
 }
 
-bool WriteFrameAudio(const std::string& gid, int idx, const std::vector<uint8_t>& bytes, const std::string& etag) {
-    (void)etag;
+bool WriteFrameAudio(const std::string& gid, int idx, const std::vector<uint8_t>& bytes, const std::string& hash) {
+    (void)hash;
     internal::DirEnsure(internal::GroupDir(gid));
     internal::DirEnsure(internal::FramesDir(gid));
-    if (!internal::WriteAll(internal::AudioPath(gid, idx), bytes.data(), bytes.size()))
-        return false;
-    internal::RemoveIfExists(internal::EtagPath(gid, idx, "pcm"));
-    return true;
+    return internal::WriteAll(internal::AudioPath(gid, idx), bytes.data(), bytes.size());
 }
 
 bool ReadFrameAudio(const std::string& gid, int idx, std::vector<uint8_t>& out) {
@@ -142,12 +127,10 @@ bool ReadFrameAudio(const std::string& gid, int idx, std::vector<uint8_t>& out) 
 
 void DeleteFrameAudio(const std::string& gid, int idx) {
     unlink(internal::AudioPath(gid, idx).c_str());
-    unlink(internal::EtagPath(gid, idx, "pcm").c_str());
 }
 
 void DeleteFrameFiles(const std::string& gid, int idx) {
     unlink(internal::ImagePath(gid, idx).c_str());
-    unlink(internal::EtagPath(gid, idx, "img").c_str());
     DeleteFrameAudio(gid, idx);
     unlink(internal::MetaPath(gid, idx).c_str());
 }
@@ -178,20 +161,20 @@ void CleanupFrameStage(const std::string& gid) {
         internal::RemoveTree(internal::StageDir(gid));
 }
 
-bool StagedFrameImageExists(const std::string& gid, int idx, const std::string& expected_etag) {
-    if (expected_etag.empty())
+bool StagedFrameImageExists(const std::string& gid, int idx, const std::string& expected_hash) {
+    if (expected_hash.empty())
         return false;
     struct stat st;
     if (stat(internal::StageImagePath(gid, idx).c_str(), &st) == 0 && st.st_size == internal::kFrameImageBytes) {
         FrameMeta meta;
-        if (ReadFrameMetaFile(internal::StageMetaPath(gid, idx), meta) && meta.image_etag == expected_etag)
+        if (ReadFrameMetaFile(internal::StageMetaPath(gid, idx), meta) && meta.image_hash == expected_hash)
             return true;
     }
-    return FrameImageExists(gid, idx, expected_etag);
+    return FrameImageExists(gid, idx, expected_hash);
 }
 
 bool WriteStagedFrameImage(const std::string& gid, int idx, const std::vector<uint8_t>& bytes,
-                           const std::string& etag) {
+                           const std::string& hash) {
     if (bytes.size() != internal::kFrameImageBytes) {
         ESP_LOGW(internal::kTag, "staged frame image refused idx=%d bytes=%u expected=%u", idx,
                  static_cast<unsigned>(bytes.size()), static_cast<unsigned>(internal::kFrameImageBytes));
@@ -200,29 +183,27 @@ bool WriteStagedFrameImage(const std::string& gid, int idx, const std::vector<ui
     internal::DirEnsure(internal::StageDir(gid));
     if (!internal::WriteAll(internal::StageImagePath(gid, idx), bytes.data(), bytes.size()))
         return false;
-    internal::RemoveIfExists(internal::StageDir(gid) + "/" + std::to_string(idx) + ".img.etag");
-    return UpdateStagedFrameEtag(gid, idx, etag, "");
+    return UpdateStagedFrameHashes(gid, idx, hash, "");
 }
 
-bool StagedFrameAudioExists(const std::string& gid, int idx, const std::string& expected_etag) {
-    if (expected_etag.empty())
+bool StagedFrameAudioExists(const std::string& gid, int idx, const std::string& expected_hash) {
+    if (expected_hash.empty())
         return false;
     struct stat st;
     if (stat(internal::StageAudioPath(gid, idx).c_str(), &st) == 0) {
         FrameMeta meta;
-        if (ReadFrameMetaFile(internal::StageMetaPath(gid, idx), meta) && meta.audio_etag == expected_etag)
+        if (ReadFrameMetaFile(internal::StageMetaPath(gid, idx), meta) && meta.audio_hash == expected_hash)
             return true;
     }
-    return FrameAudioExists(gid, idx, expected_etag);
+    return FrameAudioExists(gid, idx, expected_hash);
 }
 
 bool WriteStagedFrameAudio(const std::string& gid, int idx, const std::vector<uint8_t>& bytes,
-                           const std::string& etag) {
+                           const std::string& hash) {
     internal::DirEnsure(internal::StageDir(gid));
     if (!internal::WriteAll(internal::StageAudioPath(gid, idx), bytes.data(), bytes.size()))
         return false;
-    internal::RemoveIfExists(internal::StageDir(gid) + "/" + std::to_string(idx) + ".pcm.etag");
-    return UpdateStagedFrameEtag(gid, idx, "", etag);
+    return UpdateStagedFrameHashes(gid, idx, "", hash);
 }
 
 bool WriteStagedFrameMeta(const std::string& gid, int idx, const FrameMeta& meta) {
@@ -230,7 +211,7 @@ bool WriteStagedFrameMeta(const std::string& gid, int idx, const FrameMeta& meta
     return WriteFrameMetaFile(internal::StageMetaPath(gid, idx), meta);
 }
 
-bool CommitStagedFrame(const std::string& gid, int idx, const std::string& image_etag, const std::string& audio_etag) {
+bool CommitStagedFrame(const std::string& gid, int idx, const std::string& image_hash, const std::string& audio_hash) {
     internal::DirEnsure(internal::GroupDir(gid));
     internal::DirEnsure(internal::FramesDir(gid));
 
@@ -242,20 +223,20 @@ bool CommitStagedFrame(const std::string& gid, int idx, const std::string& image
         ESP_LOGW(internal::kTag, "staged meta missing idx=%d", idx);
         return false;
     }
-    if (staged_frame_meta.image_etag != image_etag) {
-        ESP_LOGW(internal::kTag, "staged image etag mismatch idx=%d", idx);
+    if (staged_frame_meta.image_hash != image_hash) {
+        ESP_LOGW(internal::kTag, "staged image hash mismatch idx=%d", idx);
         return false;
     }
-    if (!internal::PathExists(staged_image) && !FrameImageExists(gid, idx, image_etag)) {
+    if (!internal::PathExists(staged_image) && !FrameImageExists(gid, idx, image_hash)) {
         ESP_LOGW(internal::kTag, "frame image missing idx=%d", idx);
         return false;
     }
-    if (!audio_etag.empty()) {
-        if (staged_frame_meta.audio_etag != audio_etag) {
-            ESP_LOGW(internal::kTag, "staged audio etag mismatch idx=%d", idx);
+    if (!audio_hash.empty()) {
+        if (staged_frame_meta.audio_hash != audio_hash) {
+            ESP_LOGW(internal::kTag, "staged audio hash mismatch idx=%d", idx);
             return false;
         }
-        if (!internal::PathExists(staged_audio) && !FrameAudioExists(gid, idx, audio_etag)) {
+        if (!internal::PathExists(staged_audio) && !FrameAudioExists(gid, idx, audio_hash)) {
             ESP_LOGW(internal::kTag, "frame audio missing idx=%d", idx);
             return false;
         }
@@ -265,17 +246,12 @@ bool CommitStagedFrame(const std::string& gid, int idx, const std::string& image
     if (internal::PathExists(staged_image)) {
         swaps.push_back({staged_image, internal::ImagePath(gid, idx), internal::ImagePath(gid, idx) + ".bak"});
     }
-    if (!audio_etag.empty() && internal::PathExists(staged_audio)) {
+    if (!audio_hash.empty() && internal::PathExists(staged_audio)) {
         swaps.push_back({staged_audio, internal::AudioPath(gid, idx), internal::AudioPath(gid, idx) + ".bak"});
     }
     swaps.push_back({staged_meta, internal::MetaPath(gid, idx), internal::MetaPath(gid, idx) + ".bak"});
 
-    const bool ok = staging::CommitSwaps(swaps);
-    if (ok) {
-        internal::RemoveIfExists(internal::EtagPath(gid, idx, "img"));
-        internal::RemoveIfExists(internal::EtagPath(gid, idx, "pcm"));
-    }
-    return ok;
+    return staging::CommitSwaps(swaps);
 }
 }  // namespace
 
@@ -293,28 +269,28 @@ bool CacheWriter::Begin() {
     return begun_;
 }
 
-bool CacheWriter::FrameImageExists(int idx, const std::string& expected_etag) const {
-    return begun_ && StagedFrameImageExists(gid_, idx, expected_etag);
+bool CacheWriter::FrameImageExists(int idx, const std::string& expected_hash) const {
+    return begun_ && StagedFrameImageExists(gid_, idx, expected_hash);
 }
 
-bool CacheWriter::WriteFrameImage(int idx, const std::vector<uint8_t>& bytes, const std::string& etag) {
-    return begun_ && WriteStagedFrameImage(gid_, idx, bytes, etag);
+bool CacheWriter::WriteFrameImage(int idx, const std::vector<uint8_t>& bytes, const std::string& hash) {
+    return begun_ && WriteStagedFrameImage(gid_, idx, bytes, hash);
 }
 
-bool CacheWriter::FrameAudioExists(int idx, const std::string& expected_etag) const {
-    return begun_ && StagedFrameAudioExists(gid_, idx, expected_etag);
+bool CacheWriter::FrameAudioExists(int idx, const std::string& expected_hash) const {
+    return begun_ && StagedFrameAudioExists(gid_, idx, expected_hash);
 }
 
-bool CacheWriter::WriteFrameAudio(int idx, const std::vector<uint8_t>& bytes, const std::string& etag) {
-    return begun_ && WriteStagedFrameAudio(gid_, idx, bytes, etag);
+bool CacheWriter::WriteFrameAudio(int idx, const std::vector<uint8_t>& bytes, const std::string& hash) {
+    return begun_ && WriteStagedFrameAudio(gid_, idx, bytes, hash);
 }
 
 bool CacheWriter::WriteFrameMeta(int idx, const FrameMeta& meta) {
     return begun_ && WriteStagedFrameMeta(gid_, idx, meta);
 }
 
-bool CacheWriter::CommitFrame(int idx, const std::string& image_etag, const std::string& audio_etag) {
-    return begun_ && CommitStagedFrame(gid_, idx, image_etag, audio_etag);
+bool CacheWriter::CommitFrame(int idx, const std::string& image_hash, const std::string& audio_hash) {
+    return begun_ && CommitStagedFrame(gid_, idx, image_hash, audio_hash);
 }
 
 bool CacheWriter::Commit() {

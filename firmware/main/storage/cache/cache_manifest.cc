@@ -25,20 +25,20 @@ bool ReadManifestMetaFile(const std::string& path, cache::ManifestMeta& out) {
     cJSON* root = cJSON_ParseWithLength(reinterpret_cast<const char*>(buf.data()), buf.size());
     if (!root)
         return false;
-    out.gid             = cache::internal::JsonStringField(root, "group_id");
-    out.name            = cache::internal::JsonStringField(root, "group_name");
-    out.manifest_etag   = cache::internal::JsonStringField(root, "manifest_etag");
-    out.content_count   = cache::internal::JsonNonNegativeIntField(root, "content_count", 0);
-    out.last_access_seq = cache::internal::JsonUint32Field(root, "last_access_seq", 0);
+    out.gid              = cache::internal::JsonStringField(root, "group_id");
+    out.name             = cache::internal::JsonStringField(root, "group_name");
+    out.manifest_version = cache::internal::JsonStringField(root, "manifest_version");
+    out.content_count    = cache::internal::JsonNonNegativeIntField(root, "content_count", 0);
+    out.last_access_seq  = cache::internal::JsonUint32Field(root, "last_access_seq", 0);
     cJSON_Delete(root);
-    return !out.manifest_etag.empty();
+    return !out.manifest_version.empty();
 }
 
 }  // namespace
 
 namespace cache {
 
-bool WriteManifest(const std::string& gid, const std::string& manifest_etag, int content_count,
+bool WriteManifest(const std::string& gid, const std::string& manifest_version, int content_count,
                    const std::string& name) {
     internal::DirEnsure(std::string(internal::kRoot) + "/groups");
     internal::DirEnsure(internal::GroupDir(gid));
@@ -50,7 +50,7 @@ bool WriteManifest(const std::string& gid, const std::string& manifest_etag, int
         return false;
     cJSON_AddStringToObject(root, "group_id", gid.c_str());
     cJSON_AddStringToObject(root, "group_name", name.empty() ? old.name.c_str() : name.c_str());
-    cJSON_AddStringToObject(root, "manifest_etag", manifest_etag.c_str());
+    cJSON_AddStringToObject(root, "manifest_version", manifest_version.c_str());
     cJSON_AddNumberToObject(root, "content_count", content_count);
     cJSON_AddNumberToObject(root, "last_access_seq", static_cast<double>(old.last_access_seq));
     char* s  = cJSON_PrintUnformatted(root);
@@ -94,7 +94,7 @@ bool TouchGroup(const std::string& gid) {
         return false;
     cJSON_AddStringToObject(root, "group_id", meta.gid.empty() ? gid.c_str() : meta.gid.c_str());
     cJSON_AddStringToObject(root, "group_name", meta.name.c_str());
-    cJSON_AddStringToObject(root, "manifest_etag", meta.manifest_etag.c_str());
+    cJSON_AddStringToObject(root, "manifest_version", meta.manifest_version.c_str());
     cJSON_AddNumberToObject(root, "content_count", meta.content_count);
     cJSON_AddNumberToObject(root, "last_access_seq", static_cast<double>(meta.last_access_seq));
     char* s = cJSON_PrintUnformatted(root);

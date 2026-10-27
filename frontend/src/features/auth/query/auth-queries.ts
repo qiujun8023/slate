@@ -1,17 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { API_PREFIX, api } from '@/lib/http';
+import type { User } from '@/api';
+import { http } from '@/lib/http';
 
 export const meQueryKey = ['me'] as const;
 
-export interface CurrentUser {
-  id: string;
-  email: string;
-  username: string;
-}
+export type CurrentUser = User;
 
-export async function fetchMe(): Promise<CurrentUser> {
-  const { data } = await api.get<CurrentUser>(`${API_PREFIX}/users/current`);
-  return data;
+export function fetchMe(): Promise<CurrentUser> {
+  return http.get<CurrentUser>('/users/me');
 }
 
 export function useMe(enabled = true) {

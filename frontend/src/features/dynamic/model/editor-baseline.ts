@@ -1,19 +1,19 @@
-import type { DynamicConfigT, DynamicTypeT } from 'shared';
+import type { DynamicConfig, DynamicType } from '@/api';
 import { defaultDynamicFrameName } from '@/features/dynamic/model/display-name';
 import { dynamicConfigKey } from '@/features/dynamic/model/json-parse';
 
 export interface DynamicEditorBaseline {
   contentId: string;
-  type: DynamicTypeT;
+  type: DynamicType;
   frameName: string;
   configKey: string;
 }
 
 export function createDynamicEditorBaseline(
   contentId: string,
-  type: DynamicTypeT,
+  type: DynamicType,
   frameName: string | null,
-  config: DynamicConfigT
+  config: DynamicConfig
 ): DynamicEditorBaseline {
   return {
     contentId,

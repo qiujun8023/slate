@@ -1,12 +1,12 @@
 import { createContext } from 'react';
-import type { LoginRequestT, RegisterRequestT } from 'shared';
+import type { LoginRequest, RegisterRequest } from '@/api';
 import type { CurrentUser } from '@/features/auth/query/auth-queries';
 
 export interface AuthState {
   token: string | null;
   user: CurrentUser | null;
-  login: (creds: LoginRequestT, redirectTo?: string) => Promise<void>;
-  register: (creds: RegisterRequestT, redirectTo?: string) => Promise<void>;
+  login: (creds: LoginRequest, redirectTo?: string) => Promise<void>;
+  register: (creds: RegisterRequest, redirectTo?: string) => Promise<void>;
   logout: () => void;
 }
 

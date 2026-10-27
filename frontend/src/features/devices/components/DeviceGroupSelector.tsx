@@ -1,5 +1,5 @@
 import { Radio } from 'lucide-react';
-import type { GroupSummaryT } from 'shared';
+import type { Group } from '@/api';
 import { Select, SelectItem, SelectSeparator } from '@/components/ui/Select';
 
 export function DeviceGroupSelector({
@@ -8,7 +8,7 @@ export function DeviceGroupSelector({
   onChange,
   disabled,
 }: {
-  groups: GroupSummaryT[];
+  groups: Group[];
   value: string | null;
   onChange: (value: string) => void;
   disabled: boolean;
@@ -33,7 +33,7 @@ function GroupSelector({
   onChange,
   disabled,
 }: {
-  groups: GroupSummaryT[];
+  groups: Group[];
   value: string | null;
   onChange: (value: string) => void;
   disabled: boolean;
@@ -50,7 +50,7 @@ function GroupSelector({
       {showNone && <SelectItem value="__none__">未选组</SelectItem>}
       {showNone && groups.length > 0 && <SelectSeparator />}
       {groups.map((group) => (
-        <SelectItem key={group.id} value={group.id} hint={`${group.content_count} 项`}>
+        <SelectItem key={group.id} value={group.id} hint={`${group.contentCount} 项`}>
           <span className="font-serif">{group.name}</span>
         </SelectItem>
       ))}

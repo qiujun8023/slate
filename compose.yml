@@ -1,24 +1,23 @@
-# Slate 单机 docker compose 样例。开箱即用,自带 PostgreSQL,适合自托管。
-# 生产部署用外部 PostgreSQL 或反代时按需改造(去掉 postgres service,改 DATABASE_URL,加 traefik labels)。
+# Slate 自托管样例：Slate 加一个自带的 PostgreSQL。
 #
-# 首次启动:
-#   1. 创建 .env，至少设置 JWT_SECRET 和 POSTGRES_PASSWORD
-#   2. mkdir -p slate postgres && sudo chown -R 1000:1000 slate   # 容器以 uid 1000 运行
-#   3. docker compose up -d
-#   4. 浏览器访问 http://localhost:9494/register 注册第一个账号
+# 首次启动：
+#   1. 在本文件旁创建 .env，写入两项必填配置（可选配置见仓库 backend/README.md）：
+#        POSTGRES_PASSWORD=<openssl rand -hex 32 的输出>
+#        JWT_SECRET=<openssl rand -hex 64 的输出>
+#   2. mkdir -p slate postgres && sudo chown -R 1000:1000 slate   # Slate 容器以 uid 1000 运行
+#   3. docker compose up -d                                         # 启动时自动建表、迁移
+#   4. 浏览器打开 http://<主机>:9494/register 注册第一个账号
 #
-# 升级:
-#   docker compose pull && docker compose up -d
+# 升级：docker compose pull && docker compose up -d
+# 从 v0.1.x（MySQL）迁移：见仓库 README「从 v0.1.x 升级」。
 #
-# 持久化目录:
-#   ./slate/blobs/   图片与音频,容器内 /data/blobs
-#   ./postgres/      PostgreSQL 数据目录
-# 备份:pg_dump + 打包 ./slate/blobs。
+# 数据：./slate/blobs（图片、音频）和 ./postgres。备份 = pg_dump + 打包 ./slate。
+# 已有 PostgreSQL 时删掉 postgres 服务，把 DATABASE_URL 指过去；放在反向代理后面时
+# 可以把端口改成 127.0.0.1:9494:9494，只让代理访问。
 
 services:
   slate:
     image: ghcr.io/qiujun8023/slate:latest
-    container_name: slate
     restart: unless-stopped
     depends_on:
       postgres:
@@ -30,11 +29,10 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://slate:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/slate
+      DATABASE_URL: postgresql://slate:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/slate
 
   postgres:
     image: postgres:18-alpine
-    container_name: slate-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: slate

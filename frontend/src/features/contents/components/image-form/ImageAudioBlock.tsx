@@ -1,5 +1,5 @@
 import { Wand2, Upload } from 'lucide-react';
-import type { ContentDetailT, TtsVoiceT } from 'shared';
+import type { AudioStatus } from '@/api';
 import { SegmentToggle } from '@/components/ui/SegmentToggle';
 import { AudioDropzone } from './AudioDropzone';
 import { TtsFields } from './TtsFields';
@@ -14,11 +14,11 @@ interface ImageAudioBlockProps {
   onAudioFileChange: (f: File | null) => void;
   ttsText: string;
   onTtsTextChange: (t: string) => void;
-  ttsVoice: TtsVoiceT;
-  onTtsVoiceChange: (v: TtsVoiceT) => void;
+  ttsVoice: string;
+  onTtsVoiceChange: (v: string) => void;
   hasExistingAudio: boolean;
   editingContentId: string | null;
-  audioStatus?: ContentDetailT['audio_status'];
+  audioStatus?: AudioStatus | null;
   audioError?: string | null;
 }
 

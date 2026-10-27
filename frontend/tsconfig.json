@@ -18,11 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client"],
     "paths": {
-      "@/*": ["./src/*"],
-      "shared": ["../shared/src/index.ts"],
-      "shared/*": ["../shared/src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../shared/src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
 }

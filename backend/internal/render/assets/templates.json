@@ -1,0 +1,475 @@
+{
+ "system": [
+  {
+   "id": "ai_usage_stats",
+   "label": "AI 使用统计",
+   "description": "展示今日/累计消费、请求、Token、缓存率、均价、响应时间和平台拆分。",
+   "template": {
+    "version": 1,
+    "name": "AI 使用统计",
+    "blocks": [
+     {
+      "x": 20,
+      "y": 34,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "今日消费",
+      "value": "{today_cost_usd|usd2}"
+     },
+     {
+      "x": 112,
+      "y": 34,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "今日请求",
+      "value": "{today_request_count|int}"
+     },
+     {
+      "x": 204,
+      "y": 34,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "今日Token",
+      "value": "{today_token_count|tokens}"
+     },
+     {
+      "x": 296,
+      "y": 34,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "今日缓存率",
+      "value": "{today_cache_hit_rate_percent|percent}"
+     },
+     {
+      "x": 20,
+      "y": 92,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "累计消费",
+      "value": "{total_cost_usd|usd2}"
+     },
+     {
+      "x": 112,
+      "y": 92,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "累计请求",
+      "value": "{total_request_count|int}"
+     },
+     {
+      "x": 204,
+      "y": 92,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "累计Token",
+      "value": "{total_token_count|tokens}"
+     },
+     {
+      "x": 296,
+      "y": 92,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "总缓存率",
+      "value": "{total_cache_hit_rate_percent|percent}"
+     },
+     {
+      "x": 20,
+      "y": 150,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "平均响应",
+      "value": "{average_latency_ms|duration}"
+     },
+     {
+      "x": 112,
+      "y": 150,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "今日均价",
+      "value": "{today_cost_per_million_tokens_usd|usd_per_million}"
+     },
+     {
+      "x": 204,
+      "y": 150,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "累计均价",
+      "value": "{total_cost_per_million_tokens_usd|usd_per_million}"
+     },
+     {
+      "x": 296,
+      "y": 150,
+      "w": 84,
+      "h": 48,
+      "type": "metric",
+      "label": "更新时间",
+      "value": "{last_updated_time_label}"
+     },
+     {
+      "type": "line",
+      "x1": 20,
+      "y1": 218,
+      "x2": 380,
+      "y2": 218,
+      "style": "dashed"
+     },
+     {
+      "x": 20,
+      "y": 237,
+      "w": 120,
+      "h": 12,
+      "type": "text",
+      "value": "按平台拆分",
+      "fontSize": 12,
+      "align": "left",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 170,
+      "y": 237,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "今日",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 240,
+      "y": 237,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "请求",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 310,
+      "y": 237,
+      "w": 70,
+      "h": 12,
+      "type": "text",
+      "value": "Token",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 20,
+      "y": 255,
+      "w": 130,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.0.platform_name}",
+      "fontSize": 12,
+      "align": "left",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 170,
+      "y": 255,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.0.today_cost_usd|usd2}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 240,
+      "y": 255,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.0.today_request_count|int}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 310,
+      "y": 255,
+      "w": 70,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.0.today_token_count|tokens}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 20,
+      "y": 275,
+      "w": 130,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.1.platform_name}",
+      "fontSize": 12,
+      "align": "left",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 170,
+      "y": 275,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.1.today_cost_usd|usd2}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 240,
+      "y": 275,
+      "w": 58,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.1.today_request_count|int}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     },
+     {
+      "x": 310,
+      "y": 275,
+      "w": 70,
+      "h": 12,
+      "type": "text",
+      "value": "{platform_breakdown.1.today_token_count|tokens}",
+      "fontSize": 12,
+      "align": "right",
+      "color": "black",
+      "maxLines": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "ai_quota_monitor",
+   "label": "AI 限额监控",
+   "description": "展示 Claude Code 或 Codex/OpenAI 单服务限额快照；只放使用率、状态、绝对重置时间和更新时间。",
+   "template": {
+    "version": 1,
+    "name": "AI 限额监控",
+    "blocks": [
+     {
+      "x": 20,
+      "y": 44,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "服务",
+      "value": "{service_label}"
+     },
+     {
+      "x": 145,
+      "y": 44,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "套餐",
+      "value": "{plan_label}"
+     },
+     {
+      "x": 270,
+      "y": 44,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "状态",
+      "value": "{status_label}"
+     },
+     {
+      "x": 20,
+      "y": 120,
+      "w": 360,
+      "h": 34,
+      "type": "progress",
+      "label": "{primary_window_label}",
+      "valueText": "{primary_used_percent|int}%",
+      "percentage": "{primary_used_percent}",
+      "labelFontSize": 16,
+      "valueFontSize": 16,
+      "barHeight": 14
+     },
+     {
+      "x": 20,
+      "y": 162,
+      "w": 360,
+      "h": 34,
+      "type": "progress",
+      "label": "{secondary_window_label}",
+      "valueText": "{secondary_used_percent|int}%",
+      "percentage": "{secondary_used_percent}",
+      "labelFontSize": 16,
+      "valueFontSize": 16,
+      "barHeight": 14
+     },
+     {
+      "type": "line",
+      "x1": 20,
+      "y1": 210,
+      "x2": 380,
+      "y2": 210,
+      "style": "dashed"
+     },
+     {
+      "x": 20,
+      "y": 228,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "5小时重置",
+      "value": "{primary_reset_at_label}"
+     },
+     {
+      "x": 145,
+      "y": 228,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "周重置",
+      "value": "{secondary_reset_at_label}"
+     },
+     {
+      "x": 270,
+      "y": 228,
+      "w": 110,
+      "h": 52,
+      "type": "metric",
+      "label": "更新",
+      "value": "{updated_label}"
+     }
+    ]
+   }
+  }
+ ],
+ "starter": {
+  "version": 1,
+  "name": "自定义模板",
+  "blocks": [
+   {
+    "x": 20,
+    "y": 34,
+    "w": 170,
+    "h": 62,
+    "type": "metric",
+    "label": "{primary_label}",
+    "value": "{primary_value}",
+    "sparkline": "{primary_trend}"
+   },
+   {
+    "x": 210,
+    "y": 34,
+    "w": 170,
+    "h": 62,
+    "type": "metric",
+    "label": "{secondary_label}",
+    "value": "{secondary_value}"
+   },
+   {
+    "x": 20,
+    "y": 106,
+    "w": 170,
+    "h": 62,
+    "type": "metric",
+    "label": "{third_label}",
+    "value": "{third_value}"
+   },
+   {
+    "x": 210,
+    "y": 106,
+    "w": 170,
+    "h": 62,
+    "type": "metric",
+    "label": "{fourth_label}",
+    "value": "{fourth_value}"
+   },
+   {
+    "type": "line",
+    "x1": 20,
+    "y1": 184,
+    "x2": 380,
+    "y2": 184,
+    "style": "dashed"
+   },
+   {
+    "x": 20,
+    "y": 198,
+    "w": 360,
+    "h": 24,
+    "type": "progress",
+    "label": "{primary_progress_label}",
+    "valueText": "{primary_progress_text}",
+    "percentage": "{primary_progress_percent}",
+    "labelFontSize": 12,
+    "valueFontSize": 12,
+    "barHeight": 9
+   },
+   {
+    "x": 20,
+    "y": 228,
+    "w": 360,
+    "h": 24,
+    "type": "progress",
+    "label": "{secondary_progress_label}",
+    "valueText": "{secondary_progress_text}",
+    "percentage": "{secondary_progress_percent}",
+    "labelFontSize": 12,
+    "valueFontSize": 12,
+    "barHeight": 9
+   },
+   {
+    "x": 20,
+    "y": 270,
+    "w": 170,
+    "h": 14,
+    "type": "text",
+    "value": "{footer_left}",
+    "fontSize": 12,
+    "align": "left",
+    "color": "black",
+    "maxLines": 1
+   },
+   {
+    "x": 210,
+    "y": 270,
+    "w": 170,
+    "h": 14,
+    "type": "text",
+    "value": "{footer_right}",
+    "fontSize": 12,
+    "align": "right",
+    "color": "black",
+    "maxLines": 1
+   }
+  ]
+ }
+}

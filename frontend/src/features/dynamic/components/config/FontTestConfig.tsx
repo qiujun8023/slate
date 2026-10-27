@@ -1,32 +1,28 @@
-import { FONT_TEST_FONTS, FontTestFontId, type DynamicConfigT, type FontTestFontIdT } from 'shared';
+import { catalog, fontInfo, type DynamicConfig } from '@/api';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
 import type { DynamicConfigChange } from '@/features/dynamic/model/config-types';
-import { createSafeParseGuard } from '@/features/dynamic/lib/zod-utils';
-
-const isFontTestFontId = createSafeParseGuard<FontTestFontIdT>(FontTestFontId);
 
 export function FontTestConfigPanel({
   config,
   onChange,
 }: {
-  config: Extract<DynamicConfigT, { type: 'font_test' }>;
+  config: DynamicConfig;
   onChange: DynamicConfigChange;
 }) {
-  const selectedFont = FONT_TEST_FONTS.find((item) => item.id === config.font_id);
+  const selectedFont = fontInfo(config.fontId);
 
   return (
     <div className="space-y-4">
       <div>
         <p className="font-mono text-[10px] text-stone uppercase tracking-[0.18em] mb-1.5">字体</p>
         <Select
-          value={config.font_id}
+          value={config.fontId ?? 'fusion_pixel_12'}
           onValueChange={(value) => {
-            if (!isFontTestFontId(value)) return;
-            onChange({ ...config, font_id: value });
+            onChange({ ...config, fontId: value });
           }}
         >
-          {FONT_TEST_FONTS.map((option) => (
+          {catalog.fonts.map((option) => (
             <SelectItem key={option.id} value={option.id} hint={option.hint}>
               {option.label}
             </SelectItem>
@@ -45,7 +41,7 @@ export function FontTestConfigPanel({
       )}
       <Checkbox
         label="反白测试"
-        checked={config.invert}
+        checked={config.invert ?? false}
         onChange={(value) => onChange({ ...config, invert: value })}
       />
     </div>

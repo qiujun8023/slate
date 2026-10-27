@@ -1,5 +1,5 @@
-import { FRAME_WIDTH, FRAME_HEIGHT } from 'shared';
-import type { DitherMode } from 'shared';
+import { FrameWidth, FrameHeight } from '@/api';
+import type { DitherMode } from '@/lib/eink/dither';
 import type { RefObject } from 'react';
 import { cn } from '@/lib/cn';
 import { StatusBarOverlay } from '@/components/eink/StatusBarOverlay';
@@ -64,8 +64,8 @@ export function PreviewCanvas({
       )}
       <canvas
         ref={canvasRef}
-        width={FRAME_WIDTH}
-        height={FRAME_HEIGHT}
+        width={FrameWidth}
+        height={FrameHeight}
         className={cn('block w-full h-full', pan.isDragging && 'cursor-grabbing')}
         style={{
           imageRendering: 'auto',

@@ -1,22 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DynamicConfig, type DynamicConfigT, type DynamicTypeT } from 'shared';
-import { effectiveDynamicFrameName } from '@/features/dynamic/model/display-name';
+import type { DynamicConfig, DynamicType } from '@/api';
 import { usePreviewDynamicContent } from '@/features/dynamic/query/dynamic-content-queries';
 
-type PreviewContentType = DynamicTypeT | 'image';
+type PreviewContentType = DynamicType | 'image';
 
 export function useDynamicPreview({
   contentId,
   type,
   config,
-  frameName,
   dashboardData,
   debounceMs = 800,
 }: {
   contentId?: string;
   type: PreviewContentType | null;
-  config: DynamicConfigT | null;
-  frameName: string;
+  config: DynamicConfig | null;
   dashboardData?: Record<string, unknown> | null;
   debounceMs?: number;
 }) {
@@ -35,20 +32,14 @@ export function useDynamicPreview({
       invalidatePreview();
       return;
     }
-    const parsed = DynamicConfig.safeParse(config);
-    if (!parsed.success) {
-      invalidatePreview();
-      return;
-    }
     const seq = ++previewSeq.current;
     setLivePreviewData(null);
     const controller = new AbortController();
     const timer = setTimeout(() => {
       previewMutate(
         {
-          config: parsed.data,
-          frameName: effectiveDynamicFrameName(type, parsed.data, frameName),
-          data: parsed.data.type === 'dashboard' ? (dashboardData ?? undefined) : undefined,
+          config,
+          data: config.type === 'dashboard' ? (dashboardData ?? undefined) : undefined,
           signal: controller.signal,
         },
         {
@@ -65,7 +56,7 @@ export function useDynamicPreview({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [config, dashboardData, debounceMs, frameName, invalidatePreview, previewMutate, type]);
+  }, [config, dashboardData, debounceMs, invalidatePreview, previewMutate, type]);
 
   return { livePreviewData, previewPending: preview.isPending, invalidatePreview };
 }

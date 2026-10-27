@@ -51,7 +51,7 @@ export function AudioDropzone({
   const dz = useDropzone({
     onDrop: (files) => onPick(files[0] ?? null),
     accept: {
-      'audio/*': ['.pcm', '.wav', '.raw', '.mp3', '.aac', '.m4a', '.ogg', '.flac', '.wma'],
+      'audio/*': ['.wav', '.mp3', '.aac', '.m4a', '.ogg', '.opus', '.flac', '.wma'],
     },
     maxFiles: 1,
     disabled,

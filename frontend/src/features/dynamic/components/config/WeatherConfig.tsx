@@ -1,4 +1,4 @@
-import type { DynamicConfigT } from 'shared';
+import type { DynamicConfig } from '@/api';
 import { CitySearch } from './CitySearch';
 import { DynamicRefreshSettings } from './RefreshSettings';
 import type { DynamicConfigChange } from '@/features/dynamic/model/config-types';
@@ -7,19 +7,18 @@ export function WeatherConfigPanel({
   config,
   onChange,
 }: {
-  config: Extract<DynamicConfigT, { type: 'weather' }>;
+  config: DynamicConfig;
   onChange: DynamicConfigChange;
 }) {
   return (
     <div className="space-y-4">
       <CitySearch
-        value={config.location_label}
+        value={config.locationLabel ?? ''}
         onSelect={({ locationId, label }) =>
           onChange({
             ...config,
-            provider: 'qweather',
-            location_id: locationId,
-            location_label: label,
+            locationId: locationId,
+            locationLabel: label,
           })
         }
       />

@@ -1,13 +1,13 @@
 import { Loader2 } from 'lucide-react';
-import type { ContentAudioStatusT } from 'shared';
+import type { AudioStatus } from '@/api';
 
 interface AudioStatusBadgeProps {
-  status: ContentAudioStatusT;
-  etag: string | null;
+  status: AudioStatus | null;
+  hash: string | null;
   error?: string | null;
 }
 
-export function AudioStatusBadge({ status, etag, error }: AudioStatusBadgeProps) {
+export function AudioStatusBadge({ status, hash, error }: AudioStatusBadgeProps) {
   if (status === 'pending' || status === 'generating') {
     return (
       <span
@@ -30,7 +30,7 @@ export function AudioStatusBadge({ status, etag, error }: AudioStatusBadgeProps)
     );
   }
 
-  if (!etag) return null;
+  if (!hash) return null;
   return (
     <span className="absolute top-2 right-2 bg-paper border border-ink text-ink px-1.5 font-mono text-[10px] pointer-events-none">
       ♪

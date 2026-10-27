@@ -1,5 +1,5 @@
 import { Wifi } from 'lucide-react';
-import type { DeviceSummaryT } from 'shared';
+import type { Device } from '@/api';
 import { rssiLabel } from '@/features/devices/lib/rssi';
 import { BatteryLevelIcon } from './BatteryLevelIcon';
 import { DeviceMetaCard } from './DeviceMetaCard';
@@ -9,11 +9,11 @@ export function DeviceStatusGrid({
   online,
   lastSeenAgo,
 }: {
-  device: DeviceSummaryT;
+  device: Device;
   online: boolean;
   lastSeenAgo: string;
 }) {
-  const battery = device.battery_pct;
+  const battery = device.batteryPct;
 
   return (
     <section>
@@ -29,11 +29,11 @@ export function DeviceStatusGrid({
         <DeviceMetaCard
           icon={<Wifi size={16} />}
           label="信号"
-          value={online && device.rssi_dbm != null ? `${device.rssi_dbm} dBm` : '—'}
-          hint={online ? rssiLabel(device.rssi_dbm) : undefined}
+          value={online && device.rssiDbm != null ? `${device.rssiDbm} dBm` : '—'}
+          hint={online ? rssiLabel(device.rssiDbm) : undefined}
           stale={!online}
         />
-        <DeviceMetaCard label="固件" value={device.fw_version ?? '—'} mono />
+        <DeviceMetaCard label="固件" value={device.fwVersion ?? '—'} mono />
         <DeviceMetaCard label="心跳" value={lastSeenAgo} />
       </div>
     </section>

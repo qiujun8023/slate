@@ -1,4 +1,4 @@
-import { isAudioDynamicConfig, type DynamicConfigT, type DynamicTypeT } from 'shared';
+import { isAudioDynamicConfig, type DynamicConfig, type DynamicType } from '@/api';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { FormSection } from '@/components/ui/FormSection';
 import { Input } from '@/components/ui/Input';
@@ -24,11 +24,11 @@ export function DynamicContentFields({
   onDashboardDataChange,
   dashboardDataLabel,
 }: {
-  type: DynamicTypeT;
-  config: DynamicConfigT;
+  type: DynamicType;
+  config: DynamicConfig;
   frameName: string;
   onFrameNameChange: (value: string) => void;
-  onConfigChange: (config: DynamicConfigT) => void;
+  onConfigChange: (config: DynamicConfig) => void;
   showParams: boolean;
   showAudio: boolean;
   contentId?: string;
@@ -89,8 +89,8 @@ function DynamicConfigFields({
   onDashboardDataChange,
   dashboardDataLabel,
 }: {
-  config: DynamicConfigT;
-  onChange: (config: DynamicConfigT) => void;
+  config: DynamicConfig;
+  onChange: (config: DynamicConfig) => void;
   contentId?: string;
   dashboardData?: Record<string, unknown>;
   onDashboardDataChange?: (data: Record<string, unknown>) => void;

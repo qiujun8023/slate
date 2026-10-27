@@ -1,23 +1,26 @@
-import {
-  HOT_LIST_SOURCES_BY_NAME,
-  CurrentHotListSourceId,
-  hotListSourceDisplayLabel,
-  type CurrentHotListSourceIdT,
-  type DynamicConfigT,
-} from 'shared';
+import { catalog, type DynamicConfig, type HotListSourceInfo } from '@/api';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { DynamicRefreshSettings } from './RefreshSettings';
 import type { DynamicConfigChange } from '@/features/dynamic/model/config-types';
-import { createSafeParseGuard } from '@/features/dynamic/lib/zod-utils';
 
-const isCurrentHotListSource =
-  createSafeParseGuard<CurrentHotListSourceIdT>(CurrentHotListSourceId);
+const collator = new Intl.Collator('zh-Hans-CN-u-co-pinyin', {
+  numeric: true,
+  sensitivity: 'base',
+});
+
+function displayLabel(source: HotListSourceInfo): string {
+  return source.channelLabel ? `${source.label} · ${source.channelLabel}` : source.label;
+}
+
+const SOURCES_BY_NAME = [...catalog.hotListSources].sort((a, b) =>
+  collator.compare(displayLabel(a), displayLabel(b))
+);
 
 export function HotListConfigPanel({
   config,
   onChange,
 }: {
-  config: Extract<DynamicConfigT, { type: 'hot_list' }>;
+  config: DynamicConfig;
   onChange: DynamicConfigChange;
 }) {
   return (
@@ -25,15 +28,14 @@ export function HotListConfigPanel({
       <div>
         <p className="font-mono text-[10px] text-stone uppercase tracking-[0.18em] mb-1.5">频道</p>
         <Select
-          value={config.source}
+          value={config.source ?? 'weibo'}
           onValueChange={(value) => {
-            if (!isCurrentHotListSource(value)) return;
             onChange({ ...config, source: value });
           }}
         >
-          {HOT_LIST_SOURCES_BY_NAME.map((source) => (
+          {SOURCES_BY_NAME.map((source) => (
             <SelectItem key={source.id} value={source.id} hint={hotListKindLabel(source.kind)}>
-              {hotListSourceDisplayLabel(source)}
+              {displayLabel(source)}
             </SelectItem>
           ))}
         </Select>
@@ -43,7 +45,7 @@ export function HotListConfigPanel({
   );
 }
 
-function hotListKindLabel(kind: (typeof HOT_LIST_SOURCES_BY_NAME)[number]['kind']): string {
+function hotListKindLabel(kind: HotListSourceInfo['kind']): string {
   switch (kind) {
     case 'general':
       return '综合';

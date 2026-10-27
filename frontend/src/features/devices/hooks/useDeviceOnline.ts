@@ -4,7 +4,7 @@ import { isOnlineAt, onlineSnapshot } from '@/features/devices/lib/device-online
 const ONLINE_TIMEOUT_MARGIN_MS = 50;
 
 export function useDeviceOnline(lastSeenAt: string | null): boolean {
-  const [online, setOnline] = useState(() => isOnlineAt({ last_seen_at: lastSeenAt }, Date.now()));
+  const [online, setOnline] = useState(() => isOnlineAt({ lastSeenAt: lastSeenAt }, Date.now()));
 
   useEffect(() => {
     const now = Date.now();

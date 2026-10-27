@@ -1,8 +1,0 @@
-{
-  "type": "dashboard",
-  "default_ttl_sec": null,
-  "layout": {
-    "size": [400, 300],
-    "body": []
-  }
-}

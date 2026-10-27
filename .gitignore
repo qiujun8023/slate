@@ -1,6 +1,5 @@
 # === 依赖 ===
 node_modules/
-.bun/
 
 # === 构建输出 ===
 dist/
@@ -36,10 +35,6 @@ firmware/managed_components/
 firmware/sdkconfig
 firmware/sdkconfig.old
 .cache/
-
-# === Prisma ===
-backend/prisma/*.db
-backend/prisma/migrations/dev.db
 
 # === Blobs ===
 backend/blobs/

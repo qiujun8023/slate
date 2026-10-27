@@ -39,10 +39,10 @@ export function Layout() {
                     className="group inline-flex items-center gap-2 h-9 pl-1.5 pr-3 text-[13px] text-stone border border-ink hover:bg-cream-deep transition-colors"
                   >
                     <span className="w-6 h-6 bg-ink text-paper flex items-center justify-center font-sans text-[11px] font-semibold">
-                      {user.username.charAt(0).toUpperCase()}
+                      {(user.username ?? user.email).charAt(0).toUpperCase()}
                     </span>
                     <span className="hidden md:inline font-sans max-w-[140px] truncate text-ink">
-                      {user.username}
+                      {user.username ?? user.email}
                     </span>
                     <span className="font-mono text-[10px] text-stone">▾</span>
                   </button>

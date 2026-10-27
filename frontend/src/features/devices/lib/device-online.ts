@@ -1,22 +1,22 @@
-import type { DeviceSummaryT } from 'shared';
+import type { Device } from '@/api';
 
 export const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
-export function isOnline(d: { last_seen_at: string | null }): boolean {
+export function isOnline(d: { lastSeenAt: string | null }): boolean {
   return isOnlineAt(d, Date.now());
 }
 
-export function isOnlineAt(d: { last_seen_at: string | null }, now: number): boolean {
-  return onlineSnapshot(d.last_seen_at, now).online;
+export function isOnlineAt(d: { lastSeenAt: string | null }, now: number): boolean {
+  return onlineSnapshot(d.lastSeenAt, now).online;
 }
 
-export function deviceStatus(d: DeviceSummaryT): {
+export function deviceStatus(d: Device): {
   online: boolean;
   lowBattery: boolean;
 } {
   return {
     online: isOnline(d),
-    lowBattery: d.battery_pct != null && d.battery_pct < 20,
+    lowBattery: d.batteryPct != null && d.batteryPct < 20,
   };
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef } from 'react';
-import type { DynamicConfigT, DynamicTypeT } from 'shared';
+import type { DynamicConfig, DynamicType } from '@/api';
 import {
   createDynamicEditorBaseline,
   isSameDynamicEditorBaseline,
@@ -8,16 +8,16 @@ import {
 
 interface DynamicEditorState {
   baseline: DynamicEditorBaseline;
-  type: DynamicTypeT | null;
+  type: DynamicType | null;
   frameName: string;
   configKey: string;
 }
 
 interface BaselineInput {
   contentId: string;
-  serverType: DynamicTypeT;
+  serverType: DynamicType;
   serverFrameName: string | null;
-  serverConfig: DynamicConfigT;
+  serverConfig: DynamicConfig;
 }
 
 type BaselineAction =
@@ -56,15 +56,15 @@ export function useDynamicEditorBaselineSync({
   setConfig,
 }: {
   contentId: string;
-  serverType: DynamicTypeT;
+  serverType: DynamicType;
   serverFrameName: string | null;
-  serverConfig: DynamicConfigT;
-  type: DynamicTypeT | null;
+  serverConfig: DynamicConfig;
+  type: DynamicType | null;
   frameName: string;
   configKey: string;
-  setType: (type: DynamicTypeT) => void;
+  setType: (type: DynamicType) => void;
   setFrameName: (frameName: string) => void;
-  setConfig: (config: DynamicConfigT) => void;
+  setConfig: (config: DynamicConfig) => void;
 }) {
   const [baseline, dispatch] = useReducer(
     baselineReducer,
@@ -156,11 +156,11 @@ function resolveServerBaselineTransition(
 function syncEditorToServer(
   editorState: DynamicEditorState,
   serverBaseline: DynamicEditorBaseline,
-  serverConfig: DynamicConfigT,
+  serverConfig: DynamicConfig,
   setters: {
-    setType: (type: DynamicTypeT) => void;
+    setType: (type: DynamicType) => void;
     setFrameName: (frameName: string) => void;
-    setConfig: (config: DynamicConfigT) => void;
+    setConfig: (config: DynamicConfig) => void;
   }
 ): void {
   if (editorState.type !== serverBaseline.type) setters.setType(serverBaseline.type);

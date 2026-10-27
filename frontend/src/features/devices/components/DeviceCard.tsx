@@ -2,7 +2,7 @@
 
 import { memo, useCallback } from 'react';
 import { Wifi, Frame, Trash2 } from 'lucide-react';
-import type { DeviceSummaryT, GroupSummaryT } from 'shared';
+import type { Device, Group } from '@/api';
 import { DragHandle } from '@/components/ui/DragHandle';
 import { IconBlock } from '@/components/ui/IconBlock';
 import { rssiLabel } from '@/features/devices/lib/rssi';
@@ -18,21 +18,21 @@ export const DeviceCard = memo(function DeviceCard({
   groups,
   onOpen,
 }: {
-  device: DeviceSummaryT;
-  groups: GroupSummaryT[] | undefined;
+  device: Device;
+  groups: Group[] | undefined;
   onOpen: (deviceId: string) => void;
 }) {
-  const online = useDeviceOnline(device.last_seen_at);
-  const currentGroup = groups?.find((g) => g.id === device.selected_group_id);
+  const online = useDeviceOnline(device.lastSeenAt);
+  const currentGroup = groups?.find((g) => g.id === device.groupId);
   const groupName = currentGroup?.name;
-  const battery = device.battery_pct;
+  const battery = device.batteryPct;
   const lowBattery = battery != null && battery < 20;
 
   const { unbindWithConfirm, isPending: unbindPending } = useUnbindDeviceWithConfirm(device);
 
   const { attributes, listeners, setNodeRef, style, isDragging } = useSortableStyle(device.id);
 
-  const playingContents = currentGroup?.content_count;
+  const playingContents = currentGroup?.contentCount;
 
   const onUnbind = useCallback(
     async (e: React.MouseEvent) => {
@@ -102,12 +102,12 @@ export const DeviceCard = memo(function DeviceCard({
                   </span>
                   <span className="flex items-center gap-1.5">
                     <Wifi size={14} />
-                    <span>{rssiLabel(device.rssi_dbm)}</span>
+                    <span>{rssiLabel(device.rssiDbm)}</span>
                   </span>
                   <span className="text-stone-light text-[11px] ml-auto">刚刚</span>
                 </>
               ) : (
-                <LastSeenLabel lastSeenAt={device.last_seen_at} />
+                <LastSeenLabel lastSeenAt={device.lastSeenAt} />
               )}
             </div>
           </div>

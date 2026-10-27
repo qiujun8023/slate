@@ -1,9 +1,7 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
-#include <string>
-
-#include "storage/cache/cache.h"
 
 namespace sync_internal {
 
@@ -18,8 +16,6 @@ inline constexpr int64_t kUnboundMediumMs      = 30LL * 60 * 1000;
 inline constexpr size_t  kCacheMinFreeBytes    = 1024 * 1024;
 inline constexpr int     kMaxCachedGroups      = 4;
 
-std::string ExistingImageEtag(const std::string& gid, int seq, const std::string& expected_etag);
-std::string ExistingAudioEtag(const std::string& gid, int seq, const std::string& expected_etag);
-uint8_t     ClampProgressCount(int value);
+uint8_t ClampProgressCount(int value);
 
 }  // namespace sync_internal

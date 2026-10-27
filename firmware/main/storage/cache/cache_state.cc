@@ -41,7 +41,7 @@ struct StateCache {
     bool        loaded = false;
     bool        exists = false;
     std::string selected_group_id;
-    std::string last_etag;
+    std::string manifest_version;
     int         current_frame_seq = 0;
     uint32_t    cache_access_seq  = 0;
 };
@@ -65,13 +65,13 @@ void ResetStateCacheUnlocked() {
     cache.loaded            = false;
     cache.exists            = false;
     cache.selected_group_id = "";
-    cache.last_etag         = "";
+    cache.manifest_version  = "";
     cache.current_frame_seq = 0;
     cache.cache_access_seq  = 0;
 }
 
-bool WriteStateJsonUnlocked(const std::string& selected_group_id, const std::string& etag, int current_frame_seq,
-                            uint32_t cache_access_seq) {
+bool WriteStateJsonUnlocked(const std::string& selected_group_id, const std::string& manifest_version,
+                            int current_frame_seq, uint32_t cache_access_seq) {
     if (current_frame_seq < 0)
         current_frame_seq = 0;
 
@@ -79,7 +79,7 @@ bool WriteStateJsonUnlocked(const std::string& selected_group_id, const std::str
     if (!root)
         return false;
     cJSON_AddStringToObject(root, "selected_group_id", selected_group_id.c_str());
-    cJSON_AddStringToObject(root, "last_etag", etag.c_str());
+    cJSON_AddStringToObject(root, "manifest_version", manifest_version.c_str());
     cJSON_AddNumberToObject(root, "current_frame_seq", current_frame_seq);
     cJSON_AddNumberToObject(root, "cache_access_seq", static_cast<double>(cache_access_seq));
     char* s  = cJSON_PrintUnformatted(root);
@@ -99,7 +99,7 @@ bool LoadStateCacheUnlocked() {
     if (!state.root) {
         cache.exists            = false;
         cache.selected_group_id = "";
-        cache.last_etag         = "";
+        cache.manifest_version  = "";
         cache.current_frame_seq = 0;
         cache.cache_access_seq  = 0;
         return false;
@@ -107,7 +107,7 @@ bool LoadStateCacheUnlocked() {
 
     cache.exists            = true;
     cache.selected_group_id = JsonStringField(state.root, "selected_group_id");
-    cache.last_etag         = JsonStringField(state.root, "last_etag");
+    cache.manifest_version  = JsonStringField(state.root, "manifest_version");
     cache.current_frame_seq = JsonNonNegativeIntField(state.root, "current_frame_seq", 0);
     cache.cache_access_seq  = JsonUint32Field(state.root, "cache_access_seq", 0);
     return true;
@@ -117,7 +117,7 @@ bool PersistStateCacheUnlocked() {
     auto& cache  = StateCacheUnlocked();
     cache.loaded = true;
     cache.exists = true;
-    return WriteStateJsonUnlocked(cache.selected_group_id, cache.last_etag, cache.current_frame_seq,
+    return WriteStateJsonUnlocked(cache.selected_group_id, cache.manifest_version, cache.current_frame_seq,
                                   cache.cache_access_seq);
 }
 
@@ -144,7 +144,7 @@ bool NextCacheAccessSeq(uint32_t& out) {
 
 namespace cache {
 
-bool ReadStateMeta(std::string& selected_group_id, std::string& last_etag) {
+bool ReadStateMeta(std::string& selected_group_id, std::string& manifest_version) {
     ScopedMutexLock lock(internal::StateMutex());
     if (!lock.locked())
         return false;
@@ -152,28 +152,28 @@ bool ReadStateMeta(std::string& selected_group_id, std::string& last_etag) {
         return false;
     const auto& cache = internal::StateCacheUnlocked();
     selected_group_id = cache.selected_group_id;
-    last_etag         = cache.last_etag;
+    manifest_version  = cache.manifest_version;
     return true;
 }
 
-bool WriteStateMeta(const std::string& selected_group_id, const std::string& etag) {
+bool WriteStateMeta(const std::string& selected_group_id, const std::string& manifest_version) {
     ScopedMutexLock lock(internal::StateMutex());
     if (!lock.locked())
         return false;
     internal::LoadStateCacheUnlocked();
     auto& cache             = internal::StateCacheUnlocked();
     cache.selected_group_id = selected_group_id;
-    cache.last_etag         = etag;
+    cache.manifest_version  = manifest_version;
     return internal::PersistStateCacheUnlocked();
 }
 
-std::string ReadCurrentManifestEtag() {
+std::string ReadCurrentManifestVersion() {
     ScopedMutexLock lock(internal::StateMutex());
     if (!lock.locked())
         return "";
     if (!internal::LoadStateCacheUnlocked())
         return "";
-    return internal::StateCacheUnlocked().last_etag;
+    return internal::StateCacheUnlocked().manifest_version;
 }
 
 bool ReadCurrentFrameSeq(int& out) {
@@ -199,16 +199,16 @@ bool WriteCurrentFrameSeq(int seq) {
 
 bool ReadCachedGroupSummary(CachedGroupSummary& out) {
     out = {};
-    if (!ReadStateMeta(out.gid, out.manifest_etag) || out.gid.empty())
+    if (!ReadStateMeta(out.gid, out.manifest_version) || out.gid.empty())
         return false;
     ManifestMeta meta;
     if (!ReadManifestMeta(out.gid, meta)) {
         out = {};
         return false;
     }
-    out.name          = meta.name;
-    out.manifest_etag = meta.manifest_etag;
-    out.content_count = meta.content_count;
+    out.name             = meta.name;
+    out.manifest_version = meta.manifest_version;
+    out.content_count    = meta.content_count;
     return true;
 }
 

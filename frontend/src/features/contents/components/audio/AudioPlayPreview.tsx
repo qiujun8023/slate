@@ -2,24 +2,23 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Loader2, Pause, Play } from 'lucide-react';
-import { useContentAudio } from '@/features/contents/query/content-audio-queries';
+import { useBlob } from '@/features/contents/query/content-image-queries';
 import { useToast } from '@/components/feedback/toast-context';
 import { cn } from '@/lib/cn';
 import { usePcmAudioPlayer } from './usePcmAudioPlayer';
 
 interface AudioPlayPreviewProps {
-  contentId: string;
-  /** 没 etag 表示无音频,组件返 null */
-  etag: string | null;
+  /** 音频 blob 的 sha256；为空表示无音频，组件返 null */
+  hash: string | null;
   className?: string;
   /** 标签：显示在按钮旁（可选，如「试听」） */
   label?: string;
 }
 
-export function AudioPlayPreview({ contentId, etag, className, label }: AudioPlayPreviewProps) {
+export function AudioPlayPreview({ hash, className, label }: AudioPlayPreviewProps) {
   const [requested, setRequested] = useState(false);
   const [playAfterLoad, setPlayAfterLoad] = useState(false);
-  const audio = useContentAudio(contentId, etag, requested);
+  const audio = useBlob(requested ? hash : null);
   const toast = useToast();
   const onPlaybackError = useCallback(
     (message: string, hint?: string) => toast.error(message, hint),
@@ -43,9 +42,9 @@ export function AudioPlayPreview({ contentId, etag, className, label }: AudioPla
     stop();
     setRequested(false);
     setPlayAfterLoad(false);
-  }, [contentId, etag, stop]);
+  }, [hash, stop]);
 
-  if (!etag) return null;
+  if (!hash) return null;
 
   const loading = requested && audio.isFetching;
   const title = audio.error ? '音频加载失败' : loading ? '加载中' : playing ? '停止' : '试听';

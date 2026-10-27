@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
-import type { DeviceSummaryT } from 'shared';
+import type { Device } from '@/api';
 import { useConfirmAction } from '@/hooks/useMutationAction';
 import { useUnbindDevice } from '@/features/devices/query/device-queries';
 
-export function useUnbindDeviceWithConfirm(device: DeviceSummaryT, onSuccess?: () => void) {
+export function useUnbindDeviceWithConfirm(device: Device, onSuccess?: () => void) {
   const { mutate, isPending } = useUnbindDevice();
 
   const confirmUnbind = useConfirmAction<string>({

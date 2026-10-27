@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  ClaimDeviceRequestT,
-  DeviceSummaryT,
-  PatchDeviceRequestT,
-  ReorderDevicesRequestT,
-} from 'shared';
-import { API_PREFIX, api } from '@/lib/http';
+import type { ClaimDeviceRequest, Device, PatchDeviceRequest, OrderRequest } from '@/api';
+import { http } from '@/lib/http';
 import { groupKeys } from '@/features/groups/query/keys';
 import { deviceKeys } from './keys';
 
@@ -13,8 +8,7 @@ export function useDevices() {
   return useQuery({
     queryKey: deviceKeys.list,
     queryFn: async () => {
-      const { data } = await api.get<DeviceSummaryT[]>(`${API_PREFIX}/devices`);
-      return data;
+      return http.get<Device[]>(`/devices`);
     },
     refetchInterval: 30_000,
     staleTime: 10_000,
@@ -24,9 +18,8 @@ export function useDevices() {
 export function useClaimByPairCode() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: ClaimDeviceRequestT) => {
-      const { data } = await api.post<DeviceSummaryT>(`${API_PREFIX}/devices/claims`, body);
-      return data;
+    mutationFn: async (body: ClaimDeviceRequest) => {
+      return http.post<Device>(`/devices/claims`, body);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: deviceKeys.list }),
   });
@@ -35,8 +28,8 @@ export function useClaimByPairCode() {
 export function useReorderDevices() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: ReorderDevicesRequestT) => {
-      await api.put(`${API_PREFIX}/devices/order`, body);
+    mutationFn: async (body: OrderRequest) => {
+      await http.put(`/devices/order`, body);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: deviceKeys.list }),
   });
@@ -46,7 +39,7 @@ export function useUnbindDevice() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (deviceId: string) => {
-      await api.delete(`${API_PREFIX}/devices/${deviceId}/binding`);
+      await http.delete(`/devices/${deviceId}/binding`);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: deviceKeys.list }),
   });
@@ -55,8 +48,8 @@ export function useUnbindDevice() {
 export function usePatchDevice(deviceId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: PatchDeviceRequestT) => {
-      await api.patch(`${API_PREFIX}/devices/${deviceId}`, body);
+    mutationFn: async (body: PatchDeviceRequest) => {
+      await http.patch(`/devices/${deviceId}`, body);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: deviceKeys.list });

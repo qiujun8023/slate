@@ -10,7 +10,7 @@ import {
   Type as TypeIcon,
   type LucideIcon,
 } from 'lucide-react';
-import type { DynamicTypeT } from 'shared';
+import type { DynamicType } from '@/api';
 
 export interface DynamicTypeMeta {
   label: string;
@@ -94,7 +94,7 @@ export const DYNAMIC_TYPE_META = {
     supportsAudio: false,
     Icon: Flame,
   },
-} satisfies Record<DynamicTypeT, DynamicTypeMeta>;
+} satisfies Record<DynamicType, DynamicTypeMeta>;
 
 export const DYNAMIC_TYPE_ORDER = [
   'daily_calendar',
@@ -106,4 +106,4 @@ export const DYNAMIC_TYPE_ORDER = [
   'hot_list',
   'dashboard',
   'font_test',
-] as const satisfies readonly DynamicTypeT[];
+] as const satisfies readonly DynamicType[];

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
-import type { DitherMode } from 'shared';
+import type { DitherMode } from '@/lib/eink/dither';
 import { clearCanvas, decodeBppImage, isValidBppLength } from '@/lib/eink/bpp';
 import { drawImagePreview } from '@/lib/eink/image-preview';
 import { useCanvasPan } from './useCanvasPan';

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ContentDetailT, ContentMutationResponseT, ReorderContentsRequestT } from 'shared';
-import { API_PREFIX, api } from '@/lib/http';
+import type { Content, OrderRequest } from '@/api';
+import { http } from '@/lib/http';
 import { useInvalidateContentDependencies } from './content-cache-helpers';
 import { contentKeys } from './keys';
 
@@ -8,14 +8,7 @@ export function useCreateImageContent(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   return useMutation({
     mutationFn: async (form: FormData) => {
-      const { data } = await api.post<ContentMutationResponseT>(
-        `${API_PREFIX}/groups/${gid}/contents`,
-        form,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        }
-      );
-      return data;
+      return http.post<Content>(`/groups/${gid}/contents`, form);
     },
     onSuccess: (data) => {
       invalidate(data.id);
@@ -27,12 +20,7 @@ export function useUpdateImageContent(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   return useMutation({
     mutationFn: async ({ contentId, form }: { contentId: string; form: FormData }) => {
-      const { data } = await api.patch<ContentMutationResponseT>(
-        `${API_PREFIX}/contents/${contentId}`,
-        form,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-      return data;
+      return http.patch<Content>(`/contents/${contentId}`, form);
     },
     onSuccess: (data) => {
       invalidate(data.id);
@@ -50,11 +38,7 @@ export function usePatchContentFrameName(gid: string) {
       contentId: string;
       frameName: string | null;
     }) => {
-      const { data } = await api.patch<ContentMutationResponseT>(
-        `${API_PREFIX}/contents/${contentId}`,
-        { frame_name: frameName }
-      );
-      return data;
+      return http.patch<Content>(`/contents/${contentId}`, { frameName });
     },
     onSuccess: (data) => {
       invalidate(data.id);
@@ -66,7 +50,7 @@ export function useDeleteContent(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   return useMutation({
     mutationFn: async (contentId: string) => {
-      await api.delete(`${API_PREFIX}/contents/${contentId}`);
+      await http.delete(`/contents/${contentId}`);
       return contentId;
     },
     onSuccess: (_data, contentId) => {
@@ -80,29 +64,28 @@ export function useReorderContents(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   const groupKey = contentKeys.group(gid);
   return useMutation({
-    mutationFn: async (body: ReorderContentsRequestT) => {
-      await api.put(`${API_PREFIX}/groups/${gid}/contents/order`, body);
+    mutationFn: async (body: OrderRequest) => {
+      await http.put(`/groups/${gid}/contents/order`, body);
     },
     // 乐观更新 seq：避免拖拽落点到 refetch 完成之间 ContentCard 显示旧序号。
     onMutate: async ({ order }) => {
       await qc.cancelQueries({ queryKey: groupKey });
-      const previous = qc.getQueryData<ContentDetailT[]>(groupKey);
+      const previous = qc.getQueryData<Content[]>(groupKey);
       if (previous) {
         const byId = new Map(previous.map((c) => [c.id, c]));
-        const reordered: ContentDetailT[] = order
+        const reordered: Content[] = order
           .map((id, idx) => {
             const item = byId.get(id);
             return item ? { ...item, seq: idx } : undefined;
           })
-          .filter((c): c is ContentDetailT => c !== undefined);
-        qc.setQueryData<ContentDetailT[]>(groupKey, reordered);
+          .filter((c): c is Content => c !== undefined);
+        qc.setQueryData<Content[]>(groupKey, reordered);
       }
       return { previous };
     },
     onError: (_err, _vars, ctx) => {
       if (ctx?.previous) qc.setQueryData(groupKey, ctx.previous);
     },
-    // 后端 reorder 会重算 manifest_etag，所以 groups 缓存也要 invalidate。
     onSettled: () => {
       invalidate();
     },

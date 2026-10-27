@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import { FolderHeart, Plus } from 'lucide-react';
-import type { GroupSummaryT } from 'shared';
+import type { Group } from '@/api';
 import {
   useCreateGroup,
   useDeleteGroup,
@@ -19,7 +19,7 @@ import { getApiErrorMessage } from '@/lib/api-errors';
 import { useDndOrder } from '@/components/dnd/useDndOrder';
 
 interface GroupsSectionProps {
-  groups: GroupSummaryT[] | undefined;
+  groups: Group[] | undefined;
   isPending: boolean;
 }
 
@@ -31,12 +31,12 @@ export const GroupsSection = memo(function GroupsSection({
   const { mutate: deleteGroupMutate, isPending: deletePending } = useDeleteGroup();
   const reorder = useReorderGroups();
   const toast = useToast();
-  const deleteGroup = useConfirmAction<GroupSummaryT>({
+  const deleteGroup = useConfirmAction<Group>({
     isPending: deletePending,
     getConfirmOptions: useCallback(
       (group) => ({
         title: `删除「${group.name}」？`,
-        description: `这一组连同 ${group.content_count} 项内容的图片与音频会全部删除，不可逆。`,
+        description: `这一组连同 ${group.contentCount} 项内容的图片与音频会全部删除，不可逆。`,
         destructive: true,
         confirmText: '删除整组',
       }),
@@ -50,7 +50,7 @@ export const GroupsSection = memo(function GroupsSection({
     errorToast: '删除失败',
   });
   const renderGroup = useCallback(
-    (group: GroupSummaryT) => (
+    (group: Group) => (
       <GroupCardSortable group={group} deleteDisabled={deletePending} onDelete={deleteGroup} />
     ),
     [deleteGroup, deletePending]

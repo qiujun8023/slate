@@ -1,31 +1,24 @@
 name: setup
-description: Checkout 之后的 Bun 环境准备 —— 装 Bun、命中缓存、frozen install,可选 prisma generate。
-
-inputs:
-  prisma:
-    description: 是否执行 backend 的 prisma generate(typecheck / test 需要生成 client 类型)。
-    default: 'false'
+description: Checkout 之后准备 Go（版本取自 backend/go.mod）和 Bun（版本取自 frontend/package.json），并安装前端依赖。
 
 runs:
   using: composite
   steps:
+    - uses: actions/setup-go@v6
+      with:
+        go-version-file: backend/go.mod
+        cache-dependency-path: backend/go.sum
+
     - uses: oven-sh/setup-bun@v2
       with:
-        bun-version-file: package.json
+        bun-version-file: frontend/package.json
 
     - uses: actions/cache@v6
       with:
         path: ~/.bun/install/cache
-        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        key: bun-${{ runner.os }}-${{ hashFiles('frontend/bun.lock') }}
         restore-keys: bun-${{ runner.os }}-
 
     - run: bun install --frozen-lockfile
       shell: bash
-
-    # Prisma generate 仅读 schema.prisma 生成 client 类型,不连 DB,
-    # 但 schema validator 要 DATABASE_URL 存在(任意值即可)。
-    - if: inputs.prisma == 'true'
-      run: bun run --cwd backend prisma:generate
-      shell: bash
-      env:
-        DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
+      working-directory: frontend

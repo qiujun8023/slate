@@ -28,7 +28,7 @@ config SLATE_IDLE_DEEP_SLEEP_MIN
     help
         没按键 + 不在充电时,N 分钟后进 deep sleep。BOOT/DOWN 键唤醒(GPIO 39 UP
         键不是 RTC IO 不能 ext1 唤醒)。captive portal 期间禁用。动态帧按
-        next_wake_sec 配置 RTC timer；静态帧不配置定时唤醒。
+        服务端下发的 refreshAt 配置 RTC timer；静态帧不配置定时唤醒。
         默认 3 分钟，给正常查看/操作留足时间，同时避免长时间空耗电。
 
 endmenu

@@ -1,16 +1,17 @@
-import { DashboardTemplate, type DashboardTemplateT, type DynamicConfigT } from 'shared';
+import type { DashboardTemplate, DynamicConfig } from '@/api';
 import { canonicalJsonKey } from '@/features/dynamic/lib/json';
 
+/** Checks the template shape; field-level validation happens on the server preview. */
 export function parseDashboardTemplate(
   text: string
-): { ok: true; template: DashboardTemplateT } | { ok: false; error: string } {
-  const parsed = parseJson(text);
+): { ok: true; template: DashboardTemplate } | { ok: false; error: string } {
+  const parsed = parseJsonRecord(text);
   if (!parsed.ok) return parsed;
-  const template = DashboardTemplate.safeParse(parsed.data);
-  if (!template.success) {
-    return { ok: false, error: template.error.issues[0]?.message ?? '模板格式非法' };
+  const blocks = parsed.data.blocks;
+  if (!Array.isArray(blocks) || blocks.length === 0 || blocks.length > 32) {
+    return { ok: false, error: '模板须包含 1-32 个区块（blocks）' };
   }
-  return { ok: true, template: template.data };
+  return { ok: true, template: { version: 1, ...parsed.data } as DashboardTemplate };
 }
 
 export function parseJsonRecord(
@@ -34,6 +35,6 @@ export function parseJson(
   }
 }
 
-export function dynamicConfigKey(config: DynamicConfigT): string {
+export function dynamicConfigKey(config: DynamicConfig): string {
   return canonicalJsonKey(config);
 }

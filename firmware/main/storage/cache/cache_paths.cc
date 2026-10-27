@@ -44,10 +44,6 @@ std::string AudioPath(const std::string& gid, int idx) {
     return FramesDir(gid) + "/" + std::to_string(idx) + ".pcm";
 }
 
-std::string EtagPath(const std::string& gid, int idx, const char* ext) {
-    return FramesDir(gid) + "/" + std::to_string(idx) + "." + ext + ".etag";
-}
-
 std::string StageImagePath(const std::string& gid, int idx) {
     return StageDir(gid) + "/" + std::to_string(idx) + ".img";
 }

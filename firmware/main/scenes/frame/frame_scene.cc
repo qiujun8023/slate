@@ -395,13 +395,13 @@ void FrameScene::LoadFrame(SceneContext& ctx, int idx, bool force_full, AudioBeh
 
     if (ctx.audio) {
         std::vector<uint8_t> pcm;
-        if (!meta.audio_etag.empty() && cache::ReadFrameAudio(gid_, idx, pcm) && !pcm.empty()) {
+        if (!meta.audio_hash.empty() && cache::ReadFrameAudio(gid_, idx, pcm) && !pcm.empty()) {
             if (audio_behavior == AudioBehavior::RestartIfAvailable) {
                 ESP_LOGD(kTag, "audio play idx=%d bytes=%u", idx, static_cast<unsigned>(pcm.size()));
                 ctx.audio->Play(pcm.data(), pcm.size());
             }
         } else {
-            ESP_LOGD(kTag, "audio stop idx=%d has_audio_etag=%d", idx, meta.audio_etag.empty() ? 0 : 1);
+            ESP_LOGD(kTag, "audio stop idx=%d has_audio=%d", idx, meta.audio_hash.empty() ? 0 : 1);
             ctx.audio->Stop();
         }
     }

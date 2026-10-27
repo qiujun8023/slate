@@ -1,5 +1,6 @@
+import type { AudioStatus } from '@/api';
 import type { ReactNode } from 'react';
-import { FRAME_HEIGHT, FRAME_WIDTH, type ContentDetailT } from 'shared';
+import { FrameHeight, FrameWidth } from '@/api';
 import { Input } from '@/components/ui/Input';
 import { FormSection } from '@/components/ui/FormSection';
 import { cn } from '@/lib/cn';
@@ -17,7 +18,7 @@ interface ImageFormBodyProps {
   existingImagePending?: boolean;
   hasExistingAudio?: boolean;
   editingContentId?: string | null;
-  audioStatus?: ContentDetailT['audio_status'];
+  audioStatus?: AudioStatus | null;
   audioError?: string | null;
   frameNamePlaceholder?: string;
   frameNameAutoFocus?: boolean;
@@ -48,7 +49,7 @@ export function ImageFormBody({
     >
       <div className="order-2 min-w-0 lg:order-1">
         <p className="font-mono text-[10px] leading-5 text-stone uppercase tracking-[0.18em] ml-0.5 mb-2">
-          预览 · 1bpp · {FRAME_WIDTH}×{FRAME_HEIGHT}
+          预览 · 1bpp · {FrameWidth}×{FrameHeight}
         </p>
         <PreviewCanvas
           canvasRef={form.image.previewRef}

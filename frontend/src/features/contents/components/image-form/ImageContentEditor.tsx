@@ -8,9 +8,9 @@
 
 import type { FormEvent } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import type { ContentDetailT } from 'shared';
+import type { Content } from '@/api';
 import { useGenerateContentTts } from '@/features/contents/query/content-audio-queries';
-import { useContentImage } from '@/features/contents/query/content-image-queries';
+import { useBlob } from '@/features/contents/query/content-image-queries';
 import {
   usePatchContentFrameName,
   useUpdateImageContent,
@@ -25,7 +25,7 @@ import { ImageFormBody } from './ImageFormBody';
 
 interface ImageContentEditorProps {
   gid: string;
-  content: ContentDetailT;
+  content: Content;
   onDone: () => void;
 }
 
@@ -38,7 +38,7 @@ export function ImageContentEditor({ gid, content, onDone }: ImageContentEditorP
   const toast = useToast();
   const form = useImageContentForm(content);
 
-  const existingImg = useContentImage(content.id, !form.image.file ? content.image_etag : null);
+  const existingImg = useBlob(!form.image.file ? content.imageHash : null);
   const canSubmit = form.canEdit;
 
   async function submitContent() {
@@ -93,10 +93,10 @@ export function ImageContentEditor({ gid, content, onDone }: ImageContentEditorP
             isEdit
             existingImage={existingImg.data}
             existingImagePending={existingImg.isPending && !form.image.file}
-            hasExistingAudio={!!content.audio_etag}
+            hasExistingAudio={!!content.audio?.hash}
             editingContentId={content.id}
-            audioStatus={content.audio_status}
-            audioError={content.audio_error}
+            audioStatus={content.audio?.status ?? null}
+            audioError={content.audio?.error ?? null}
             beforeFields={
               <div className="space-y-3">
                 <p className="font-sans text-[12px] text-stone leading-relaxed">
