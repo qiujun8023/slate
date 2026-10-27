@@ -12,6 +12,7 @@
 #include "scenes/settings/settings_scene.h"
 #include "scenes/splash/splash_scene.h"
 #include "storage/cache/cache.h"
+#include "ui/empty_group_label.h"
 #include "ui/frame_view.h"
 #include "ui/status_bar.h"
 #include "ui/theme.h"
@@ -106,15 +107,7 @@ void FrameScene::OnEnter(SceneContext& ctx) {
 
     frame_view_ = std::make_unique<FrameView>(root_);
 
-    empty_label_ = lv_label_create(root_);
-    lv_obj_set_style_text_font(empty_label_, &Zfull_16, 0);
-    lv_obj_set_style_text_color(empty_label_, lv_color_black(), 0);
-    lv_obj_set_style_text_align(empty_label_, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_line_space(empty_label_, 8, 0);
-    lv_label_set_long_mode(empty_label_, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(empty_label_, LV_HOR_RES - 32);
-    lv_label_set_text(empty_label_, "内容组暂无内容\n\n请在管理端添加内容");
-    lv_obj_align(empty_label_, LV_ALIGN_CENTER, 0, 0);
+    empty_label_ = CreateEmptyGroupLabel(root_);
     lv_obj_add_flag(empty_label_, LV_OBJ_FLAG_HIDDEN);
 
     status_bar_ = std::make_unique<StatusBar>(root_);

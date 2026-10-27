@@ -60,8 +60,20 @@ bool SyncService::ClearSelectedGroup() {
 
 bool SyncService::ApplyState(const api::DeviceState& state, SyncReason reason, bool& group_changed) {
     group_changed = false;
-    if (!state.has_group)
-        return ClearSelectedGroup();
+    if (!state.has_group) {
+        std::string selected_gid;
+        std::string selected_version;
+        cache::ReadStateMeta(selected_gid, selected_version);
+        if (!ClearSelectedGroup())
+            return false;
+        // 屏幕上还是被删组的画面:后台刷新要画空状态,确认刷完前保持待重绘。
+        if (!selected_gid.empty() || power_state::ScreenRedrawPending()) {
+            group_changed = true;
+            if (reason == SyncReason::kBackgroundRefresh)
+                power_state::SetScreenRedrawPending(true);
+        }
+        return true;
+    }
     return SyncManifestAndFrames(state, reason, group_changed);
 }
 

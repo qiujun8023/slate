@@ -29,11 +29,15 @@ RTC_DATA_ATTR int     s_current_frame_seq = 0;
 // 成功同步清零;cold boot 清零;深睡跨越保留(退避需跨唤醒累计)。
 RTC_DATA_ATTR uint32_t s_timer_wake_fail_count = 0;
 
-RTC_DATA_ATTR bool s_screen_redraw_pending = false;
+RTC_DATA_ATTR bool     s_screen_redraw_pending = false;
+RTC_DATA_ATTR uint32_t s_redraw_retry_count    = 0;
 
 // 退避位移上限:60s << 6 ≈ 64min,与下方 kMaxBackoffWakeSec 共同封顶。
 constexpr uint32_t kMaxBackoffShift   = 6;
 constexpr uint64_t kMaxBackoffWakeSec = 3600;
+// 补画最多定时重试 3 次(60s/120s/240s 后),之后不再为补画唤醒,省电优先;
+// 标记保留,下次按键或动态帧定时唤醒时照常全刷补画。
+constexpr uint32_t kMaxRedrawRetries = 3;
 
 constexpr uint32_t     kStatusBarSnapshotMagic                             = 0x53544231u;  // "STB1"
 RTC_DATA_ATTR uint32_t s_status_bar_magic                                  = 0;
@@ -65,6 +69,7 @@ void Init(bool cold_boot) {
     s_current_frame_seq     = 0;
     s_timer_wake_fail_count = 0;
     s_screen_redraw_pending = false;
+    s_redraw_retry_count    = 0;
     s_status_bar_magic      = 0;
     s_status_bar_hash       = 0;
     std::memset(s_status_bar_snapshot, 0, sizeof(s_status_bar_snapshot));
@@ -112,6 +117,14 @@ bool ScreenRedrawPending() {
 void SetScreenRedrawPending(bool pending) {
     ScopedMutexLock lock(StateMutex());
     s_screen_redraw_pending = pending;
+    if (!pending)
+        s_redraw_retry_count = 0;
+}
+
+void RecordRedrawAttempt() {
+    ScopedMutexLock lock(StateMutex());
+    if (s_screen_redraw_pending && s_redraw_retry_count < kMaxRedrawRetries)
+        ++s_redraw_retry_count;
 }
 
 void ClearCurrentFrame() {
@@ -155,19 +168,34 @@ bool CurrentFrameNeedsTimerWake() {
     return s_frame_refresh_at > 0;
 }
 
-uint32_t ComputeNextWakeSec() {
-    ScopedMutexLock lock(StateMutex());
+namespace {
+uint32_t BackoffSec(uint32_t count) {
+    const uint32_t shift   = count > kMaxBackoffShift ? kMaxBackoffShift : count;
+    const uint64_t backoff = static_cast<uint64_t>(kMinWakeIntervalSec) << shift;
+    return static_cast<uint32_t>(backoff > kMaxBackoffWakeSec ? kMaxBackoffWakeSec : backoff);
+}
+
+uint32_t ComputeFrameWakeSecLocked() {
     if (s_frame_refresh_at <= 0)
         return 0;
-    const uint32_t shift = s_timer_wake_fail_count > kMaxBackoffShift ? kMaxBackoffShift : s_timer_wake_fail_count;
     // 不可达退避:连续 timer wake 失败时指数抬高下限,封顶 kMaxBackoffWakeSec。
-    const uint64_t backoff = static_cast<uint64_t>(kMinWakeIntervalSec) << shift;
-    const uint64_t floor   = backoff > kMaxBackoffWakeSec ? kMaxBackoffWakeSec : backoff;
+    const uint64_t floor = BackoffSec(s_timer_wake_fail_count);
     // 未对时则无法换算绝对时刻,按下限唤醒,醒来后由 serverTime 校准。
     const int64_t delta = sntp::TimeSynced() ? s_frame_refresh_at - static_cast<int64_t>(time(nullptr)) : 0;
     if (delta <= static_cast<int64_t>(floor))
         return static_cast<uint32_t>(floor);
     return delta > static_cast<int64_t>(UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(delta);
+}
+}  // namespace
+
+uint32_t ComputeNextWakeSec() {
+    ScopedMutexLock lock(StateMutex());
+    const uint32_t  frame_sec = ComputeFrameWakeSecLocked();
+    if (!s_screen_redraw_pending || s_redraw_retry_count >= kMaxRedrawRetries)
+        return frame_sec;
+    // 缓存已换新但屏幕未确认刷完(EPD 忙、刷新超时或后台刷新中断):定时回来补画。
+    const uint32_t redraw_sec = BackoffSec(s_redraw_retry_count);
+    return frame_sec == 0 || redraw_sec < frame_sec ? redraw_sec : frame_sec;
 }
 
 void RecordTimerWakeResult(bool success) {

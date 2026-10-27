@@ -313,15 +313,22 @@ func (d drawer) sparkline(x, y, w, h int, values []float64) {
 	for _, v := range values {
 		lo, hi = math.Min(lo, v), math.Max(hi, v)
 	}
-	span := hi - lo
-	if span == 0 {
-		span = 1
+	// Halve before subtracting so values near ±MaxFloat64 cannot overflow to Inf.
+	half := hi/2 - lo/2
+	level := func(v float64) int {
+		t := 0.0
+		if half > 0 {
+			t = (v/2 - lo/2) / half
+		}
+		if !(t >= 0) { // NaN or negative
+			t = 0
+		}
+		return y + h - round(math.Min(t, 1)*float64(h))
 	}
-	px := x
-	py := y + h - round((values[0]-lo)/span*float64(h))
+	px, py := x, level(values[0])
 	for i := 1; i < len(values); i++ {
 		xx := x + round(float64(w*i)/float64(len(values)-1))
-		yy := y + h - round((values[i]-lo)/span*float64(h))
+		yy := level(values[i])
 		d.c.Line(px, py, xx, yy, Black)
 		px, py = xx, yy
 	}

@@ -61,17 +61,11 @@ export const GroupsSection = memo(function GroupsSection({
   const { sensors, currentOrder, orderedItems, onDragEnd } = useDndOrder(
     groups,
     useCallback((g) => g.id, []),
-    (newOrder, { commit, rollback }) =>
-      reorder.mutate(
-        { order: newOrder },
-        {
-          onSuccess: commit,
-          onError: (err) => {
-            rollback();
-            toast.error('排序保存失败', getApiErrorMessage(err));
-          },
-        }
-      )
+    (newOrder) =>
+      reorder.mutateAsync({ order: newOrder }).catch((err: unknown) => {
+        toast.error('排序保存失败', getApiErrorMessage(err));
+        throw err;
+      })
   );
 
   return (

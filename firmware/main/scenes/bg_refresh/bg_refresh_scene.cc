@@ -16,6 +16,7 @@
 #include "events/event_bus.h"
 #include "power/power_state.h"
 #include "storage/cache/cache.h"
+#include "ui/empty_group_label.h"
 #include "ui/frame_view.h"
 #include "ui/status_bar.h"
 #include "ui/theme.h"
@@ -93,6 +94,8 @@ void BgRefreshScene::OnEnter(SceneContext& ctx) {
     done_posted_->store(false, std::memory_order_release);
     // 待重绘时缓存可能已不是屏幕上的画面,不能拿它当旧画面,后面直接全刷。
     redraw_pending_         = power_state::ScreenRedrawPending();
+    if (redraw_pending_)
+        power_state::RecordRedrawAttempt();
     previous_screen_seeded_ = !redraw_pending_ && SeedPreviousFrame(ctx);
     state_                  = State::kWaiting;
     StartDeadlineWatchdog();
@@ -180,14 +183,15 @@ bool BgRefreshScene::SeedPreviousFrame(SceneContext& ctx) {
 
 bool BgRefreshScene::ResolveCurrentFrame(std::string& gid, int& seq, int& content_count) {
     std::string manifest_version;
-    if (!cache::ReadStateMeta(gid, manifest_version) || gid.empty()) {
-        ESP_LOGW(kTag, "render skipped reason=cached_group_missing");
-        return false;
-    }
-    if (!cache::ReadManifestContentCount(gid, content_count) || content_count <= 0) {
+    content_count = 0;
+    if (!cache::ReadStateMeta(gid, manifest_version) || gid.empty())
+        return true;  // 未选组,画空状态
+    if (!cache::ReadManifestContentCount(gid, content_count)) {
         ESP_LOGW(kTag, "render skipped reason=manifest_missing");
         return false;
     }
+    if (content_count <= 0)
+        return true;
 
     seq = power_state::GetCurrentFrameSeq();
     if (seq < 0 || seq >= content_count) {
@@ -205,6 +209,8 @@ bool BgRefreshScene::RenderChangedFrame(SceneContext& ctx) {
     int         content_count = 0;
     if (!ResolveCurrentFrame(gid, seq, content_count))
         return false;
+    if (content_count <= 0)
+        return RenderEmptyState(ctx);
 
     std::vector<uint8_t> raw;
     if (!cache::ReadFrameImage(gid, seq, raw) || raw.size() != static_cast<size_t>(FrameView::kRawBytes)) {
@@ -241,6 +247,27 @@ bool BgRefreshScene::RenderChangedFrame(SceneContext& ctx) {
         ESP_LOGI(kTag, "render full refresh redraw_pending=%d", redraw_pending_ ? 1 : 0);
         ctx.epd->RequestUrgentFullRefresh();
     }
+    ctx.epd->Unlock();
+
+    StartWatcher(ctx.epd);
+    return true;
+}
+
+// 组被删或组内容清空:画和前台一致的空状态,全刷后再休眠;没有动态帧,不再定时唤醒。
+bool BgRefreshScene::RenderEmptyState(SceneContext& ctx) {
+    power_state::ClearCurrentFrame();
+    if (!ctx.epd->Lock(2000)) {
+        ESP_LOGW(kTag, "render empty failed reason=epd_lock_timeout");
+        return false;
+    }
+    root_ = CreateFullscreenRoot();
+    CreateEmptyGroupLabel(root_);
+    status_bar_ = std::make_unique<StatusBar>(root_);
+    status_bar_->SetCaption("");
+    RefreshStatusBarFromSensors(ctx, *status_bar_);
+    lv_refr_now(NULL);
+    ESP_LOGI(kTag, "render empty full refresh");
+    ctx.epd->RequestUrgentFullRefresh();
     ctx.epd->Unlock();
 
     StartWatcher(ctx.epd);

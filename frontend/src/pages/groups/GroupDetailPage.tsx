@@ -32,7 +32,7 @@ export function GroupDetailPage() {
       hint="请从总览页进入具体内容组。"
       action={<BackHomeLink />}
     >
-      {({ gid }) => <GroupDetailContent gid={gid} navigate={navigate} />}
+      {({ gid }) => <GroupDetailContent key={gid} gid={gid} navigate={navigate} />}
     </RequireRouteParams>
   );
 }
@@ -53,17 +53,11 @@ function GroupDetailContent({
   const { sensors, currentOrder, orderedItems, onDragEnd } = useDndOrder(
     contents.data,
     getContentId,
-    (newOrder, { commit, rollback }) =>
-      reorder.mutate(
-        { order: newOrder },
-        {
-          onSuccess: commit,
-          onError: (err) => {
-            rollback();
-            toast.error('排序保存失败', getApiErrorMessage(err));
-          },
-        }
-      )
+    (newOrder) =>
+      reorder.mutateAsync({ order: newOrder }).catch((err: unknown) => {
+        toast.error('排序保存失败', getApiErrorMessage(err));
+        throw err;
+      })
   );
 
   const openCreate = () => navigate(appRoutes.newContent(gid));

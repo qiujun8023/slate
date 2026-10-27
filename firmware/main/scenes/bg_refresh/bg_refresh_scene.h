@@ -36,6 +36,7 @@ class BgRefreshScene : public Scene {
     bool SeedPreviousFrame(SceneContext& ctx);
     bool ResolveCurrentFrame(std::string& gid, int& seq, int& content_count);
     bool RenderChangedFrame(SceneContext& ctx);
+    bool RenderEmptyState(SceneContext& ctx);
     void StartWatcher(EpdSsd1683* epd);
     void StartDeadlineWatchdog();
     void Finish();

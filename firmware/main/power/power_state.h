@@ -11,8 +11,8 @@
 // 当前帧调度状态机：
 //   - FrameScene / BgRefreshScene 展示某帧后调用 SetCurrentFrameFromMeta(seq, meta)，
 //     同时更新 RTC slow memory 与 LittleFS 中的 current_frame_seq。
-//   - SleepManager 睡前调用 ComputeNextWakeSec()；只有 meta.refresh_at 非 0 的动态帧才配置
-//     RTC timer，静态帧只靠按键/插电唤醒后再同步。
+//   - SleepManager 睡前调用 ComputeNextWakeSec()；只有 meta.refresh_at 非 0 的动态帧或屏幕
+//     待重绘时才配置 RTC timer，静态帧只靠按键/插电唤醒后再同步。
 //   - Timer wake 的后台刷新路径先 RestoreCurrentFrameScheduleFromCache()，再只上报/刷新当前帧。
 //   - 组被清空或内容不可用时 ClearCurrentFrame() 把序号和动态调度都回到静态默认态。
 
@@ -47,6 +47,7 @@ bool RestoreCurrentFrameScheduleFromCache();
 
 // 当前动态帧的下次 RTC timer wakeup 间隔（秒）= refresh_at - now，至少 60s。
 // 0 表示静态帧。连续 timer wake 联系不上服务器时按指数退避抬高下限，封顶 ~1h。
+// 屏幕待重绘时另按补画退避唤醒(60s 起翻倍,最多 3 次),两者取较早者。
 uint32_t ComputeNextWakeSec();
 
 // 记录一次 timer wake 的同步结果。success=true 清零退避计数；false 递增（封顶）。
@@ -56,8 +57,10 @@ void RecordTimerWakeResult(bool success);
 // 屏幕待重绘：缓存提交前置位，确认物理屏幕已显示新缓存后清除（前台提交成功、后台刷新
 // 等到 EPD 刷新完成）。置位期间缓存可能已换成新内容而屏幕仍是旧画面：下一次成功同步
 // 必须按内容已变化处理，后台刷新不能用缓存当旧画面做局刷，须全刷。
+// 清除时同时清零补画退避;RecordRedrawAttempt 在每次后台补画尝试时递增退避。
 bool ScreenRedrawPending();
 void SetScreenRedrawPending(bool pending);
+void RecordRedrawAttempt();
 
 // 睡前最后一次刷到物理屏上的状态栏 1bpp 快照。用于 timer wake 后重建
 // prev_buffer_ 的 0~24 行，让后台 partial refresh 的 old/new 输入真实一致。

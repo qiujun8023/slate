@@ -49,17 +49,11 @@ export function DevicesSection({ devices, groups, isPending }: DevicesSectionPro
   const dnd = useDndOrder(
     devices,
     useCallback((device) => device.id, []),
-    (newOrder, { commit, rollback }) =>
-      reorderDevices.mutate(
-        { order: newOrder },
-        {
-          onSuccess: commit,
-          onError: (err) => {
-            rollback();
-            toast.error('排序保存失败', getApiErrorMessage(err));
-          },
-        }
-      )
+    (newOrder) =>
+      reorderDevices.mutateAsync({ order: newOrder }).catch((err: unknown) => {
+        toast.error('排序保存失败', getApiErrorMessage(err));
+        throw err;
+      })
   );
 
   return (

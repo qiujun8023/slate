@@ -40,10 +40,14 @@ func Run(ctx context.Context, name string) error {
 	slog.Info("job started", "job", name, "description", j.Description, "interval", interval.String(), "once", once)
 	for {
 		start := time.Now()
-		if err := j.Run(ctx); err != nil {
-			slog.Error("job failed", "job", name, "error", err.Error())
-		} else {
+		err := j.Run(ctx)
+		switch {
+		case err == nil:
 			slog.Info("job completed", "job", name, "durationMs", time.Since(start).Milliseconds())
+		case once:
+			return err
+		default:
+			slog.Error("job failed", "job", name, "error", err.Error())
 		}
 		if once {
 			return nil

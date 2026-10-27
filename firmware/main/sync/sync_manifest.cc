@@ -172,14 +172,17 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
     // 后台刷新由场景在确认刷新完成后清标记;前台 UI 用真实的上一帧缓冲重绘,提交成功即可清。
     const bool redraw_pending = power_state::ScreenRedrawPending();
     const bool background     = reason == SyncReason::kBackgroundRefresh;
+    const bool same_group     = selected_group_id == gid;
     if (cached_meta_ok && cached_meta.manifest_version == state.manifest_version) {
         if (!HandleCachedManifestHit(gid, state.manifest_version, status_name, state.content_count, previous_current,
                                      selected_group_id, reason, redraw_pending))
             return false;
-        if (redraw_pending) {
+        // 切到已缓存的组:屏幕还是旧组,和前台 RebindGroup 一样从第一帧开始重绘。
+        if (redraw_pending || !same_group) {
             group_changed = true;
-            if (!background)
-                power_state::SetScreenRedrawPending(false);
+            if (background && !same_group)
+                power_state::ClearCurrentFrame();
+            power_state::SetScreenRedrawPending(background);
         }
         return true;
     }
@@ -194,7 +197,6 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
         return false;
 
     // 后台刷新只在当前展示帧的像素或状态栏变化时重绘,refresh_at 变化只更新调度。
-    const bool       same_group = selected_group_id == gid;
     const int        cur_seq    = power_state::GetCurrentFrameSeq();
     cache::FrameMeta old_current;
     const bool       old_current_ok = same_group && cache::ReadFrameMeta(gid, cur_seq, old_current);
@@ -253,6 +255,8 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
         power_state::SetScreenRedrawPending(false);
 
     group_changed = true;
+    if (background && !same_group)
+        power_state::ClearCurrentFrame();
     if (same_group && cur_seq < static_cast<int>(mf.frames.size())) {
         cache::FrameMeta now_current;
         if (cache::ReadFrameMeta(gid, cur_seq, now_current)) {

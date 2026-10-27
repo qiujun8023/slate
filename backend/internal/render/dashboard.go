@@ -198,7 +198,7 @@ func toNumber(v any) (float64, bool) {
 			return 0, false
 		}
 		f, err := strconv.ParseFloat(strings.TrimSpace(n), 64)
-		return f, err == nil && !math.IsInf(f, 0)
+		return f, err == nil && !math.IsNaN(f) && !math.IsInf(f, 0)
 	}
 	return 0, false
 }
