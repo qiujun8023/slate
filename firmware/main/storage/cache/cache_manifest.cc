@@ -106,6 +106,13 @@ bool TouchGroup(const std::string& gid) {
     return ok;
 }
 
+size_t FreeBytes() {
+    size_t total = 0, used = 0;
+    if (esp_littlefs_info("storage", &total, &used) != ESP_OK || total < used)
+        return 0;
+    return total - used;
+}
+
 bool PruneOldGroups(const std::string& current_gid, const std::string& target_gid, size_t min_free_bytes,
                     int max_groups) {
     const std::string groups_dir  = std::string(internal::kRoot) + "/groups";
@@ -144,16 +151,9 @@ bool PruneOldGroups(const std::string& current_gid, const std::string& target_gi
         return a.path < b.path;
     });
 
-    auto free_bytes = []() -> size_t {
-        size_t total = 0, used = 0;
-        if (esp_littlefs_info("storage", &total, &used) != ESP_OK || total < used)
-            return 0;
-        return total - used;
-    };
-
     bool ok = true;
     for (const auto& c : candidates) {
-        if ((max_groups <= 0 || group_count <= max_groups) && free_bytes() >= min_free_bytes)
+        if ((max_groups <= 0 || group_count <= max_groups) && FreeBytes() >= min_free_bytes)
             break;
         ESP_LOGD(internal::kTag, "prune group path=%s", c.path.c_str());
         ok = internal::RemoveTree(c.path) && ok;

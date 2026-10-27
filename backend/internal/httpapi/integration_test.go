@@ -196,6 +196,31 @@ func TestDeviceProtocol(t *testing.T) {
 	h.must(401, h.call("POST", "/api/device/sync", randomHex(32), api.DeviceSyncRequest{Protocol: api.DeviceProtocol}, nil), "unknown secret")
 }
 
+// Concurrent group switches must each step from the previous result, not from a stale read.
+func TestConcurrentGroupSwitchesAllCount(t *testing.T) {
+	h := newHarness(t)
+	token := h.user("alice")
+	gids := []string{h.group(token, "一"), h.group(token, "二"), h.group(token, "三")}
+	dev := h.device("AA:BB:CC:DD:EE:09")
+	h.must(200, h.call("POST", "/api/devices/claims", token, map[string]string{"pairCode": dev.PairCode}, nil), "claim")
+
+	const n = 7
+	statuses := make(chan int, n)
+	for range n {
+		go func() {
+			statuses <- h.call("POST", "/api/device/group", dev.Secret, api.DeviceGroupRequest{Protocol: api.DeviceProtocol, Action: "next"}, nil)
+		}()
+	}
+	for range n {
+		h.must(200, <-statuses, "next group")
+	}
+	var d api.Device
+	h.must(200, h.call("GET", "/api/devices/"+dev.DeviceID, token, nil, &d), "get device")
+	if d.GroupID == nil || *d.GroupID != gids[n%len(gids)] {
+		t.Fatalf("after %d switches group = %v, want %s", n, d.GroupID, gids[n%len(gids)])
+	}
+}
+
 func TestPatchDeviceRequiresOwner(t *testing.T) {
 	h := newHarness(t)
 	alice, bob := h.user("alice"), h.user("bob")
@@ -312,4 +337,31 @@ func TestUploadAudioWithGenericType(t *testing.T) {
 	if c.Audio == nil || c.Audio.Hash == nil {
 		t.Fatalf("audio not stored: %+v", c.Audio)
 	}
+}
+
+func TestUploadRejectsExtraFields(t *testing.T) {
+	h := newHarness(t)
+	token := h.user("alice")
+	gid := h.group(token, "相册")
+	form := func(fields map[string][]byte, dup string) multipartBody {
+		buf := &bytes.Buffer{}
+		w := multipart.NewWriter(buf)
+		for name, v := range fields {
+			part, _ := w.CreateFormFile(name, name+".bin")
+			_, _ = part.Write(v)
+		}
+		if dup != "" {
+			_ = w.WriteField(dup, "again")
+		}
+		_ = w.Close()
+		return multipartBody{buf, w.FormDataContentType()}
+	}
+	frame := make([]byte, api.FrameBytes)
+	path := "/api/groups/" + gid + "/contents"
+	h.must(400, h.call("POST", path, token, form(map[string][]byte{"frame": frame, "extra": []byte("x")}, ""), nil), "unknown field")
+	h.must(400, h.call("POST", path, token, form(map[string][]byte{"frame": frame, "frameName": []byte("a")}, "frameName"), nil), "duplicate field")
+	// The total limit holds even for bytes no field reads, such as a preamble.
+	big := form(map[string][]byte{"frame": frame}, "")
+	big.buf = bytes.NewBuffer(append(bytes.Repeat([]byte("preamble\r\n"), 800<<10), append([]byte("\r\n"), big.buf.Bytes()...)...))
+	h.must(413, h.call("POST", path, token, big, nil), "oversized body")
 }

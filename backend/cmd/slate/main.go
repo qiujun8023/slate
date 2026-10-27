@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,7 +33,7 @@ const usage = `usage: slate <command>
   serve                      apply migrations, then run the HTTP server and background workers (default)
   migrate                    apply database migrations
   import <mysql-url>         copy a v0.1.x MySQL deployment into an empty database
-  job <name>                 run a dashboard push job (sub2api-usage-stats, claude-code-quota-monitor)
+  job <name>                 run a dashboard push job (claude-code-quota-monitor)
   claude-statusline          Claude Code statusLine command that also pushes quota data`
 
 func main() {
@@ -112,31 +113,44 @@ func serve(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	// Cancelled on every exit path, so workers and in-flight requests stop before the
+	// pool closes.
+	ctx, stop := context.WithCancel(ctx)
+	defer stop()
 	if cfg.BackgroundWorkers {
 		engine.Start(ctx)
 	}
 	a := &httpapi.API{Config: cfg, Store: st, Blobs: blobs, Dynamic: engine, Media: m}
+	// Requests outlive ctx so Shutdown can drain them; reqCtx ends them if it times out.
+	reqCtx, cancelRequests := context.WithCancel(context.Background())
+	defer cancelRequests()
 	srv := &http.Server{
 		Addr:              ":" + strconv.Itoa(cfg.Port),
 		Handler:           a.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
 		MaxHeaderBytes:    64 << 10,
+		BaseContext:       func(net.Listener) context.Context { return reqCtx },
 	}
 	errs := make(chan error, 1)
 	go func() { errs <- srv.ListenAndServe() }()
 	slog.Info("server listening", "port", cfg.Port, "backgroundWorkers", cfg.BackgroundWorkers)
 	select {
-	case err := <-errs:
-		return err
+	case err = <-errs:
 	case <-ctx.Done():
 	}
+	stop()
 	shutdown, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	err = srv.Shutdown(shutdown)
-	// ctx is done, so the workers are winding down; give them the rest of the shutdown
-	// budget to finish before the pool closes.
+	if serr := srv.Shutdown(shutdown); serr != nil {
+		slog.Warn("shutdown timed out; closing open requests", "error", serr.Error())
+		cancelRequests()
+		_ = srv.Close()
+	}
 	if werr := engine.Wait(shutdown); werr != nil {
 		slog.Warn("background workers still running at exit", "error", werr.Error())
+	}
+	if errors.Is(err, http.ErrServerClosed) {
+		err = nil
 	}
 	return err
 }

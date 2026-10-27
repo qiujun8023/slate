@@ -3,6 +3,13 @@ import type { Envelope } from '@/api';
 import { notifyUnauthorized } from '@/features/auth/lib/auth-events';
 import { tokenStorage } from '@/features/auth/lib/auth-storage';
 
+/**
+ * For requests the server may spend long on: uploads it transcodes, dynamic content it
+ * fetches and renders, and previews. Covers the AI (45s), TTS (60s) and ffmpeg
+ * (30s queue + 30s run) budgets.
+ */
+export const SLOW_REQUEST = { timeout: 120_000 } satisfies AxiosRequestConfig;
+
 export const api = axios.create({
   baseURL: '/api',
   timeout: 30_000,

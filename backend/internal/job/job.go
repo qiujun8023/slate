@@ -21,7 +21,6 @@ type Job struct {
 }
 
 var jobs = map[string]Job{
-	"sub2api-usage-stats":       {"Push Sub2API usage stats to a dashboard.", sub2apiUsageStats},
 	"claude-code-quota-monitor": {"Push Claude Code quota usage to a dashboard.", claudeQuota},
 }
 

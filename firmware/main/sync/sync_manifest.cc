@@ -168,15 +168,18 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
     }
     const std::string status_name = !state.group_name.empty() ? state.group_name : cached_meta.name;
 
-    // 上次提交中途失败时屏幕可能还是旧画面,这一轮成功后无论缓存是否命中都要重绘。
-    const bool commit_interrupted = power_state::CacheCommitInterrupted();
+    // 屏幕待重绘(上次提交中断或刷新未完成)时,这一轮成功后无论缓存是否命中都要重绘。
+    // 后台刷新由场景在确认刷新完成后清标记;前台 UI 用真实的上一帧缓冲重绘,提交成功即可清。
+    const bool redraw_pending = power_state::ScreenRedrawPending();
+    const bool background     = reason == SyncReason::kBackgroundRefresh;
     if (cached_meta_ok && cached_meta.manifest_version == state.manifest_version) {
         if (!HandleCachedManifestHit(gid, state.manifest_version, status_name, state.content_count, previous_current,
-                                     selected_group_id, reason, commit_interrupted))
+                                     selected_group_id, reason, redraw_pending))
             return false;
-        if (commit_interrupted) {
-            power_state::SetCacheCommitInterrupted(false);
+        if (redraw_pending) {
             group_changed = true;
+            if (!background)
+                power_state::SetScreenRedrawPending(false);
         }
         return true;
     }
@@ -204,8 +207,30 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
         return false;
     }
 
-    const api::Manifest& mf            = state.manifest;
-    int                  total_updates = 0;
+    const api::Manifest& mf = state.manifest;
+
+    // 提交成功后才会清理旧组,所以下载前先按待下载体积腾空间;否则空间不足时每轮都
+    // 下载失败、回滚,永远走不到清理。
+    size_t pending_bytes = 0;
+    for (int idx = 0; idx < static_cast<int>(mf.frames.size()); ++idx) {
+        const auto& f = mf.frames[idx];
+        if (!writer.FrameImageExists(idx, f.image.hash))
+            pending_bytes += static_cast<size_t>(f.image.size);
+        if (!f.audio.hash.empty() && !writer.FrameAudioExists(idx, f.audio.hash))
+            pending_bytes += static_cast<size_t>(f.audio.size);
+    }
+    const size_t need_bytes = pending_bytes + kCacheMinFreeBytes;
+    if (cache::FreeBytes() < need_bytes) {
+        cache::PruneOldGroups(selected_group_id, gid, need_bytes, kMaxCachedGroups);
+        if (cache::FreeBytes() < need_bytes) {
+            ESP_LOGE(kTag, "cache full gid=%s need_bytes=%u free_bytes=%u", gid.c_str(),
+                     static_cast<unsigned>(need_bytes), static_cast<unsigned>(cache::FreeBytes()));
+            writer.Rollback();
+            return false;
+        }
+    }
+
+    int total_updates = 0;
     if (!DownloadFramesToStage(writer, gid, mf, status_name, previous_current, selected_group_id, reason,
                                total_updates)) {
         ESP_LOGW(kTag, "manifest sync incomplete action=rollback");
@@ -219,21 +244,26 @@ bool SyncService::SyncManifestAndFrames(const api::DeviceState& state, SyncReaso
 
     const bool current_group_update =
         reason != SyncReason::kCycle && (previous_current == gid || selected_group_id == gid);
-    power_state::SetCacheCommitInterrupted(true);
+    power_state::SetScreenRedrawPending(true);
     if (!CommitStagedFrames(writer, gid, mf, status_name, selected_group_id, current_group_update, reason,
                             total_updates, old_content_count)) {
         return false;
     }
-    power_state::SetCacheCommitInterrupted(false);
+    if (!background)
+        power_state::SetScreenRedrawPending(false);
 
     group_changed = true;
     if (same_group && cur_seq < static_cast<int>(mf.frames.size())) {
         cache::FrameMeta now_current;
         if (cache::ReadFrameMeta(gid, cur_seq, now_current)) {
             power_state::SetCurrentFrameFromMeta(cur_seq, now_current);
-            if (reason == SyncReason::kBackgroundRefresh && old_current_ok && !commit_interrupted)
+            if (background && old_current_ok && !redraw_pending) {
                 group_changed = old_current.image_hash != now_current.image_hash ||
                                 old_current.status_bar_text != now_current.status_bar_text;
+                // 当前帧没变,屏幕上的旧画面就是新缓存的内容。
+                if (!group_changed)
+                    power_state::SetScreenRedrawPending(false);
+            }
         }
     }
     return true;

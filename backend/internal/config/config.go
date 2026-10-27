@@ -88,22 +88,30 @@ func LogLevel() (slog.Level, error) {
 	}
 }
 
-// ParseDuration accepts plain seconds or a number followed by s, m, h, d or w.
+// ParseDuration accepts plain seconds or a number followed by s, m, h, d or w. The result
+// must be finite, positive and fit in a time.Duration.
 func ParseDuration(v string) (time.Duration, error) {
+	bad := fmt.Errorf("expected seconds or a duration like 15m, 1h, 7d")
 	v = strings.TrimSpace(v)
-	if n, err := strconv.Atoi(v); err == nil && n > 0 {
-		return time.Duration(n) * time.Second, nil
-	}
 	units := map[byte]time.Duration{'s': time.Second, 'm': time.Minute, 'h': time.Hour, 'd': 24 * time.Hour, 'w': 7 * 24 * time.Hour}
-	if len(v) < 2 {
-		return 0, fmt.Errorf("expected seconds or a duration like 15m, 1h, 7d")
+	unit, num := time.Second, v
+	if len(v) > 0 {
+		if u, ok := units[v[len(v)-1]]; ok {
+			unit, num = u, v[:len(v)-1]
+		}
 	}
-	unit, ok := units[v[len(v)-1]]
-	n, err := strconv.ParseFloat(v[:len(v)-1], 64)
-	if !ok || err != nil || n <= 0 {
-		return 0, fmt.Errorf("expected seconds or a duration like 15m, 1h, 7d")
+	n, err := strconv.ParseFloat(num, 64)
+	if err != nil || math.IsNaN(n) || math.IsInf(n, 0) || n <= 0 {
+		return 0, bad
 	}
-	return time.Duration(n * float64(unit)), nil
+	ns := n * float64(unit)
+	if ns >= math.MaxInt64 {
+		return 0, fmt.Errorf("duration too long")
+	}
+	if d := time.Duration(ns); d > 0 {
+		return d, nil
+	}
+	return 0, bad
 }
 
 func parseBool(v string) (bool, error) {

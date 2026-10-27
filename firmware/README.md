@@ -12,23 +12,22 @@ target、Flash、PSRAM、分区表都已写在 `sdkconfig.defaults` 里，不需
 
 ## 代码结构
 
-```text
-main/
-├── app/          生命周期编排
-├── startup/      启动模式判定、首次注册流程
-├── bsp/          板级 GPIO、电源、ADC、充电状态
-├── drivers/      EPD（SSD1683 兼容）、ES8311 音频、I2C 总线、按键
-├── network/      Wi-Fi、SNTP、配网页（SoftAP + DNS 劫持）、凭据存储
-├── sync/         后端 API 客户端与同步服务
-├── storage/      LittleFS 缓存、NVS
-├── scenes/       界面场景：Splash、Frame、BgRefresh、Settings、Xiaozhi
-├── ui/           状态栏、帧视图、菜单
-├── events/       事件总线与 UI 事件
-├── power/        电源状态、休眠管理、关机、分钟时钟
-├── xiaozhi/      小智：配置激活、协议（MQTT / WebSocket）、MCP、对话服务
-├── resources/    配网页 HTML、内置字体
-└── utils/        JSON、字节、GPIO、MAC 工具
-```
+| 目录 | 内容 |
+| --- | --- |
+| `main/app/` | 生命周期编排 |
+| `main/startup/` | 启动模式判定、首次注册流程 |
+| `main/bsp/` | 板级 GPIO、电源、ADC、充电状态 |
+| `main/drivers/` | EPD（SSD1683 兼容）、ES8311 音频、I2C 总线、按键 |
+| `main/network/` | Wi-Fi、SNTP、配网页（SoftAP + DNS 劫持）、凭据存储 |
+| `main/sync/` | 后端 API 客户端与同步服务 |
+| `main/storage/` | LittleFS 缓存、NVS |
+| `main/scenes/` | 界面场景：Splash、Frame、BgRefresh、Settings、Xiaozhi |
+| `main/ui/` | 状态栏、帧视图、菜单 |
+| `main/events/` | 事件总线与 UI 事件 |
+| `main/power/` | 电源状态、休眠管理、关机、分钟时钟 |
+| `main/xiaozhi/` | 小智：配置激活、协议（MQTT / WebSocket）、MCP、对话服务 |
+| `main/resources/` | 配网页 HTML、内置字体 |
+| `main/utils/` | JSON、字节、GPIO、MAC 工具 |
 
 ## 硬件
 
@@ -44,39 +43,39 @@ Flash 为 QIO、PSRAM 为 Octal，所以 `CONFIG_ESPTOOLPY_OCT_FLASH=n` 配合 `
 
 ### GPIO
 
-```text
-GPIO0   KEY_ENTER     确认 / BOOT，低有效
-GPIO1   STDBY_H       充电 IC 充满状态
-GPIO2   CHRG_L        充电 IC 充电状态
-GPIO3   LED_G         绿灯，低有效
-GPIO4   ADC_BAT       VBAT 1:2 分压（ADC1 CH3）
-GPIO5   RTC_INT       PCF8563 INT#
-GPIO6   EPD_PWR_EN    EPD 供电
-GPIO7   NFC_FD        NFC 场检测
-GPIO8   EPD_BUSY      低 = 忙，高 = 空闲
-GPIO9   EPD_NRES
-GPIO10  EPD_NDC
-GPIO11  EPD_NCS       软件控制 CS
-GPIO12  EPD_SCK
-GPIO13  EPD_SDA       SPI MOSI
-GPIO14  I2S_MCLK
-GPIO15  I2S_SCLK
-GPIO16  I2S_ASDOUT    麦克风数据
-GPIO17  PWR_ON        主电源自锁，高 = 保持供电
-GPIO18  KEY_DET       下键 / 开机
-GPIO19  USB_DN
-GPIO20  USB_DP
-GPIO21  NFC_PWR
-GPIO38  I2S_LRCK
-GPIO39  KEY_PGUP      上键，不是 RTC IO，不能唤醒深睡
-GPIO42  PA_PWR_EN     AVDD_3V3：音频供电 + I2C 上拉
-GPIO43  TXD0
-GPIO44  RXD0
-GPIO45  I2S_DSDIN     扬声器数据
-GPIO46  PA_CTRL       功放使能，高 = 出声
-GPIO47  I2C_SDA
-GPIO48  I2C_SCL
-```
+| 引脚 | 网络名 | 说明 |
+| --- | --- | --- |
+| GPIO0 | `KEY_ENTER` | 确认 / BOOT，低有效 |
+| GPIO1 | `STDBY_H` | 充电 IC 充满状态 |
+| GPIO2 | `CHRG_L` | 充电 IC 充电状态 |
+| GPIO3 | `LED_G` | 绿灯，低有效 |
+| GPIO4 | `ADC_BAT` | VBAT 1:2 分压（ADC1 CH3） |
+| GPIO5 | `RTC_INT` | PCF8563 INT# |
+| GPIO6 | `EPD_PWR_EN` | EPD 供电 |
+| GPIO7 | `NFC_FD` | NFC 场检测 |
+| GPIO8 | `EPD_BUSY` | 低 = 忙，高 = 空闲 |
+| GPIO9 | `EPD_NRES` |  |
+| GPIO10 | `EPD_NDC` |  |
+| GPIO11 | `EPD_NCS` | 软件控制 CS |
+| GPIO12 | `EPD_SCK` |  |
+| GPIO13 | `EPD_SDA` | SPI MOSI |
+| GPIO14 | `I2S_MCLK` |  |
+| GPIO15 | `I2S_SCLK` |  |
+| GPIO16 | `I2S_ASDOUT` | 麦克风数据 |
+| GPIO17 | `PWR_ON` | 主电源自锁，高 = 保持供电 |
+| GPIO18 | `KEY_DET` | 下键 / 开机 |
+| GPIO19 | `USB_DN` |  |
+| GPIO20 | `USB_DP` |  |
+| GPIO21 | `NFC_PWR` |  |
+| GPIO38 | `I2S_LRCK` |  |
+| GPIO39 | `KEY_PGUP` | 上键，不是 RTC IO，不能唤醒深睡 |
+| GPIO42 | `PA_PWR_EN` | AVDD_3V3：音频供电 + I2C 上拉 |
+| GPIO43 | `TXD0` |  |
+| GPIO44 | `RXD0` |  |
+| GPIO45 | `I2S_DSDIN` | 扬声器数据 |
+| GPIO46 | `PA_CTRL` | 功放使能，高 = 出声 |
+| GPIO47 | `I2C_SDA` |  |
+| GPIO48 | `I2C_SCL` |  |
 
 ### 总线
 
@@ -100,12 +99,12 @@ GPIO48  I2C_SCL
 
 ## 分区
 
-```text
-nvs      0x9000    24 KB
-phy_init 0xf000    4 KB
-factory  0x10000   4 MB
-storage  0x410000  12 MB   LittleFS，缓存帧与音频
-```
+| 分区 | 偏移 | 大小 | 用途 |
+| --- | --- | --- | --- |
+| `nvs` | `0x9000` | 24 KB | Wi-Fi、服务端地址、设备密钥、小智配置 |
+| `phy_init` | `0xf000` | 4 KB | 射频校准数据 |
+| `factory` | `0x10000` | 4 MB | 应用固件 |
+| `storage` | `0x410000` | 12 MB | LittleFS，缓存帧与音频 |
 
 ## 启动与配网
 
@@ -133,14 +132,16 @@ storage  0x410000  12 MB   LittleFS，缓存帧与音频
 - 定时器唤醒时上报当前帧的 `currentContentId`，服务端会先重新渲染这一帧（如果已到期），设备在同一次唤醒中拿到新图。只有当前帧的图片或状态栏变化时才刷新屏幕。
 - 服务端返回 426 表示固件协议版本过旧，需要升级固件。
 
-整组同步先把缺失的文件下载到该组的暂存目录，下载阶段失败不影响已有缓存。全部下载完成后逐帧替换（每帧的图片、音频和 meta 一起换），最后才写 manifest 版本；提交中途失败或断电时版本号保持旧值，下一轮同步会拿到完整 manifest，按 hash 补齐不一致的帧。缓存最多保留 4 个组，并保证至少 1 MB 空闲空间。
+整组同步先把缺失的文件下载到该组的暂存目录，下载阶段失败不影响已有缓存。全部下载完成后逐帧替换（每帧的图片、音频和 meta 一起换），最后才写 manifest 版本；提交中途失败或断电时版本号保持旧值，下一轮同步会拿到完整 manifest，按 hash 补齐不一致的帧。缓存最多保留 4 个组，并保证至少 1 MB 空闲空间；下载前按待下载体积先清理其他组，目标组本身放不下时同步报错。
 
-```text
-/littlefs/layout                      缓存布局版本，不一致时启动时整体格式化
-/littlefs/state.json
-/littlefs/groups/{gid}/manifest.json
-/littlefs/groups/{gid}/frames/{idx}.img | .pcm | .meta    idx 为帧在 manifest 中的位置
-```
+提交前设备会标记「屏幕待重绘」，确认物理屏幕已显示新缓存后才清除：前台提交成功即清；后台刷新等 EPD 刷新完成才清，刷新超时或中途截止则保留。标记存在时，下一轮成功同步按内容已变化处理，后台刷新不拿缓存当旧画面做局刷，而是全刷当前帧。
+
+| 路径 | 内容 |
+| --- | --- |
+| `/littlefs/layout` | 缓存布局版本，不一致时启动时整体格式化 |
+| `/littlefs/state.json` | 所选组、manifest 版本、当前帧位置、访问计数 |
+| `/littlefs/groups/{gid}/manifest.json` | 组名、manifest 版本、帧数、最近访问序号 |
+| `/littlefs/groups/{gid}/frames/{idx}.img` / `.pcm` / `.meta` | 帧的图片、音频和元数据，idx 为帧在 manifest 中的位置 |
 
 ## 按键与界面
 

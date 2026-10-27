@@ -143,21 +143,35 @@ type upload struct {
 	hasFrameName bool
 }
 
-func readUpload(r *http.Request) (upload, error) {
+// maxUploadBytes bounds the whole multipart body: both files plus headers and frameName.
+const maxUploadBytes = api.FrameBytes + maxAudioBytes + 64<<10
+
+func readUpload(w http.ResponseWriter, r *http.Request) (upload, error) {
 	var u upload
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadBytes)
 	mr, err := r.MultipartReader()
 	if err != nil {
 		return u, badRequest("请求格式错误，请使用 multipart/form-data")
 	}
+	seen := map[string]bool{}
 	for {
 		part, err := mr.NextPart()
 		if errors.Is(err, io.EOF) {
 			return u, nil
 		}
+		var tooLarge *http.MaxBytesError
+		if errors.As(err, &tooLarge) {
+			return u, fail(413, "上传内容过大")
+		}
 		if err != nil {
 			return u, badRequest("multipart 请求体无效")
 		}
-		switch part.FormName() {
+		name := part.FormName()
+		if seen[name] {
+			return u, badRequest("字段 %s 重复", name)
+		}
+		seen[name] = true
+		switch name {
 		case "frame":
 			// The browser renders and dithers the frame; the server stores it as is.
 			if u.frame, err = readPart(part, api.FrameBytes, "帧数据须为 15000 字节的 1bpp 位图"); err != nil {
@@ -180,12 +194,18 @@ func readUpload(r *http.Request) (upload, error) {
 			if name := truncateRunes(strings.TrimSpace(string(v)), 64); name != "" {
 				u.frameName = &name
 			}
+		default:
+			return u, badRequest("未知字段 %s", name)
 		}
 	}
 }
 
 func readPart(p *multipart.Part, limit int64, message string) ([]byte, error) {
 	data, err := io.ReadAll(io.LimitReader(p, limit+1))
+	var tooLarge *http.MaxBytesError
+	if errors.As(err, &tooLarge) {
+		return nil, fail(413, "上传内容过大")
+	}
 	if err != nil {
 		return nil, badRequest("读取上传内容失败")
 	}
@@ -231,7 +251,7 @@ func (a *API) createContent(w http.ResponseWriter, r *http.Request) error {
 	if !isMultipart(r) {
 		return a.createDynamic(w, r, g)
 	}
-	u, err := readUpload(r)
+	u, err := readUpload(w, r)
 	if err != nil {
 		return err
 	}
@@ -418,7 +438,7 @@ func (a *API) patchImage(w http.ResponseWriter, r *http.Request, c db.GetContent
 	if c.Kind != db.ContentKindImage {
 		return badRequest("动态内容请使用 JSON 更新")
 	}
-	u, err := readUpload(r)
+	u, err := readUpload(w, r)
 	if err != nil {
 		return err
 	}

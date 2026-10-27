@@ -48,8 +48,11 @@ void WatcherEntry(void* arg) {
     std::unique_ptr<WatcherContext> ctx(static_cast<WatcherContext*>(arg));
     auto*                           epd        = ctx ? ctx->epd : nullptr;
     constexpr int                   kTimeoutMs = 8000;
-    if (epd)
-        epd->WaitForRefreshIdle(kTimeoutMs);
+    // 只有确认刷新完成才清待重绘标记;超时则保留,下次唤醒继续全刷补画。
+    if (epd && epd->WaitForRefreshIdle(kTimeoutMs))
+        power_state::SetScreenRedrawPending(false);
+    else if (epd)
+        ESP_LOGW(kTag, "refresh wait timeout timeout_ms=%d action=keep_redraw_pending", kTimeoutMs);
     auto done_posted = ctx ? ctx->done_posted : std::shared_ptr<std::atomic<bool>>();
     PostBgRefreshDoneOnce(done_posted);
     vTaskDelete(nullptr);
@@ -88,7 +91,9 @@ BgRefreshScene::~BgRefreshScene() = default;
 
 void BgRefreshScene::OnEnter(SceneContext& ctx) {
     done_posted_->store(false, std::memory_order_release);
-    previous_screen_seeded_ = SeedPreviousFrame(ctx);
+    // 待重绘时缓存可能已不是屏幕上的画面,不能拿它当旧画面,后面直接全刷。
+    redraw_pending_         = power_state::ScreenRedrawPending();
+    previous_screen_seeded_ = !redraw_pending_ && SeedPreviousFrame(ctx);
     state_                  = State::kWaiting;
     StartDeadlineWatchdog();
 }
@@ -119,12 +124,6 @@ void BgRefreshScene::OnEvent(SceneContext& ctx, const UiEvent& e) {
     power_state::RecordTimerWakeResult(e.u.sync.ok);
 
     if (!e.u.sync.ok || !e.u.sync.group_changed) {
-        Finish();
-        return;
-    }
-
-    if (!previous_screen_seeded_) {
-        ESP_LOGW(kTag, "render skipped reason=previous_seed_incomplete");
         Finish();
         return;
     }
@@ -235,7 +234,13 @@ bool BgRefreshScene::RenderChangedFrame(SceneContext& ctx) {
     const int y = theme::kStatusBarHeight;
     const int h = FrameView::kHeight - y;
     ctx.epd->WriteRaw1bpp(0, y, FrameView::kWidth, h, raw.data() + y * kBpr, h * kBpr);
-    ctx.epd->RequestUrgentPartialRefresh();
+    // 旧画面未知(待重绘或快照缺失)时局刷的差异不可信,零差异还会被直接跳过,只能全刷。
+    if (previous_screen_seeded_) {
+        ctx.epd->RequestUrgentPartialRefresh();
+    } else {
+        ESP_LOGI(kTag, "render full refresh redraw_pending=%d", redraw_pending_ ? 1 : 0);
+        ctx.epd->RequestUrgentFullRefresh();
+    }
     ctx.epd->Unlock();
 
     StartWatcher(ctx.epd);

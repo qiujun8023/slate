@@ -46,8 +46,11 @@ bool WriteManifest(const std::string& gid, const std::string& manifest_version, 
 bool ReadManifestMeta(const std::string& gid, ManifestMeta& out);
 bool ReadManifestContentCount(const std::string& gid, int& out);
 bool TouchGroup(const std::string& gid);
-bool PruneOldGroups(const std::string& current_gid, const std::string& target_gid, size_t min_free_bytes,
-                    int max_groups);
+// 按 last_access 从旧到新删除除 current / target 外的组，直到组数不超过 max_groups
+// 且剩余空间不少于 min_free_bytes。
+bool   PruneOldGroups(const std::string& current_gid, const std::string& target_gid, size_t min_free_bytes,
+                      int max_groups);
+size_t FreeBytes();  // LittleFS 剩余字节，读取失败时为 0
 
 bool FrameImageExists(const std::string& gid, int idx, const std::string& expected_hash);
 bool WriteFrameImage(const std::string& gid, int idx, const std::vector<uint8_t>& bytes, const std::string& hash);

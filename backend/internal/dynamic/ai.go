@@ -252,6 +252,7 @@ func (l llm) synthesize(ctx context.Context, text, voice string) ([]byte, error)
 	}
 	defer resp.Body.Close()
 	var pcm []byte
+	finish := ""
 	sc := bufio.NewScanner(resp.Body)
 	sc.Buffer(make([]byte, 64<<10), 8<<20)
 	for sc.Scan() {
@@ -269,6 +270,7 @@ func (l llm) synthesize(ctx context.Context, text, voice string) ([]byte, error)
 						Data string `json:"data"`
 					} `json:"audio"`
 				} `json:"delta"`
+				FinishReason *string `json:"finish_reason"`
 			} `json:"choices"`
 		}
 		if err := json.Unmarshal([]byte(payload), &chunk); err != nil {
@@ -276,6 +278,9 @@ func (l llm) synthesize(ctx context.Context, text, voice string) ([]byte, error)
 		}
 		if chunk.Error != nil {
 			return nil, fmt.Errorf("TTS 流错误: %s", truncate(chunk.Error.Message, 240))
+		}
+		if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason != nil {
+			finish = *chunk.Choices[0].FinishReason
 		}
 		if len(chunk.Choices) == 0 || chunk.Choices[0].Delta.Audio.Data == "" {
 			continue
@@ -290,6 +295,11 @@ func (l llm) synthesize(ctx context.Context, text, voice string) ([]byte, error)
 	}
 	if err := sc.Err(); err != nil {
 		return nil, fmt.Errorf("TTS 流读取失败: %w", err)
+	}
+	// A stream cut short still ends in a clean EOF; only a stop finish means the
+	// whole text was spoken.
+	if finish != "stop" {
+		return nil, fmt.Errorf("TTS 流未正常结束 (finish_reason=%q)", finish)
 	}
 	if len(pcm) == 0 || len(pcm)%2 != 0 {
 		return nil, errors.New("TTS 音频为空或未按 16-bit 对齐")

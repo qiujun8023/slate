@@ -6,37 +6,36 @@
 
 ## 命令
 
-```text
-slate serve               应用迁移后启动 HTTP 服务和后台任务（默认）
-slate migrate             只应用迁移
-slate import <mysql-url>  把 v0.1.x 的 MySQL 部署导入空库，见根 README「从 v0.1.x 升级」
-slate job <name>          运行 dashboard 推送任务，见下文
-slate claude-statusline   Claude Code 的 statusLine 命令，顺带推送限额数据
-```
+| 命令 | 作用 |
+| --- | --- |
+| `slate serve` | 应用迁移后启动 HTTP 服务和后台任务（默认） |
+| `slate migrate` | 只应用迁移 |
+| `slate import <mysql-url>` | 把 v0.1.x 的 MySQL 部署导入空库，见根 README「从 v0.1.x 升级」 |
+| `slate job <name>` | 运行 dashboard 推送任务，见下文 |
+| `slate claude-statusline` | Claude Code 的 statusLine 命令，顺带推送限额数据 |
 
 启动时读取当前目录的 `.env`（已有的环境变量优先），日志为 JSON，输出到 stdout。
 
 ## 目录
 
-```text
-cmd/slate/          入口与子命令
-cmd/gencatalog/     生成 frontend/src/api/catalog.json（音色、热榜源、字体、模板）
-cmd/genfont/        把 LVGL C 字体或 BDF 字体转成 render 用的点阵 JSON，由 scripts/fonts/backend.sh 调用
-internal/
-├── api/            请求与响应类型，tygo 由此生成 frontend/src/api/generated.ts
-├── httpapi/        路由、鉴权、限流、handler
-├── store/          sqlc 查询（sql/）与生成代码（db/）
-├── dynamic/        动态内容：配置校验、数据源、调度、TTS 队列、blob GC
-├── render/         1bpp 帧绘制：点阵字体、布局、各类型模板；testdata/frames 是 golden PNG
-├── hotlist/        热榜抓取，sources.json 是榜单源清单
-├── blob/           sha256 内容寻址文件存储
-├── media/          ffmpeg 音频转码
-├── job/            dashboard 推送任务
-├── legacyimport/   v0.1.x MySQL 导入
-├── fetch/          第三方数据源的 HTTP 客户端
-└── config/         环境变量与 .env
-migrations/         嵌入式 SQL 迁移
-```
+| 目录 | 内容 |
+| --- | --- |
+| `cmd/slate/` | 入口与子命令 |
+| `cmd/gencatalog/` | 生成 `frontend/src/api/catalog.json`（音色、热榜源、字体、模板） |
+| `cmd/genfont/` | 把 LVGL C 字体或 BDF 字体转成 render 用的点阵 JSON，由 `scripts/fonts/backend.sh` 调用 |
+| `internal/api/` | 请求与响应类型，tygo 由此生成 `frontend/src/api/generated.ts` |
+| `internal/httpapi/` | 路由、鉴权、限流、handler |
+| `internal/store/` | sqlc 查询（`sql/`）与生成代码（`db/`） |
+| `internal/dynamic/` | 动态内容：配置校验、数据源、调度、TTS 队列、blob GC |
+| `internal/render/` | 1bpp 帧绘制：点阵字体、布局、各类型模板；`testdata/frames` 是 golden PNG |
+| `internal/hotlist/` | 热榜抓取，`sources.json` 是榜单源清单 |
+| `internal/blob/` | sha256 内容寻址文件存储 |
+| `internal/media/` | ffmpeg 音频转码 |
+| `internal/job/` | dashboard 推送任务 |
+| `internal/legacyimport/` | v0.1.x MySQL 导入 |
+| `internal/fetch/` | 第三方数据源的 HTTP 客户端 |
+| `internal/config/` | 环境变量与 `.env` |
+| `migrations/` | 嵌入式 SQL 迁移 |
 
 ## 数据模型
 
@@ -57,56 +56,54 @@ migrations/         嵌入式 SQL 迁移
 
 失败时 `success` 为 false，`message` 是可直接展示的中文说明，HTTP 状态码表达错误类型。JSON 请求体必须是单个对象，未知字段报错。类型定义在 `internal/api`，前端从生成的 TypeScript 引用。
 
-**账号**
+### 账号
 
-```text
-POST   /api/users                  注册 { email, username, password }
-POST   /api/sessions               登录 { identifier, password }，identifier 为邮箱或用户名
-GET    /api/users/me
-GET    /api/health
-```
+| 接口 | 说明 |
+| --- | --- |
+| `POST /api/users` | 注册 `{ email, username, password }` |
+| `POST /api/sessions` | 登录 `{ identifier, password }`，identifier 为邮箱或用户名 |
+| `GET /api/users/me` | 当前用户 |
+| `GET /api/health` | 健康检查 |
 
-**Web 管理**（`Authorization: Bearer <JWT>`）
+### Web 管理
 
-```text
-GET    /api/devices                PUT  /api/devices/order
-POST   /api/devices/claims         用配对码绑定 { pairCode }
-GET    /api/devices/{id}           PATCH /api/devices/{id}   { name?, groupId? }
-DELETE /api/devices/{id}/binding
+需要 `Authorization: Bearer <JWT>`。
 
-GET    /api/groups                 POST /api/groups          PUT /api/groups/order
-GET    /api/groups/{id}            PATCH /api/groups/{id}    DELETE /api/groups/{id}
-GET    /api/groups/{id}/contents   POST /api/groups/{id}/contents
-PUT    /api/groups/{id}/contents/order
+| 接口 | 说明 |
+| --- | --- |
+| `GET /api/devices` | 设备列表 |
+| `PUT /api/devices/order` | 设备排序 |
+| `POST /api/devices/claims` | 用配对码绑定 `{ pairCode }` |
+| `GET` / `PATCH /api/devices/{id}` | 读取、修改 `{ name?, groupId? }` |
+| `DELETE /api/devices/{id}/binding` | 解绑 |
+| `GET` / `POST /api/groups` | 内容组列表、创建 |
+| `PUT /api/groups/order` | 内容组排序 |
+| `GET` / `PATCH` / `DELETE /api/groups/{id}` | 读取、修改、删除内容组 |
+| `GET` / `POST /api/groups/{id}/contents` | 组内内容列表、创建内容 |
+| `PUT /api/groups/{id}/contents/order` | 组内内容排序 |
+| `GET` / `PATCH` / `DELETE /api/contents/{id}` | 读取、修改、删除内容 |
+| `POST /api/contents/{id}/refresh` | 立即刷新动态内容 |
+| `POST /api/contents/preview` | 预览未保存的动态配置 |
+| `POST /api/contents/{id}/preview` | 用已保存内容的数据预览新配置 |
+| `DELETE /api/contents/{id}/audio` | 删除音频 |
+| `POST /api/contents/{id}/audio/tts` | 设置 TTS 朗读 |
+| `GET /api/blobs/{hash}` | 帧或音频原始字节 |
+| `GET /api/weather/cities?q=` | 城市搜索 |
 
-GET    /api/contents/{id}          PATCH /api/contents/{id}  DELETE /api/contents/{id}
-POST   /api/contents/{id}/refresh  立即刷新动态内容
-POST   /api/contents/preview       预览未保存的动态配置
-POST   /api/contents/{id}/preview  用已保存内容的数据预览新配置
-DELETE /api/contents/{id}/audio
-POST   /api/contents/{id}/audio/tts
-GET    /api/blobs/{hash}           帧或音频原始字节
-GET    /api/weather/cities?q=
-```
+图片内容用 `multipart/form-data` 创建和修改：`frame` 是浏览器渲染好的 400×300 packed 1bpp（15000 字节，MSB first，1 为白），`audio` 是任意支持格式的音频（≤ 5 MB），`frameName` 是状态栏标题。其他字段或重复字段直接报错，请求体总大小不超过两个文件上限之和加 64 KB。服务端不处理图片像素，只校验长度。换图片会保留已有音频，删除音频走 `DELETE /audio`。动态内容用 JSON（`CreateDynamicContentRequest` / `PatchContentRequest`）；修改配置时先按新配置取数并渲染，成功后才落库。
 
-图片内容用 `multipart/form-data` 创建和修改：`frame` 是浏览器渲染好的 400×300 packed 1bpp（15000 字节，MSB first，1 为白），`audio` 是任意支持格式的音频（≤ 5 MB），`frameName` 是状态栏标题。服务端不处理图片像素，只校验长度。换图片会保留已有音频，删除音频走 `DELETE /audio`。动态内容用 JSON（`CreateDynamicContentRequest` / `PatchContentRequest`）；修改配置时先按新配置取数并渲染，成功后才落库。
+### Dashboard 数据推送
 
-**Dashboard 数据推送**
+`POST /api/contents/{id}/data`，请求体为 `{ "version": 1, "data": { ... } }`。不需要 JWT，内容 ID 本身就是凭证，泄漏后删除内容重建。请求体 ≤ 64 KB，每个内容每分钟 30 次。
 
-```text
-POST   /api/contents/{id}/data     { "version": 1, "data": { ... } }
-```
+### 设备协议 v2
 
-不需要 JWT，内容 ID 本身就是凭证，泄漏后删除内容重建。请求体 ≤ 64 KB，每个内容每分钟 30 次。
-
-**设备协议 v2**
-
-```text
-POST   /api/device/register        { protocol, mac }，无需鉴权
-POST   /api/device/sync            { protocol, manifestVersion, telemetry }
-POST   /api/device/group           { protocol, action: next|prev|select, groupId?, manifestVersion }
-GET    /api/device/blobs/{hash}
-```
+| 接口 | 请求体 |
+| --- | --- |
+| `POST /api/device/register` | `{ protocol, mac }`，无需鉴权 |
+| `POST /api/device/sync` | `{ protocol, manifestVersion, telemetry }` |
+| `POST /api/device/group` | `{ protocol, action: next\|prev\|select, groupId?, manifestVersion }` |
+| `GET /api/device/blobs/{hash}` | — |
 
 - 注册返回 `deviceId`、`secret`（64 位 hex）、`pairCode` 和 `serverTime`（Unix 毫秒），之后的请求都带 `Authorization: Bearer <secret>`。
 - `sync` 和 `group` 返回 `DeviceState`：设备名、是否绑定、配对码、当前组（位置、内容数、`manifestVersion`），以及只在设备上报的版本与服务端不同时才附带的 `manifest`。
@@ -114,7 +111,9 @@ GET    /api/device/blobs/{hash}
 - 定时唤醒时设备在 telemetry 里带上 `currentContentId`，该内容已到期就先同步重新渲染，本轮即可拿到新帧。
 - `protocol` 与 `api.DeviceProtocol` 不一致时返回 426；固件的 `api::kProtocol` 必须同步修改。
 
-**限流**（每分钟固定窗口，单进程内计数）
+### 限流
+
+每分钟固定窗口，单进程内计数。
 
 | 端点 | 限制 |
 | --- | --- |
@@ -163,22 +162,19 @@ GET    /api/device/blobs/{hash}
 
 | 任务 | 必填变量 |
 | --- | --- |
-| `sub2api-usage-stats` | `SUB2API_BASE`、`SUB2API_EMAIL`、`SUB2API_PASSWORD`、`SUB2API_CONTENT_ID` |
 | `claude-code-quota-monitor` | `CLAUDE_QUOTA_CONTENT_ID`；token 取自 `ANTHROPIC_API_KEY` 或 `~/.claude/.credentials.json`，可选 `ANTHROPIC_API_BASE`、`CLAUDE_PLAN_LABEL` |
 
 用同一个镜像作为 compose sidecar 运行时，它不监听端口，需要关掉镜像自带的健康检查：
 
 ```yaml
-  sub2api-stats:
+  claude-quota:
     image: ghcr.io/qiujun8023/slate:latest
     restart: unless-stopped
-    command: ['job', 'sub2api-usage-stats']
+    command: ['job', 'claude-code-quota-monitor']
     environment:
       SLATE_API_BASE: http://slate:9494
-      SUB2API_BASE: https://sub2api.example.com
-      SUB2API_EMAIL: ${SUB2API_EMAIL}
-      SUB2API_PASSWORD: ${SUB2API_PASSWORD}
-      SUB2API_CONTENT_ID: <dashboard 内容 ID>
+      CLAUDE_QUOTA_CONTENT_ID: <dashboard 内容 ID>
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     healthcheck:
       disable: true
 ```

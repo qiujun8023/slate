@@ -6,17 +6,16 @@ React 19 + React Router 7 + Vite 8 + Tailwind v4，TypeScript。数据请求用 
 
 ## 目录
 
-```text
-src/
-├── api/          与后端的契约：generated.ts 和 catalog.json 由后端 go generate 生成，不要手改
-├── app/          入口、Provider、路由（routes.ts 定义路径，App.tsx 定义路由表）
-├── pages/        路由页面
-├── features/     按业务域划分：auth / devices / groups / contents / dynamic
-├── components/   跨业务的 UI：ui 基础组件、layout、feedback（Toast / Confirm）、dnd、eink 帧预览
-├── hooks/        跨业务的 hooks
-├── lib/          axios 实例、错误处理、格式化；eink/ 是帧的抖动、打包与解码
-└── styles/global.css  设计 token
-```
+| 目录 | 内容 |
+| --- | --- |
+| `src/api/` | 与后端的契约：`generated.ts` 和 `catalog.json` 由后端 `go generate` 生成，不要手改 |
+| `src/app/` | 入口、Provider、路由（`routes.ts` 定义路径，`App.tsx` 定义路由表） |
+| `src/pages/` | 路由页面 |
+| `src/features/` | 按业务域划分：auth / devices / groups / contents / dynamic |
+| `src/components/` | 跨业务的 UI：ui 基础组件、layout、feedback（Toast / Confirm）、dnd、eink 帧预览 |
+| `src/hooks/` | 跨业务的 hooks |
+| `src/lib/` | axios 实例、错误处理、格式化；`eink/` 是帧的抖动、打包与解码 |
+| `src/styles/global.css` | 设计 token |
 
 - 只属于某个业务域的组件、hook、查询放在 `features/<域>/`；跨域复用的才放到 `components/`、`hooks/`、`lib/`。
 - 查询 hook 放在 `features/<域>/query/`，页面和组件从这里导入。

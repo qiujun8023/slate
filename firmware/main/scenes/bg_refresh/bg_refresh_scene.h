@@ -42,6 +42,7 @@ class BgRefreshScene : public Scene {
 
     State                              state_                  = State::kWaiting;
     bool                               previous_screen_seeded_ = false;
+    bool                               redraw_pending_         = false;
     std::shared_ptr<std::atomic<bool>> done_posted_            = std::make_shared<std::atomic<bool>>(false);
 
     lv_obj_t*                  root_ = nullptr;

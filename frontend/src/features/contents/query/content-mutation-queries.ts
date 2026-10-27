@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Content, OrderRequest } from '@/api';
-import { http } from '@/lib/http';
+import { http, SLOW_REQUEST } from '@/lib/http';
 import { useInvalidateContentDependencies } from './content-cache-helpers';
 import { contentKeys } from './keys';
 
@@ -8,7 +8,7 @@ export function useCreateImageContent(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   return useMutation({
     mutationFn: async (form: FormData) => {
-      return http.post<Content>(`/groups/${gid}/contents`, form);
+      return http.post<Content>(`/groups/${gid}/contents`, form, SLOW_REQUEST);
     },
     onSuccess: (data) => {
       invalidate(data.id);
@@ -20,7 +20,7 @@ export function useUpdateImageContent(gid: string) {
   const invalidate = useInvalidateContentDependencies(gid);
   return useMutation({
     mutationFn: async ({ contentId, form }: { contentId: string; form: FormData }) => {
-      return http.patch<Content>(`/contents/${contentId}`, form);
+      return http.patch<Content>(`/contents/${contentId}`, form, SLOW_REQUEST);
     },
     onSuccess: (data) => {
       invalidate(data.id);

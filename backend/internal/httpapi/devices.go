@@ -397,6 +397,15 @@ func (a *API) changeDeviceGroup(w http.ResponseWriter, r *http.Request) error {
 		if _, err := q.LockUser(r.Context(), *d.OwnerID); err != nil {
 			return err
 		}
+		// Re-read under the user lock: a concurrent switch, unbind or rebind may have
+		// committed since the first read.
+		d, err = q.LockOwnedDevice(r.Context(), db.LockOwnedDeviceParams{ID: id, OwnerID: d.OwnerID})
+		if store.Missing(err) {
+			return fail(409, "设备绑定已变化，请重试")
+		}
+		if err != nil {
+			return err
+		}
 		ids, err := q.ListGroupIDs(r.Context(), *d.OwnerID)
 		if err != nil || len(ids) == 0 {
 			return err

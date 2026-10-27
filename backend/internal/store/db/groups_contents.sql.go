@@ -13,7 +13,8 @@ import (
 
 const blobVisibleToDevice = `-- name: BlobVisibleToDevice :one
 SELECT EXISTS (
-    SELECT 1 FROM devices dv JOIN contents c ON c.group_id = dv.group_id
+    SELECT 1 FROM devices dv JOIN groups g ON g.id = dv.group_id AND g.owner_id = dv.owner_id
+    JOIN contents c ON c.group_id = g.id
     LEFT JOIN content_audio a ON a.content_id = c.id
     WHERE dv.id = $1 AND (c.image_hash = $2 OR a.hash = $2)
 )

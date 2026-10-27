@@ -53,10 +53,11 @@ uint32_t ComputeNextWakeSec();
 // 由后台刷新路径调用：网络建立失败 / sync 完成(ok 或失败) 时各上报一次。
 void RecordTimerWakeResult(bool success);
 
-// 缓存提交阶段失败时置位：缓存可能已部分换成新内容而屏幕仍是旧画面，下一次成功同步
-// 必须按内容已变化处理，不能只比较前后缓存。
-bool CacheCommitInterrupted();
-void SetCacheCommitInterrupted(bool interrupted);
+// 屏幕待重绘：缓存提交前置位，确认物理屏幕已显示新缓存后清除（前台提交成功、后台刷新
+// 等到 EPD 刷新完成）。置位期间缓存可能已换成新内容而屏幕仍是旧画面：下一次成功同步
+// 必须按内容已变化处理，后台刷新不能用缓存当旧画面做局刷，须全刷。
+bool ScreenRedrawPending();
+void SetScreenRedrawPending(bool pending);
 
 // 睡前最后一次刷到物理屏上的状态栏 1bpp 快照。用于 timer wake 后重建
 // prev_buffer_ 的 0~24 行，让后台 partial refresh 的 old/new 输入真实一致。

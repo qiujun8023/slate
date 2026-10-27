@@ -29,7 +29,7 @@ RTC_DATA_ATTR int     s_current_frame_seq = 0;
 // 成功同步清零;cold boot 清零;深睡跨越保留(退避需跨唤醒累计)。
 RTC_DATA_ATTR uint32_t s_timer_wake_fail_count = 0;
 
-RTC_DATA_ATTR bool s_cache_commit_interrupted = false;
+RTC_DATA_ATTR bool s_screen_redraw_pending = false;
 
 // 退避位移上限:60s << 6 ≈ 64min,与下方 kMaxBackoffWakeSec 共同封顶。
 constexpr uint32_t kMaxBackoffShift   = 6;
@@ -61,12 +61,12 @@ void Init(bool cold_boot) {
     if (!cold_boot)
         return;
     ScopedMutexLock lock(StateMutex());
-    s_frame_refresh_at         = 0;
-    s_current_frame_seq        = 0;
-    s_timer_wake_fail_count    = 0;
-    s_cache_commit_interrupted = false;
-    s_status_bar_magic         = 0;
-    s_status_bar_hash          = 0;
+    s_frame_refresh_at      = 0;
+    s_current_frame_seq     = 0;
+    s_timer_wake_fail_count = 0;
+    s_screen_redraw_pending = false;
+    s_status_bar_magic      = 0;
+    s_status_bar_hash       = 0;
     std::memset(s_status_bar_snapshot, 0, sizeof(s_status_bar_snapshot));
 }
 
@@ -104,14 +104,14 @@ void SetCurrentFrameFromMeta(int seq, const cache::FrameMeta& meta) {
     cache::WriteCurrentFrameSeq(seq);
 }
 
-bool CacheCommitInterrupted() {
+bool ScreenRedrawPending() {
     ScopedMutexLock lock(StateMutex());
-    return s_cache_commit_interrupted;
+    return s_screen_redraw_pending;
 }
 
-void SetCacheCommitInterrupted(bool interrupted) {
+void SetScreenRedrawPending(bool pending) {
     ScopedMutexLock lock(StateMutex());
-    s_cache_commit_interrupted = interrupted;
+    s_screen_redraw_pending = pending;
 }
 
 void ClearCurrentFrame() {

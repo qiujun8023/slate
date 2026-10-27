@@ -202,9 +202,11 @@ func (e *Engine) markError(ctx context.Context, d db.ContentDynamic, message str
 }
 
 // SyncAudio queues TTS for audio-enabled dynamic content whose speech changed, and drops
-// audio when it is disabled. Failures are logged; the frame is already saved.
+// audio when it is disabled. It holds the content lock from reading the config to writing
+// the audio, so a late call reconciles to the newest config instead of an older one.
+// Failures are logged; the frame is already saved.
 func (e *Engine) SyncAudio(ctx context.Context, contentID string) {
-	if err := e.syncAudio(ctx, contentID); err != nil {
+	if err := e.Mutate(ctx, contentID, func() error { return e.syncAudio(ctx, contentID) }); err != nil {
 		slog.Warn("dynamic audio sync failed", "contentId", contentID, "error", err.Error())
 	}
 }
